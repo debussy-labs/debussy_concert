@@ -6,6 +6,5 @@ dags_folder = conf.get('core', 'dags_folder')
 env_file = f'{dags_folder}/vivaldi_summer/environment.yaml'
 integration_file = f'{dags_folder}/vivaldi_summer/integration.yaml'
 
-summer = Vivaldi.summer(environment_yaml_filepath=env_file, integration_yaml_filepath=integration_file)
-# summer.show()
-dag = summer.build()
+vivaldi = Vivaldi.crate_from_yaml(environment_yaml_filepath=env_file, integration_yaml_filepath=integration_file)
+dag = vivaldi.build(vivaldi.summer())

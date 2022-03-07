@@ -1,7 +1,7 @@
 name: Summer
 description: Vivaldi Summer test
 dag_parameters:
-    dag_id: summer_concert_9
+    dag_id: summer_concert_10
     schedule_interval: null
     start_date:
       year: 2022
@@ -10,7 +10,13 @@ dag_parameters:
     default_args:
       owner: airflow
 tables:
-    - name: summer_table
+    - name: summer_table1
+      fields:        
+        - name: day
+          description: day
+        - name: month
+          description: month
+    - name: summer_table2
       fields:        
         - name: day
           description: day

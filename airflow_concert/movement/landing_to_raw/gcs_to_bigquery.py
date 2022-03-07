@@ -10,8 +10,8 @@ class GcsToBigQueryMovement(MovementBase):
                          config=config,
                          phrases=[AppendCsvPhrase(config), MergeCsvPhrase(config)])
 
-    def build(self, dag) -> TaskGroup:
-        task_group = TaskGroup(group_id=self.name, dag=dag)
+    def build(self, dag, parent_group) -> TaskGroup:
+        task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=parent_group)
         self.phrases[0].build(dag, task_group)
         self.phrases[1].build(dag, task_group)
 
