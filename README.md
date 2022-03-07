@@ -6,18 +6,18 @@ Mount examples folder on airflow dags folder
 ```mermaid
 classDiagram
 class Compositor {
-    composition_factory(ConfigIntegration) CompositionBase
+    build(Composition) DAG
 }
 class CompositionBase {
     ConfigIntegration config
     CompositionBase[] movements
-    build() DAG
+    build(dag) TaskGroup
 }
 class MovementBase{
     String name
     ConfigIntegration config
     PhraseBase[] phrases
-    build(dag) TaskGroup
+    build(dag, task_group) TaskGroup
 }
 class PhraseBase {
     String name
