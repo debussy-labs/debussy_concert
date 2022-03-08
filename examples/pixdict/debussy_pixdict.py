@@ -1,4 +1,4 @@
-from airflow import DAG
+from airflow import DAG  # noqa: F401
 from airflow_concert.composer.debussy import Debussy
 from airflow.configuration import conf
 

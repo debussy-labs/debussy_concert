@@ -1,5 +1,3 @@
-from airflow import DAG
-
 from airflow_concert.composition.composition_base import CompositionBase
 from airflow_concert.movement.ingestion_to_landing import IngestionToLandingMovement
 from airflow_concert.movement.landing_to_raw import GcsLandingToBigQueryRawMovement
