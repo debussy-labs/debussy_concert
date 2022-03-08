@@ -4,10 +4,9 @@ from airflow_concert.phrase.merge_csv import MergeCsvPhrase
 from airflow.utils.task_group import TaskGroup
 
 
-class GcsToBigQueryMovement(MovementBase):
+class GcsLandingToBigQueryRawMovement(MovementBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name,
-                         config=config,
                          phrases=[AppendCsvPhrase(config), MergeCsvPhrase(config)])
 
     def build(self, dag, parent_group) -> TaskGroup:

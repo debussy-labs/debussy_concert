@@ -1,8 +1,7 @@
-from airflow_concert.phrase.phrase_base import PhraseBase
 from airflow.operators.dummy import DummyOperator
+from airflow_concert.phrase.phrase_base import PhraseBase
 
-
-class ExportTablePhrase(PhraseBase):
+class ExportBigQueryTablePhrase(PhraseBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 

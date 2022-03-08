@@ -1,7 +1,9 @@
-name: Summer
-description: Vivaldi Summer test
+name: four_seasons
+database: four_seasons
+secret_id: secret_id
+description: Vivaldi four_seasons test
 dag_parameters:
-    dag_id: summer_concert_10
+    dag_id: four_seasons_concert_12
     schedule_interval: null
     start_date:
       year: 2022
@@ -10,13 +12,13 @@ dag_parameters:
     default_args:
       owner: airflow
 tables:
-    - name: summer_table1
+    - name: four_seasons_table1
       fields:        
         - name: day
           description: day
         - name: month
           description: month
-    - name: summer_table2
+    - name: four_seasons_table2
       fields:        
         - name: day
           description: day

@@ -7,17 +7,16 @@ from airflow_concert.config.config_integration import ConfigIntegration
 class CompositionBase:
     def __init__(
         self,
+        name,
         config: ConfigIntegration,
         movements: List[MovementBase]
     ) -> None:
-        self.name = None
+        self.name = name
         self.config = config
         self.movements = movements
 
-    def show(self):
-        for movement in self.movements:
-            print(movement.name)
-            print(', '.join(phrase.name for phrase in movement.phrases))
+    def play(self, *args, **kwargs):
+        return self.build(*args, **kwargs)
 
     def build(self, dag) -> TaskGroup:
         task_group = TaskGroup(group_id=self.name, dag=dag)
@@ -28,4 +27,3 @@ class CompositionBase:
             current_task_group >> movement_task_group
             current_task_group = movement_task_group
         return task_group
-

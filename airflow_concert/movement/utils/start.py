@@ -6,6 +6,5 @@ class StartMovement(MovementBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(
             name=name,
-            config=config,
             phrases=[StartPhrase(config=config)]
         )

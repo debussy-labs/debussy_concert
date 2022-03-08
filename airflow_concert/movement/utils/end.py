@@ -6,6 +6,5 @@ class EndMovement(MovementBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(
             name=name,
-            config=config,
             phrases=[EndPhrase(config=config)]
         )

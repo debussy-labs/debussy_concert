@@ -5,9 +5,9 @@ Mount examples folder on airflow dags folder
 
 ```mermaid
 classDiagram
-class Compositor {
+class ComposerBase {
     ConfigIntegration config
-    build(Composition) DAG
+    build(composition_callable) DAG
 }
 
 class CompositionBase {
@@ -31,7 +31,7 @@ class PhraseBase {
     build(dag, task_group) TaskMixin
 }
 
+ComposerBase --> CompositionBase
 CompositionBase --> MovementBase
 MovementBase --> PhraseBase
-Compositor --> CompositionBase
 ```

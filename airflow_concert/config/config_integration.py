@@ -10,11 +10,15 @@ class ConfigIntegration(ConfigBase):
         self,
         name,
         description,
+        database,
+        secret_id,
         dag_parameters,
         environment: ConfigEnvironment,
         tables
     ):
         self.name = name
+        self.database = database
+        self.secret_id = secret_id
         self.description = description
         self.environment = environment
         self.tables = tables

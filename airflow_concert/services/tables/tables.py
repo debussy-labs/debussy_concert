@@ -1,5 +1,5 @@
 from typing import List, Iterator, Dict
-from airflow_concert.entities.table.table import Table
+from airflow_concert.entities.table import Table
 
 
 class TablesService:
