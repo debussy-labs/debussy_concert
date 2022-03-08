@@ -4,10 +4,15 @@ from airflow.utils.task_group import TaskGroup
 
 
 class MovementBase:
-    def __init__(self, config, phrases: List[PhraseBase], name=None) -> None:
-        self.config = config
+    def __init__(self, phrases: List[PhraseBase] = None, name=None) -> None:
         self.name = name or self.__class__.__name__
-        self.phrases = phrases
+        self.phrases = phrases or list()
+
+    def add_phrase(self, phrase):
+        self.phrases.append(phrase)
+
+    def play(self, *args, **kwargs):
+        return self.build(*args, **kwargs)
 
     def build(self, dag, parent_task_group) -> TaskGroup:
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=parent_task_group)
