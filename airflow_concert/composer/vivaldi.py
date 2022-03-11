@@ -38,13 +38,3 @@ class Vivaldi(ComposerBase):
         name = f'Composition_{table.name}'
         four_seasons = CompositionBase(name=name, config=config, movements=movements)
         return four_seasons
-
-    def play(self, *args, **kwargs):
-        return self.build(*args, **kwargs)
-
-    def build(self, composition_callable: CompositionBase) -> DAG:
-        dag = DAG(**self.config.dag_parameters)
-        for table in self.tables_service.tables():
-            composition = composition_callable(table)
-            composition.build(dag=dag, table=table)
-        return dag
