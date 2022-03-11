@@ -15,10 +15,20 @@ class Debussy(ComposerBase):
         super().__init__(config)
 
     def ingestion_composition(self, ingestion_to_landing, table: Table):
+        from airflow_concert.phrase.merge_table import MergeReplaceBigQueryPhrase
+        merge_landing_to_raw = MergeReplaceBigQueryPhrase(
+            config=self.config,
+            table=table,
+            destiny_dataset=self.config.environment.raw_dataset,
+            origin_bucket=self.config.environment.landing_bucket
+        )
         movements = [
             StartMovement(config=self.config),
             ingestion_to_landing,
-            GcsLandingToBigQueryRawMovement(name='Landing_to_Raw_Movement', config=self.config),
+            GcsLandingToBigQueryRawMovement(
+                name='Landing_to_Raw_Movement',
+                merge_landing_to_raw=merge_landing_to_raw
+            ),
             BigQueryRawToBigQueryTrustedMovement(name='Raw_to_Trusted_Movement', config=self.config),
             EndMovement(config=self.config)
 
@@ -30,3 +40,14 @@ class Debussy(ComposerBase):
     def mysql_composition(self, table: Table) -> None:
         ingestion_to_landing = IngestionToLandingMovement(ExportMySqlTablePhrase(config=self.config, table=table))
         return self.ingestion_composition(ingestion_to_landing, table)
+
+    def build(self, composition_callable, globals) -> None:
+        from airflow import DAG
+        for table in self.tables_service.tables():
+            name = self.config.dag_parameters.dag_id + '.' + table.name
+            kwargs = {**self.config.dag_parameters}
+            del kwargs['dag_id']
+            dag = DAG(dag_id=name, **kwargs)
+            composition = composition_callable(table)
+            composition.build(dag=dag)
+            globals[name] = dag
