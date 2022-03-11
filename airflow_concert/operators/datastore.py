@@ -51,6 +51,7 @@ class DatastoreGetEntityOperator(BaseOperator):
         return DotzDatastoreClient(self.project, self.namespace)
 
     def execute(self, context):
+        self.log.info(f"Getting entity for {self.kind} where {self.filters}")
         entity = self.ds_client.query(self.kind, self.filters)[0]
         entity_dict = {}
         # a way of making an entity an its id available in a single structure
