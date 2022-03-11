@@ -3,7 +3,7 @@ import json
 import pendulum
 from mysql.connector import connect
 from airflow.models import SkipMixin
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 
 def check_mysql_table(entity_json_str, db_conn_data_callable):
