@@ -14,13 +14,15 @@ class Debussy(ComposerBase):
     def __init__(self, config: ConfigIntegration):
         super().__init__(config)
 
-    def ingestion_composition(self, ingestion_to_landing, table: Table):
+    def rdbms_ingestion_composition(self, ingestion_to_landing, table: Table, rdbms):
         from airflow_concert.phrase.merge_table import MergeReplaceBigQueryPhrase
+        origin_bucket = (f"gs://{self.config.environment.landing_bucket}/"
+                         f"{rdbms}/{self.config.database}/{table.name}")
         merge_landing_to_raw = MergeReplaceBigQueryPhrase(
             config=self.config,
             table=table,
             destiny_dataset=self.config.environment.raw_dataset,
-            origin_bucket=self.config.environment.landing_bucket
+            origin_bucket=origin_bucket
         )
         movements = [
             StartMovement(config=self.config),
@@ -39,7 +41,7 @@ class Debussy(ComposerBase):
 
     def mysql_composition(self, table: Table) -> None:
         ingestion_to_landing = IngestionToLandingMovement(ExportMySqlTablePhrase(config=self.config, table=table))
-        return self.ingestion_composition(ingestion_to_landing, table)
+        return self.rdbms_ingestion_composition(ingestion_to_landing, table, rdbms='mysql')
 
     def build(self, composition_callable, globals) -> None:
         from airflow import DAG
