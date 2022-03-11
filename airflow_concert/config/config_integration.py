@@ -14,7 +14,8 @@ class ConfigIntegration(ConfigBase):
         secret_id,
         dag_parameters,
         environment: ConfigEnvironment,
-        tables
+        tables,
+        dataproc_config=None,
     ):
         self.name = name
         self.database = database
@@ -23,6 +24,7 @@ class ConfigIntegration(ConfigBase):
         self.environment = environment
         self.tables = tables
         self.dag_parameters = ConfigDagParameters.create_from_dict(dag_parameters)
+        self.dataproc_config = dataproc_config
 
     @classmethod
     def load_from_file(cls, integration_file_path, env_file_path):
