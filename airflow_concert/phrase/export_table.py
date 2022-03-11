@@ -71,7 +71,7 @@ class ExportMySqlTablePhrase(PhraseBase):
 
     @property
     def cluster_name(self):
-        return 'pixdict_cluster'
+        return 'pixdict-phrase-cluster'
 
     @property
     def cluster_config(self):
@@ -176,9 +176,10 @@ class ExportMySqlTablePhrase(PhraseBase):
             dag=dag,
             task_group=task_group
         )
+        get_datastore_entity_task_id = get_datastore_entity.task_id
         check_mysql_table = MySQLCheckOperator(
             task_id="check_mysql_table",
-            entity_json_str="{{ task_instance.xcom_pull('get_datastore_entity') }}",
+            entity_json_str=f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}",
             db_conn_data_callable=self.get_db_conn_data,
             dag=dag,
             task_group=task_group
@@ -187,10 +188,11 @@ class ExportMySqlTablePhrase(PhraseBase):
             task_id="build_extract_query",
             python_callable=build_query_from_datastore_entity_json,
             op_args=[
-                    "{{ task_instance.xcom_pull('get_datastore_entity') }}"],
+                    f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}"],
             dag=dag,
             task_group=task_group
         )
+        build_extract_query_id = build_extract_query.task_id
 
         create_dataproc_cluster = DataprocCreateClusterOperator(
             task_id="create_dataproc_cluster",
@@ -226,7 +228,7 @@ class ExportMySqlTablePhrase(PhraseBase):
                             jdbc_url,
                             secret_uri,
                             self.config.database,
-                            "{{ task_instance.xcom_pull('build_extract_query') }}",
+                            f"{{{{ task_instance.xcom_pull('{build_extract_query_id}') }}}}",
                             run_ts,
                             f"{landing_table_uri}/{load_date_partition}={run_date}/{load_timestamp_partition}={run_ts}/",
                         ],
