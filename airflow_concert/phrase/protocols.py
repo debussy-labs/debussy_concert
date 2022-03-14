@@ -1,11 +1,15 @@
 from typing import Protocol
 
 
-class PExportTableMotif(Protocol):
+class PExportDataToStorageMotif(Protocol):
     pass
 
 
 class PMergeLandingToRawMotif(Protocol):
+    pass
+
+
+class PCreateExternalTableMotif(Protocol):
     pass
 
 

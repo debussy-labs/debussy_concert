@@ -5,7 +5,7 @@ from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobO
 from google.protobuf.duration_pb2 import Duration
 
 from airflow_concert.motif.motif_base import MotifBase
-from airflow_concert.phrase.protocols import PExportTableMotif
+from airflow_concert.phrase.protocols import PExportDataToStorageMotif
 from airflow_concert.operators.basic import StartOperator
 from airflow_concert.operators.datastore import DatastoreGetEntityOperator
 from airflow_concert.operators.mysql_check import MySQLCheckOperator
@@ -13,7 +13,7 @@ from airflow_concert.entities.table import Table
 from airflow_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
 
 
-class ExportBigQueryTableMotif(MotifBase, PExportTableMotif):
+class ExportBigQueryTableMotif(MotifBase, PExportDataToStorageMotif):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 
@@ -64,9 +64,14 @@ def build_query_from_datastore_entity_json(entity_json_str):
     return query
 
 
-class ExportMySqlTableMotif(MotifBase, DataprocClusterHandlerMixin, PExportTableMotif):
-    def __init__(self, config, table: Table, name=None) -> None:
+class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PExportDataToStorageMotif):
+    def __init__(
+            self, config, table: Table,
+            destination_bucket_uri,
+            name=None
+    ) -> None:
         self.table = table
+        self.destination_bucket_uri = destination_bucket_uri
         super().__init__(name=name, config=config)
 
     @property
@@ -192,7 +197,7 @@ class ExportMySqlTableMotif(MotifBase, DataprocClusterHandlerMixin, PExportTable
         load_date_partition = "loadDate"
         run_date = "{{ ds }}"
         pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
-        landing_table_uri = f"gs://{self.config.environment.landing_bucket}/mysql/{self.config.database}/{self.table.name}"
+
         driver = "com.mysql.cj.jdbc.Driver"
         jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.database
 
@@ -210,7 +215,7 @@ class ExportMySqlTableMotif(MotifBase, DataprocClusterHandlerMixin, PExportTable
                             self.config.database,
                             f"{{{{ task_instance.xcom_pull('{build_extract_query_id}') }}}}",
                             run_ts,
-                            f"{landing_table_uri}/{load_date_partition}={run_date}/{load_timestamp_partition}={run_ts}/",
+                            f"{self.destination_bucket_uri}/{load_date_partition}={run_date}/{load_timestamp_partition}={run_ts}/",
                         ],
                     },
             },

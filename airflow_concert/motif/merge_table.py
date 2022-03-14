@@ -2,6 +2,7 @@ from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 
 from airflow_concert.operators.bigquery import BigQueryCreateExternalTableOperator
+
 from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.phrase.protocols import PMergeLandingToRawMotif
 from airflow_concert.entities.table import Table
@@ -93,48 +94,21 @@ class MergeReplaceBigQueryMotif(MotifBase, PMergeLandingToRawMotif):
         self,
         config,
         table: Table,
-        origin_bucket,
-        destiny_dataset: str,
+        main_table_uri: str,
+        delta_table_uri: str,
         name=None
     ) -> None:
         self.table = table
-        self.origin_bucket = origin_bucket
-        self.destiny_dataset = destiny_dataset
+        self.main_table_uri = main_table_uri
+        self.delta_table_uri = delta_table_uri
         super().__init__(name=name, config=config)
-
-    @property
-    def table_prefix(self):
-        return self.config.database.lower()
-
-    @property
-    def table_resource(self):
-        return {
-            "type": "EXTERNAL",
-                    "externalDataConfiguration": {
-                        "hivePartitioningOptions": {
-                            "mode": "AUTO",
-                            "sourceUriPrefix": self.origin_bucket,
-                        },
-                        "sourceFormat": "PARQUET",
-                        "sourceUris": [f"{self.origin_bucket}/*.parquet"],
-                    },
-        }
 
     def build(self, dag, task_group):
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=task_group)
-
-        create_landing_external_table = self.create_landing_external_table(dag, task_group)
-        build_merge_query = self.build_merge_query(dag, task_group)
-        create_landing_external_table >> build_merge_query
+        self.build_merge_query(dag, task_group)
         return task_group
 
     def build_merge_query(self, dag, task_group):
-        main_table = (f"{self.config.environment.project}."
-                      f"{self.config.environment.raw_dataset}."
-                      f"{self.table_prefix}_{self.table.name}")
-        delta_table = (f"{self.config.environment.project}."
-                       f"{self.config.environment.landing_dataset}."
-                       f"{self.table_prefix}_{self.table.name}")
         pii_columns = ','.join([column.name for column in self.table.pii_columns])
         primary_key = self.table.primary_key.name
         fields_list = [field.name for field in self.table.fields]
@@ -147,8 +121,8 @@ class MergeReplaceBigQueryMotif(MotifBase, PMergeLandingToRawMotif):
             python_callable=build_bigquery_merge_query,
             op_kwargs={
                 "sql_template": MERGE,
-                "main_table": main_table,
-                "delta_table": delta_table,
+                "main_table": self.main_table_uri,
+                "delta_table": self.delta_table_uri,
                 "pii_columns": pii_columns,
                 "pii_table": "",
                 "delta_date_partition": delta_date_partition,
@@ -164,20 +138,5 @@ class MergeReplaceBigQueryMotif(MotifBase, PMergeLandingToRawMotif):
             dag=dag,
             task_group=task_group
         )
-        
+
         return build_merge_query
-
-    def create_landing_external_table(self, dag, task_group):
-        destination_project_dataset_table = (f"{self.config.environment.project}."
-                                             f"{self.destiny_dataset}."
-                                             f"{self.table_prefix}_{self.table.name}")
-        create_landing_external_table = BigQueryCreateExternalTableOperator(
-            task_id="create_landing_external_table",
-            bucket=self.origin_bucket,
-            destination_project_dataset_table=destination_project_dataset_table,
-            table_resource=self.table_resource,
-            dag=dag,
-            task_group=task_group
-        )
-
-        return create_landing_external_table

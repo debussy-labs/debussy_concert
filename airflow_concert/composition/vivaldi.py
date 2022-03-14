@@ -1,9 +1,9 @@
 from airflow import DAG
 
 from airflow_concert.movement.movement_base import MovementBase
-from airflow_concert.phrase.ingestion_to_landing import IngestionToLandingPhrase
-from airflow_concert.phrase.landing_to_raw import GcsLandingToBigQueryRawPhrase
-from airflow_concert.phrase.raw_to_trusted import BigQueryRawToBigQueryTrustedPhrase
+from airflow_concert.phrase.ingestion_to_landing import IngestionSourceToLandingStoragePhrase
+from airflow_concert.phrase.landing_to_raw import LandingStorageToDataWarehouseRawPhrase
+from airflow_concert.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhrase
 from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
 from airflow_concert.motif.export_table import ExportBigQueryTableMotif
@@ -27,12 +27,12 @@ class Vivaldi(CompositionBase):
 
     def four_seasons(self, table) -> None:
         config = self.config
-        bq_to_gcs_ingestion = IngestionToLandingPhrase(export_table=ExportBigQueryTableMotif(self.config))
+        bq_to_gcs_ingestion = IngestionSourceToLandingStoragePhrase(export_table=ExportBigQueryTableMotif(self.config))
         phrases = [
             StartPhrase(config=config),
             bq_to_gcs_ingestion,
-            GcsLandingToBigQueryRawPhrase(name='Landing_to_Raw_Phrase', config=config),
-            BigQueryRawToBigQueryTrustedPhrase(name='Raw_to_Trusted_Phrase', config=config),
+            LandingStorageToDataWarehouseRawPhrase(name='Landing_to_Raw_Phrase', config=config),
+            DataWarehouseRawToTrustedPhrase(name='Raw_to_Trusted_Phrase', config=config),
             EndPhrase(config=config)
         ]
         name = f'Movement_{table.name}'

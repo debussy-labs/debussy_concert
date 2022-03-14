@@ -3,7 +3,7 @@ from airflow_concert.phrase.protocols import PRawToTrustedMotif
 from airflow_concert.phrase.phrase_base import PhraseBase
 
 
-class BigQueryRawToBigQueryTrustedPhrase(PhraseBase, PDataWarehouseRawToTrustedPhrase):
+class DataWarehouseRawToTrustedPhrase(PhraseBase, PDataWarehouseRawToTrustedPhrase):
     def __init__(
         self,
         raw_to_trusted_motif: PRawToTrustedMotif,
