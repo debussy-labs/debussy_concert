@@ -1,8 +1,9 @@
 from airflow_concert.motif.motif_base import MotifBase
+from airflow_concert.phrase.protocols import PRawToTrustedMotif
 from airflow.operators.dummy import DummyOperator
 
 
-class BigQueryToBigQueryMotif(MotifBase):
+class BigQueryToBigQueryMotif(MotifBase, PRawToTrustedMotif):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 

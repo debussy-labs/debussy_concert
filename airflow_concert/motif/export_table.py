@@ -7,13 +7,14 @@ from airflow.providers.google.cloud.operators.dataproc import (
 from google.protobuf.duration_pb2 import Duration
 
 from airflow_concert.motif.motif_base import MotifBase
+from airflow_concert.phrase.protocols import PExportTableMotif
 from airflow_concert.operators.basic import StartOperator
 from airflow_concert.operators.datastore import DatastoreGetEntityOperator
 from airflow_concert.operators.mysql_check import MySQLCheckOperator
 from airflow_concert.entities.table import Table
 
 
-class ExportBigQueryTableMotif(MotifBase):
+class ExportBigQueryTableMotif(MotifBase, PExportTableMotif):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 
@@ -64,7 +65,7 @@ def build_query_from_datastore_entity_json(entity_json_str):
     return query
 
 
-class ExportMySqlTableMotif(MotifBase):
+class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
     def __init__(self, config, table: Table, name=None) -> None:
         self.table = table
         super().__init__(name=name, config=config)
