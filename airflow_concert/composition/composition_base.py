@@ -1,29 +1,33 @@
-from typing import List
-from airflow.utils.task_group import TaskGroup
+from typing import Callable
+
+from airflow import DAG
+
 from airflow_concert.movement.movement_base import MovementBase
 from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.services.tables.tables import TablesService
+from airflow_concert.entities.table import Table
 
 
 class CompositionBase:
-    def __init__(
-        self,
-        name,
-        config: ConfigIntegration,
-        movements: List[MovementBase]
-    ) -> None:
-        self.name = name
+    def __init__(self, config: ConfigIntegration):
         self.config = config
-        self.movements = movements
+        self.tables_service = TablesService.create_from_dict(config.tables)
+
+    @classmethod
+    def crate_from_yaml(cls, environment_yaml_filepath, integration_yaml_filepath) -> 'CompositionBase':
+        config = ConfigIntegration.load_from_file(
+            integration_file_path=integration_yaml_filepath,
+            env_file_path=environment_yaml_filepath
+        )
+        return cls(config)
 
     def play(self, *args, **kwargs):
         return self.build(*args, **kwargs)
 
-    def build(self, dag) -> TaskGroup:
-        task_group = TaskGroup(group_id=self.name, dag=dag)
-        current_task_group = self.movements[0].build(dag, task_group)
+    def build(self, movement_callable: Callable[[Table], MovementBase]) -> DAG:
+        dag = DAG(**self.config.dag_parameters)
 
-        for movement in self.movements[1:]:
-            movement_task_group = movement.build(dag, task_group)
-            current_task_group >> movement_task_group
-            current_task_group = movement_task_group
-        return task_group
+        for table in self.tables_service.tables():
+            movement = movement_callable(table)
+            movement.build(dag=dag)
+        return dag

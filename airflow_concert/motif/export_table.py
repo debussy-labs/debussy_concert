@@ -6,14 +6,14 @@ from airflow.providers.google.cloud.operators.dataproc import (
     DataprocSubmitJobOperator, DataprocCreateClusterOperator, DataprocDeleteClusterOperator)
 from google.protobuf.duration_pb2 import Duration
 
-from airflow_concert.phrase.phrase_base import PhraseBase
+from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.operators.basic import StartOperator
 from airflow_concert.operators.datastore import DatastoreGetEntityOperator
 from airflow_concert.operators.mysql_check import MySQLCheckOperator
 from airflow_concert.entities.table import Table
 
 
-class ExportBigQueryTablePhrase(PhraseBase):
+class ExportBigQueryTableMotif(MotifBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 
@@ -64,14 +64,14 @@ def build_query_from_datastore_entity_json(entity_json_str):
     return query
 
 
-class ExportMySqlTablePhrase(PhraseBase):
+class ExportMySqlTableMotif(MotifBase):
     def __init__(self, config, table: Table, name=None) -> None:
         self.table = table
         super().__init__(name=name, config=config)
 
     @property
     def cluster_name(self):
-        return 'pixdict-phrase-cluster'
+        return 'pixdict-motif-cluster'
 
     @property
     def cluster_config(self):

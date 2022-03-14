@@ -3,11 +3,11 @@ import logging
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 
-from airflow_concert.phrase.phrase_base import PhraseBase
+from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.operators.basic import StartOperator
 
 
-class StartPhrase(PhraseBase):
+class StartMotif(MotifBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 

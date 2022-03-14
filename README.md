@@ -5,33 +5,33 @@ Mount examples folder on airflow dags folder
 
 ```mermaid
 classDiagram
-class ComposerBase {
+class CompositionBase {
     ConfigIntegration config
-    build(composition_callable) DAG
+    build(movement_callable) DAG
 }
 
-class CompositionBase {
+class MovementBase {
     source_info
     String name
     ConfigIntegration config
-    CompositionBase[] movements
+    MovementBase[] phrases
     build(dag) TaskGroup
 }
 
-class MovementBase{
+class PhraseBase{
     String name
     ConfigIntegration config
-    PhraseBase[] phrases
+    MotifBase[] motifs
     build(dag, task_group) TaskGroup
 }
 
-class PhraseBase {
+class MotifBase {
     String name
     ConfigIntegration config
     build(dag, task_group) TaskMixin
 }
 
-ComposerBase --> CompositionBase
 CompositionBase --> MovementBase
 MovementBase --> PhraseBase
+PhraseBase --> MotifBase
 ```

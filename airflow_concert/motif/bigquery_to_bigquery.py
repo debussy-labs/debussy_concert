@@ -1,8 +1,8 @@
-from airflow_concert.phrase.phrase_base import PhraseBase
+from airflow_concert.motif.motif_base import MotifBase
 from airflow.operators.dummy import DummyOperator
 
 
-class EndPhrase(PhraseBase):
+class BigQueryToBigQueryMotif(MotifBase):
     def __init__(self, config, name=None) -> None:
         super().__init__(name=name, config=config)
 

@@ -2,7 +2,7 @@ from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 
 from airflow_concert.operators.bigquery import BigQueryCreateExternalTableOperator
-from airflow_concert.phrase.phrase_base import PhraseBase
+from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.entities.table import Table
 
 
@@ -87,7 +87,7 @@ MERGE = """
 """
 
 
-class MergeReplaceBigQueryPhrase(PhraseBase):
+class MergeReplaceBigQueryMotif(MotifBase):
     def __init__(
         self,
         config,
