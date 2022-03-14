@@ -164,46 +164,39 @@ class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
     def build(self, dag, parent_task_group: TaskGroup):
         table = self.table
         task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
-        db_kind = self.config.database[0].upper() + self.config.database[1:]
-        kind = f"MySql{db_kind}Tables"
-        cluster_name = self.cluster_name
-        start = StartOperator(phase=table.name, dag=dag, task_group=task_group)
-        get_datastore_entity = DatastoreGetEntityOperator(
-            task_id="get_datastore_entity",
-            project=self.config.environment.project,
-            namespace="TABLE",
-            kind=kind,
-            filters=("SourceTable", "=", table.name),
-            dag=dag,
-            task_group=task_group
-        )
-        get_datastore_entity_task_id = get_datastore_entity.task_id
-        check_mysql_table = MySQLCheckOperator(
-            task_id="check_mysql_table",
-            entity_json_str=f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}",
-            db_conn_data_callable=self.get_db_conn_data,
-            dag=dag,
-            task_group=task_group
-        )
-        build_extract_query = PythonOperator(
-            task_id="build_extract_query",
-            python_callable=build_query_from_datastore_entity_json,
-            op_args=[
-                    f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}"],
-            dag=dag,
-            task_group=task_group
-        )
-        build_extract_query_id = build_extract_query.task_id
 
-        create_dataproc_cluster = DataprocCreateClusterOperator(
-            task_id="create_dataproc_cluster",
+        start = StartOperator(phase=table.name, dag=dag, task_group=task_group)
+        get_datastore_entity = self.get_datastore_entity(dag, table, task_group)
+        check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
+        build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)
+        create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
+        jdbc_to_landing = self.jdbc_to_landing(dag, task_group, build_extract_query.task_id)
+        delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
+        (
+            start >>
+            get_datastore_entity >>
+            check_mysql_table >>
+            build_extract_query >>
+            create_dataproc_cluster >>
+            jdbc_to_landing >>
+            delete_dataproc_cluster
+        )
+        return task_group
+
+    def delete_dataproc_cluster(self, dag, task_group):
+        delete_dataproc_cluster = DataprocDeleteClusterOperator(
+            task_id="delete_dataproc_cluster",
             project_id=self.config.environment.project,
-            cluster_config=self.cluster_config,
+            cluster_name=self.cluster_name,
             region=self.config.environment.region,
-            cluster_name=cluster_name,
+            trigger_rule=TriggerRule.ALL_DONE,
             dag=dag,
             task_group=task_group
         )
+
+        return delete_dataproc_cluster
+
+    def jdbc_to_landing(self, dag, task_group, build_extract_query_id):
         secret_uri = f"projects/{self.config.environment.project}/secrets/{self.config.secret_id}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
@@ -221,7 +214,7 @@ class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
             task_id="jdbc_to_landing",
             job={
                     "reference": {"project_id": self.config.environment.project},
-                    "placement": {"cluster_name": cluster_name},
+                    "placement": {"cluster_name": self.cluster_name},
                     "pyspark_job": {
                         "main_python_file_uri": f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py",
                         "args": [
@@ -240,15 +233,56 @@ class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
             dag=dag,
             task_group=task_group
         )
-        delete_dataproc_cluster = DataprocDeleteClusterOperator(
-            task_id="delete_dataproc_cluster",
+
+        return jdbc_to_landing
+
+    def create_dataproc_cluster(self, dag, task_group):
+        create_dataproc_cluster = DataprocCreateClusterOperator(
+            task_id="create_dataproc_cluster",
             project_id=self.config.environment.project,
-            cluster_name=cluster_name,
+            cluster_config=self.cluster_config,
             region=self.config.environment.region,
-            trigger_rule=TriggerRule.ALL_DONE,
+            cluster_name=self.cluster_name,
             dag=dag,
             task_group=task_group
         )
-        start >> get_datastore_entity >> check_mysql_table >> build_extract_query
-        build_extract_query >> create_dataproc_cluster >> jdbc_to_landing >> delete_dataproc_cluster
-        return task_group
+
+        return create_dataproc_cluster
+
+    def build_extract_query(self, dag, task_group, get_datastore_entity_task_id):
+        build_extract_query = PythonOperator(
+            task_id="build_extract_query",
+            python_callable=build_query_from_datastore_entity_json,
+            op_args=[
+                    f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}"],
+            dag=dag,
+            task_group=task_group
+        )
+
+        return build_extract_query
+
+    def check_mysql_table(self, dag, task_group, get_datastore_entity_task_id):
+        check_mysql_table = MySQLCheckOperator(
+            task_id="check_mysql_table",
+            entity_json_str=f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}",
+            db_conn_data_callable=self.get_db_conn_data,
+            dag=dag,
+            task_group=task_group
+        )
+
+        return check_mysql_table
+
+    def get_datastore_entity(self, dag, table, task_group):
+        db_kind = self.config.database[0].upper() + self.config.database[1:]
+        kind = f"MySql{db_kind}Tables"
+        get_datastore_entity = DatastoreGetEntityOperator(
+            task_id="get_datastore_entity",
+            project=self.config.environment.project,
+            namespace="TABLE",
+            kind=kind,
+            filters=("SourceTable", "=", table.name),
+            dag=dag,
+            task_group=task_group
+        )
+
+        return get_datastore_entity
