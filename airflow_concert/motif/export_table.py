@@ -245,7 +245,7 @@ class ExportMySqlTableMotif(MotifBase, DataprocClusterHandlerMixin, PExportTable
 
         return check_mysql_table
 
-    def get_datastore_entity(self, dag, table, task_group):
+    def get_datastore_entity(self, dag, table: Table, task_group):
         db_kind = self.config.database[0].upper() + self.config.database[1:]
         kind = f"MySql{db_kind}Tables"
         get_datastore_entity = DatastoreGetEntityOperator(
