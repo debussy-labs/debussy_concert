@@ -1,9 +1,7 @@
 from airflow.utils.task_group import TaskGroup
-from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
-from airflow.providers.google.cloud.operators.dataproc import (
-    DataprocSubmitJobOperator, DataprocCreateClusterOperator, DataprocDeleteClusterOperator)
+from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
 from google.protobuf.duration_pb2 import Duration
 
 from airflow_concert.motif.motif_base import MotifBase
@@ -12,6 +10,7 @@ from airflow_concert.operators.basic import StartOperator
 from airflow_concert.operators.datastore import DatastoreGetEntityOperator
 from airflow_concert.operators.mysql_check import MySQLCheckOperator
 from airflow_concert.entities.table import Table
+from airflow_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
 
 
 class ExportBigQueryTableMotif(MotifBase, PExportTableMotif):
@@ -65,7 +64,7 @@ def build_query_from_datastore_entity_json(entity_json_str):
     return query
 
 
-class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
+class ExportMySqlTableMotif(MotifBase, DataprocClusterHandlerMixin, PExportTableMotif):
     def __init__(self, config, table: Table, name=None) -> None:
         self.table = table
         super().__init__(name=name, config=config)
@@ -183,19 +182,6 @@ class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
         )
         return task_group
 
-    def delete_dataproc_cluster(self, dag, task_group):
-        delete_dataproc_cluster = DataprocDeleteClusterOperator(
-            task_id="delete_dataproc_cluster",
-            project_id=self.config.environment.project,
-            cluster_name=self.cluster_name,
-            region=self.config.environment.region,
-            trigger_rule=TriggerRule.ALL_DONE,
-            dag=dag,
-            task_group=task_group
-        )
-
-        return delete_dataproc_cluster
-
     def jdbc_to_landing(self, dag, task_group, build_extract_query_id):
         secret_uri = f"projects/{self.config.environment.project}/secrets/{self.config.secret_id}/versions/latest"
         run_ts = "{{ ts_nodash }}"
@@ -235,19 +221,6 @@ class ExportMySqlTableMotif(MotifBase, PExportTableMotif):
         )
 
         return jdbc_to_landing
-
-    def create_dataproc_cluster(self, dag, task_group):
-        create_dataproc_cluster = DataprocCreateClusterOperator(
-            task_id="create_dataproc_cluster",
-            project_id=self.config.environment.project,
-            cluster_config=self.cluster_config,
-            region=self.config.environment.region,
-            cluster_name=self.cluster_name,
-            dag=dag,
-            task_group=task_group
-        )
-
-        return create_dataproc_cluster
 
     def build_extract_query(self, dag, task_group, get_datastore_entity_task_id):
         build_extract_query = PythonOperator(
