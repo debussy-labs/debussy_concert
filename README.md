@@ -6,29 +6,30 @@ Mount examples folder on airflow dags folder
 ```mermaid
 classDiagram
 class CompositionBase {
+    <<interface>>
     ConfigIntegration config
-    build(movement_callable) DAG
+    build(Callable movement_builder) DAG
 }
 
 class MovementBase {
-    source_info
+    <<interface>>
     String name
-    ConfigIntegration config
     MovementBase[] phrases
-    build(dag) TaskGroup
+    build(DAG dag) TaskGroup
 }
 
 class PhraseBase{
+    <<interface>>
     String name
-    ConfigIntegration config
     MotifBase[] motifs
-    build(dag, task_group) TaskGroup
+    build(DAG dag, TaskGroup task_group) TaskGroup
 }
 
 class MotifBase {
+    <<interface>>
     String name
     ConfigIntegration config
-    build(dag, task_group) TaskMixin
+    build(DAG dag, TaskGroup task_group) TaskMixin
 }
 
 CompositionBase --> MovementBase
