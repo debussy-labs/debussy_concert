@@ -6,9 +6,9 @@ dags_folder = conf.get('core', 'dags_folder')
 env_file = f'{dags_folder}/examples/pixdict/environment.yaml'
 integration_file = f'{dags_folder}/examples/pixdict/integration.yaml'
 
-debussy = Debussy.crate_from_yaml(environment_yaml_filepath=env_file, integration_yaml_filepath=integration_file)
+debussy = Debussy.create_from_yaml(environment_yaml_filepath=env_file, integration_yaml_filepath=integration_file)
 mysql = debussy.mysql_movement
-dags = debussy.play(mysql, globals())
+dags = debussy.play(mysql)
 
-# for dag in dags:
-#     globals()[dag.dag_id] = dag
+for dag in dags:
+    globals()[dag.dag_id] = dag

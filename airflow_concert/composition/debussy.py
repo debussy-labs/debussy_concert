@@ -1,3 +1,4 @@
+from typing import Callable
 from airflow_concert.movement.movement_base import MovementBase
 from airflow_concert.phrase.ingestion_to_landing import IngestionToLandingPhrase
 from airflow_concert.phrase.landing_to_raw import GcsLandingToBigQueryRawPhrase
@@ -43,13 +44,14 @@ class Debussy(CompositionBase):
         ingestion_to_landing = IngestionToLandingPhrase(ExportMySqlTableMotif(config=self.config, table=table))
         return self.rdbms_ingestion_movement(ingestion_to_landing, table, rdbms='mysql')
 
-    def build(self, movement_callable, globals) -> None:
+    def build(self, movement_builder: Callable[[Table], MovementBase]) -> None:
         from airflow import DAG
+        dags = list()
         for table in self.tables_service.tables():
             name = self.config.dag_parameters.dag_id + '.' + table.name
             kwargs = {**self.config.dag_parameters}
             del kwargs['dag_id']
             dag = DAG(dag_id=name, **kwargs)
-            movement = movement_callable(table)
-            movement.build(dag=dag)
-            globals[name] = dag
+            movement_builder(table).play(dag=dag)
+            dags.append(dag)
+        return dags

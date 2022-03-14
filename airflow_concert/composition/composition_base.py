@@ -14,7 +14,7 @@ class CompositionBase:
         self.tables_service = TablesService.create_from_dict(config.tables)
 
     @classmethod
-    def crate_from_yaml(cls, environment_yaml_filepath, integration_yaml_filepath) -> 'CompositionBase':
+    def create_from_yaml(cls, environment_yaml_filepath, integration_yaml_filepath) -> 'CompositionBase':
         config = ConfigIntegration.load_from_file(
             integration_file_path=integration_yaml_filepath,
             env_file_path=environment_yaml_filepath
@@ -24,10 +24,10 @@ class CompositionBase:
     def play(self, *args, **kwargs):
         return self.build(*args, **kwargs)
 
-    def build(self, movement_callable: Callable[[Table], MovementBase]) -> DAG:
+    def build(self, movement_builder: Callable[[Table], MovementBase]) -> DAG:
         dag = DAG(**self.config.dag_parameters)
 
         for table in self.tables_service.tables():
-            movement = movement_callable(table)
+            movement = movement_builder(table)
             movement.build(dag=dag)
         return dag
