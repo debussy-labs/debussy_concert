@@ -1,25 +1,25 @@
 from typing import Protocol
-
+from airflow_concert.phrase.phrase_base import PPhrase
 #
 # Phrase Protocols
 #
 
 
-class PStartPhrase(Protocol):
+class PStartPhrase(PPhrase, Protocol):
     pass
 
 
-class PIngestionSourceToLandingStoragePhrase(Protocol):
+class PIngestionSourceToLandingStoragePhrase(PPhrase, Protocol):
     pass
 
 
-class PLandingStorageToDataWarehouseRawPhrase(Protocol):
+class PLandingStorageToDataWarehouseRawPhrase(PPhrase, Protocol):
     pass
 
 
-class PDataWarehouseRawToTrustedPhrase(Protocol):
+class PDataWarehouseRawToTrustedPhrase(PPhrase, Protocol):
     pass
 
 
-class PEndPhrase(Protocol):
+class PEndPhrase(PPhrase, Protocol):
     pass

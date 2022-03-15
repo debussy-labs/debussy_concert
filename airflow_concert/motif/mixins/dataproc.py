@@ -2,11 +2,11 @@ from airflow.utils.trigger_rule import TriggerRule
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator, DataprocDeleteClusterOperator)
 
-from airflow_concert.motif.motif_base import MotifBase
+from airflow_concert.motif.motif_base import PClusterMotifMixin
 
 
 class DataprocClusterHandlerMixin:
-    def delete_dataproc_cluster(self: MotifBase, dag, task_group):
+    def delete_dataproc_cluster(self: PClusterMotifMixin, dag, task_group) -> DataprocDeleteClusterOperator:
         delete_dataproc_cluster = DataprocDeleteClusterOperator(
             task_id="delete_dataproc_cluster",
             project_id=self.config.environment.project,
@@ -18,7 +18,7 @@ class DataprocClusterHandlerMixin:
         )
         return delete_dataproc_cluster
 
-    def create_dataproc_cluster(self: MotifBase, dag, task_group):
+    def create_dataproc_cluster(self: PClusterMotifMixin, dag, task_group) -> DataprocCreateClusterOperator:
         create_dataproc_cluster = DataprocCreateClusterOperator(
             task_id="create_dataproc_cluster",
             project_id=self.config.environment.project,

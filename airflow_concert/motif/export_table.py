@@ -1,16 +1,16 @@
+from google.protobuf.duration_pb2 import Duration
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
-from google.protobuf.duration_pb2 import Duration
 
-from airflow_concert.motif.motif_base import MotifBase
+from airflow_concert.motif.motif_base import MotifBase, PClusterMotifMixin
+from airflow_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
 from airflow_concert.phrase.protocols import PExportDataToStorageMotif
 from airflow_concert.operators.basic import StartOperator
 from airflow_concert.operators.datastore import DatastoreGetEntityOperator
 from airflow_concert.operators.mysql_check import MySQLCheckOperator
 from airflow_concert.entities.table import Table
-from airflow_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
 
 
 class ExportBigQueryTableMotif(MotifBase, PExportDataToStorageMotif):
@@ -64,14 +64,14 @@ def build_query_from_datastore_entity_json(entity_json_str):
     return query
 
 
-class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PExportDataToStorageMotif):
+class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
     def __init__(
             self, config, table: Table,
-            destination_bucket_uri,
+            destination_storage_uri,
             name=None
     ) -> None:
         self.table = table
-        self.destination_bucket_uri = destination_bucket_uri
+        self.destination_storage_uri = destination_storage_uri
         super().__init__(name=name, config=config)
 
     @property
@@ -113,7 +113,8 @@ class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PExport
                         self.config.dataproc_config["parallelism"]
                     ),
                     "spark:spark.sql.legacy.parquet.int96RebaseModeInWrite": "CORRECTED",
-                    "spark:spark.jars.packages": "com.amazon.deequ:deequ:1.1.0_spark-2.4-scala-2.11,com.microsoft.sqlserver:mssql-jdbc:9.2.1.jre8",
+                    "spark:spark.jars.packages": ("com.amazon.deequ:deequ:1.1.0_spark-2.4-scala-2.11,"
+                                                  "com.microsoft.sqlserver:mssql-jdbc:9.2.1.jre8"),
                     "spark:spark.jars.excludes": "net.sourceforge.f2j:arpack_combined_all",
                     "dataproc:dataproc.conscrypt.provider.enable": "false",
                 },
@@ -215,7 +216,8 @@ class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PExport
                             self.config.database,
                             f"{{{{ task_instance.xcom_pull('{build_extract_query_id}') }}}}",
                             run_ts,
-                            f"{self.destination_bucket_uri}/{load_date_partition}={run_date}/{load_timestamp_partition}={run_ts}/",
+                            (f"{self.destination_storage_uri}/{load_date_partition}={run_date}/"
+                             f"{load_timestamp_partition}={run_ts}/"),
                         ],
                     },
             },

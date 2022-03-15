@@ -1,13 +1,23 @@
-from typing import List
+from typing import Protocol, Sequence
 from airflow.utils.task_group import TaskGroup
-from airflow_concert.phrase.phrase_base import PhraseBase
-from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.phrase.phrase_base import PPhrase
 
 
-class MovementBase:
+class PMovement(Protocol):
+    name: str
+    phrases: Sequence[PPhrase]
+
+    def play(self, *args, **kwargs):
+        pass
+
+    def build(self, dag) -> TaskGroup:
+        pass
+
+
+class MovementBase(PMovement):
     def __init__(
         self, name,
-        phrases: List[PhraseBase]
+        phrases: Sequence[PPhrase]
     ) -> None:
         self.name = name
         self.phrases = phrases

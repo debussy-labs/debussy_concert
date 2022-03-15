@@ -1,17 +1,21 @@
 from typing import Protocol
 
-
-class PExportDataToStorageMotif(Protocol):
-    pass
+from airflow_concert.motif.motif_base import PMotif
 
 
-class PMergeLandingToRawMotif(Protocol):
-    pass
+class PExportDataToStorageMotif(PMotif, Protocol):
+    destination_storage_uri: str
 
 
-class PCreateExternalTableMotif(Protocol):
-    pass
+class PMergeLandingToRawMotif(PMotif, Protocol):
+    main_table_uri: str
+    delta_table_uri: str
 
 
-class PRawToTrustedMotif(Protocol):
+class PCreateExternalTableMotif(PMotif, Protocol):
+    source_bucket_uri_prefix: str
+    destination_project_dataset_table: str
+
+
+class PRawToTrustedMotif(PMotif, Protocol):
     pass

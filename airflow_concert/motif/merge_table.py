@@ -1,7 +1,6 @@
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
-
-from airflow_concert.operators.bigquery import BigQueryCreateExternalTableOperator
+from airflow.operators.dummy import DummyOperator
 
 from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.phrase.protocols import PMergeLandingToRawMotif
@@ -65,7 +64,7 @@ def build_bigquery_merge_query(
 
 
 MERGE = """
-    MERGE 
+    MERGE
         `{main_table}` AS main
     USING
         (
@@ -105,7 +104,9 @@ class MergeReplaceBigQueryMotif(MotifBase, PMergeLandingToRawMotif):
 
     def build(self, dag, task_group):
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=task_group)
-        self.build_merge_query(dag, task_group)
+        build_merge_query = self.build_merge_query(dag, task_group)
+        execute_query = DummyOperator(task_id="execute_query", dag=dag, task_group=task_group)
+        build_merge_query >> execute_query
         return task_group
 
     def build_merge_query(self, dag, task_group):

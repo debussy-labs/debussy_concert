@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Protocol
 
 from airflow import DAG
 from airflow.utils.task_group import TaskGroup
@@ -8,7 +8,19 @@ from airflow.models.taskmixin import TaskMixin
 from airflow_concert.config.config_integration import ConfigIntegration
 
 
-class MotifBase(ABC):
+class PMotif(Protocol):
+    config: ConfigIntegration
+
+    def build(self, dag, task_group) -> TaskMixin:
+        pass
+
+
+class PClusterMotifMixin(PMotif, Protocol):
+    cluster_name: str
+    cluster_config: dict
+
+
+class MotifBase(PMotif, ABC):
     def __init__(self, config: ConfigIntegration, name=None) -> None:
         self.config = config
         self.name = name or self.__class__.__name__

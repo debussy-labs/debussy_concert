@@ -1,10 +1,17 @@
-from typing import List
-from airflow_concert.motif.motif_base import MotifBase
+from typing import Protocol, Sequence
+from airflow_concert.motif.motif_base import PMotif
 from airflow.utils.task_group import TaskGroup
 
 
-class PhraseBase:
-    def __init__(self, motifs: List[MotifBase] = None, name=None) -> None:
+class PPhrase(Protocol):
+    motifs: Sequence[PMotif]
+
+    def build(self, dag, parent_task_group) -> TaskGroup:
+        pass
+
+
+class PhraseBase(PPhrase):
+    def __init__(self, motifs: Sequence[PMotif] = None, name=None) -> None:
         self.name = name or self.__class__.__name__
         self.motifs = motifs or list()
 

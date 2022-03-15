@@ -1,10 +1,10 @@
 from airflow_concert.operators.bigquery import BigQueryCreateExternalTableOperator
-
 from airflow_concert.motif.motif_base import MotifBase
+from airflow_concert.phrase.protocols import PCreateExternalTableMotif
 from airflow_concert.entities.table import Table
 
 
-class CreateExternalBigQueryTableMotif(MotifBase):
+class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
     def __init__(
         self,
         config,
@@ -34,7 +34,7 @@ class CreateExternalBigQueryTableMotif(MotifBase):
 
     def create_landing_external_table(self, dag, task_group) -> BigQueryCreateExternalTableOperator:
         create_landing_external_table = BigQueryCreateExternalTableOperator(
-            task_id="create_landing_external_table",
+            task_id=self.name,
             bucket=self.source_bucket_uri_prefix,
             destination_project_dataset_table=self.destination_project_dataset_table,
             table_resource=self.table_resource,
@@ -44,4 +44,4 @@ class CreateExternalBigQueryTableMotif(MotifBase):
         return create_landing_external_table
 
     def build(self, dag, task_group):
-        return self._build(dag, task_group, self.create_landing_external_table)
+        return self.create_landing_external_table(dag, task_group)
