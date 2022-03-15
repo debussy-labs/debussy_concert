@@ -19,3 +19,6 @@ clean-test:
 	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
+
+mypy:
+	mypy --namespace-packages --explicit-package-bases airflow_concert
