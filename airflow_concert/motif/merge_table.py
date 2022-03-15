@@ -1,9 +1,9 @@
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
-from airflow.operators.dummy import DummyOperator
 
 from airflow_concert.motif.motif_base import MotifBase
-from airflow_concert.phrase.protocols import PMergeLandingToRawMotif
+from airflow_concert.motif.mixins.bigquery_job import BigQueryJobMixin
+from airflow_concert.phrase.protocols import PMergeTableMotif
 from airflow_concert.entities.table import Table
 
 
@@ -88,7 +88,7 @@ MERGE = """
 """
 
 
-class MergeReplaceBigQueryMotif(MotifBase, PMergeLandingToRawMotif):
+class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
     def __init__(
         self,
         config,
@@ -105,11 +105,12 @@ class MergeReplaceBigQueryMotif(MotifBase, PMergeLandingToRawMotif):
     def build(self, dag, task_group):
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=task_group)
         build_merge_query = self.build_merge_query(dag, task_group)
-        execute_query = DummyOperator(task_id="execute_query", dag=dag, task_group=task_group)
+        query_macro = f"{{{{ task_instance.xcom_pull('{build_merge_query.task_id}') }}}}"
+        execute_query = self.insert_job_operator(dag, task_group, self.query_configuration(sql_query=query_macro))
         build_merge_query >> execute_query
         return task_group
 
-    def build_merge_query(self, dag, task_group):
+    def build_merge_query(self, dag, task_group) -> PythonOperator:
         pii_columns = ','.join([column.name for column in self.table.pii_columns])
         primary_key = self.table.primary_key.name
         fields_list = [field.name for field in self.table.fields]
