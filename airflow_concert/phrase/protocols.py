@@ -7,9 +7,13 @@ class PExportDataToStorageMotif(PMotif, Protocol):
     destination_storage_uri: str
 
 
-class PMergeLandingToRawMotif(PMotif, Protocol):
+class PMergeTableMotif(PMotif, Protocol):
     main_table_uri: str
     delta_table_uri: str
+
+
+class PExecuteQueryMotif(PMotif, Protocol):
+    sql_query: str
 
 
 class PCreateExternalTableMotif(PMotif, Protocol):

@@ -10,6 +10,10 @@ from airflow_concert.config.config_integration import ConfigIntegration
 
 class PMotif(Protocol):
     config: ConfigIntegration
+    name: str
+
+    def play(self, *args, **kwargs) -> TaskMixin:
+        pass
 
     def build(self, dag, task_group) -> TaskMixin:
         pass

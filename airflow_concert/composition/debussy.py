@@ -6,9 +6,9 @@ from airflow_concert.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhras
 from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
 from airflow_concert.motif.export_table import ExportMySqlTableToGcsMotif
-from airflow_concert.motif.bigquery_to_bigquery import BigQueryToBigQueryMotif
+from airflow_concert.motif.bigquery_job import BigQueryJobMotif
 from airflow_concert.motif.create_external_table import CreateExternalBigQueryTableMotif
-from airflow_concert.motif.merge_table import MergeReplaceBigQueryMotif
+from airflow_concert.motif.merge_table import MergeBigQueryTableMotif
 from airflow_concert.config.config_integration import ConfigIntegration
 from airflow_concert.entities.table import Table
 
@@ -63,7 +63,7 @@ class Debussy(CompositionBase):
         return ingestion
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
-        bigquery_to_bigquery_motif = BigQueryToBigQueryMotif(self.config)
+        bigquery_to_bigquery_motif = BigQueryJobMotif(sql_query='')
         data_warehouse_raw_to_trusted_phrase = DataWarehouseRawToTrustedPhrase(
             name='Raw_to_Trusted_Phrase',
             raw_to_trusted_motif=bigquery_to_bigquery_motif
@@ -72,24 +72,29 @@ class Debussy(CompositionBase):
 
     def gcs_landing_to_bigquery_raw_phrase(self, table: Table, rdbms) -> LandingStorageToDataWarehouseRawPhrase:
         create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(table, rdbms)
-        merge_replace_bigquery_motif = self.merge_replace_bigquery_motif(table)
+        merge_bigquery_table_motif = self.merge_bigquery_table_motif(table)
+        execute_bigquery_sql_motif = self.execute_query_motif(sql_query='')
         gcs_landing_to_bigquery_raw_phrase = LandingStorageToDataWarehouseRawPhrase(
             name='Landing_to_Raw_Phrase',
             create_external_table_motif=create_external_bigquery_table_motif,
-            merge_landing_to_raw_motif=merge_replace_bigquery_motif
+            merge_table_motif=merge_bigquery_table_motif
         )
         return gcs_landing_to_bigquery_raw_phrase
 
-    def merge_replace_bigquery_motif(self, table: Table) -> MergeReplaceBigQueryMotif:
+    def execute_query_motif(self, sql_query):
+        execute_query_motif = BigQueryJobMotif(sql_query=sql_query)
+        return execute_query_motif
+
+    def merge_bigquery_table_motif(self, table: Table) -> MergeBigQueryTableMotif:
         main_table = self.raw_table_uri(table)
         delta_table = self.landing_external_table_uri(table)
-        merge_replace_bigquery_motif = MergeReplaceBigQueryMotif(
+        merge_bigquery_table_motif = MergeBigQueryTableMotif(
             config=self.config,
             table=table,
             main_table_uri=main_table,
             delta_table_uri=delta_table
         )
-        return merge_replace_bigquery_motif
+        return merge_bigquery_table_motif
 
     def create_external_bigquery_table_motif(self, table: Table, rdbms) -> CreateExternalBigQueryTableMotif:
         source_bucket_uri_prefix = self.landing_bucket_uri_prefix(rdbms=rdbms, table=table)
