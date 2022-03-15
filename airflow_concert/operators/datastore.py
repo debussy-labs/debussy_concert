@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from airflow.models import BaseOperator
-from google.cloud import datastore
+from google.cloud import datastore  # type: ignore
 
 
 class DotzDatastoreClient:

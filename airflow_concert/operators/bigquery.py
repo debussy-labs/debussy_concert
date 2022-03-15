@@ -11,8 +11,8 @@ from typing import (
     Union,
 )
 
-from google.cloud.bigquery import TableReference
-from google.api_core.exceptions import Conflict
+from google.cloud.bigquery import TableReference  # type: ignore
+from google.api_core.exceptions import Conflict  # type: ignore
 
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook, _parse_gcs_url
@@ -20,7 +20,7 @@ from airflow.providers.google.cloud.hooks.gcs import GCSHook, _parse_gcs_url
 from airflow.models import BaseOperator
 
 
-from debussy_framework.v2.utils.bigquery import bigquery_singlevalue_formatter
+from debussy_framework.v2.utils.bigquery import bigquery_singlevalue_formatter  # type: ignore
 
 
 class BigQueryUIColors(enum.Enum):

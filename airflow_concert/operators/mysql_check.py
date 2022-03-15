@@ -1,7 +1,7 @@
 import json
 
 import pendulum
-from mysql.connector import connect
+from mysql.connector import connect  # type: ignore
 from airflow.models import SkipMixin
 from airflow.operators.python import PythonOperator
 
