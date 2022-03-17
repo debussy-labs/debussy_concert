@@ -9,6 +9,11 @@ class IngestionSourceToLandingStoragePhrase(PhraseBase, PIngestionSourceToLandin
         export_data_to_storage_motif: PExportDataToStorageMotif,
         name=None
     ) -> None:
-        motifs = [export_data_to_storage_motif]
+        self.export_data_to_storage_motif = export_data_to_storage_motif
+        motifs = [self.export_data_to_storage_motif]
         super().__init__(name=name,
                          motifs=motifs)
+
+    def setup(self, destination_storage_uri):
+        self.export_data_to_storage_motif.setup(
+            destination_storage_uri=destination_storage_uri)
