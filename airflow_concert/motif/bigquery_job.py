@@ -4,8 +4,11 @@ from airflow_concert.phrase.protocols import PExecuteQueryMotif
 
 
 class BigQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
-    def __init__(self, sql_query, config=None, name=None) -> None:
+    def __init__(self, sql_query=None, config=None, name=None) -> None:
         super().__init__(name=name, config=config)
+        self.sql_query = sql_query
+
+    def setup(self, sql_query: str):
         self.sql_query = sql_query
 
     def build(self, dag, task_group):

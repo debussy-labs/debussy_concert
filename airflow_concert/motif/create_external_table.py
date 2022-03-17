@@ -9,13 +9,13 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
         self,
         config,
         table: Table,
-        source_bucket_uri_prefix,
-        destination_project_dataset_table: str,
+        source_bucket_uri_prefix: str = None,
+        destination_project_dataset_table: str = None,
         name=None
     ) -> None:
         self.table = table
-        self.source_bucket_uri_prefix = source_bucket_uri_prefix
-        self.destination_project_dataset_table = destination_project_dataset_table
+        self.source_storage_uri_prefix = source_bucket_uri_prefix
+        self.destination_table_uri = destination_project_dataset_table
         super().__init__(name=name, config=config)
 
     @property
@@ -25,18 +25,26 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
                     "externalDataConfiguration": {
                         "hivePartitioningOptions": {
                             "mode": "AUTO",
-                            "sourceUriPrefix": self.source_bucket_uri_prefix,
+                            "sourceUriPrefix": self.source_storage_uri_prefix,
                         },
                         "sourceFormat": "PARQUET",
-                        "sourceUris": [f"{self.source_bucket_uri_prefix}/*.parquet"],
+                        "sourceUris": [f"{self.source_storage_uri_prefix}/*.parquet"],
                     },
         }
+
+    def setup(
+        self,
+        source_bucket_uri_prefix: str,
+        destination_project_dataset_table: str
+    ):
+        self.source_storage_uri_prefix = source_bucket_uri_prefix
+        self.destination_table_uri = destination_project_dataset_table
 
     def create_landing_external_table(self, dag, task_group) -> BigQueryCreateExternalTableOperator:
         create_landing_external_table = BigQueryCreateExternalTableOperator(
             task_id=self.name,
-            bucket=self.source_bucket_uri_prefix,
-            destination_project_dataset_table=self.destination_project_dataset_table,
+            bucket=self.source_storage_uri_prefix,
+            destination_project_dataset_table=self.destination_table_uri,
             table_resource=self.table_resource,
             dag=dag,
             task_group=task_group
