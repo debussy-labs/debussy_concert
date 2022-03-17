@@ -1,7 +1,6 @@
 from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.motif.mixins.bigquery_job import BigQueryJobMixin
 from airflow_concert.phrase.protocols import PExecuteQueryMotif
-from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 
 
 class BigQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):

@@ -73,7 +73,6 @@ class Debussy(CompositionBase):
     def gcs_landing_to_bigquery_raw_phrase(self, table: Table, rdbms) -> LandingStorageToDataWarehouseRawPhrase:
         create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(table, rdbms)
         merge_bigquery_table_motif = self.merge_bigquery_table_motif(table)
-        execute_bigquery_sql_motif = self.execute_query_motif(sql_query='')
         gcs_landing_to_bigquery_raw_phrase = LandingStorageToDataWarehouseRawPhrase(
             name='Landing_to_Raw_Phrase',
             create_external_table_motif=create_external_bigquery_table_motif,
