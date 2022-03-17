@@ -4,7 +4,7 @@ from airflow import DAG
 
 from airflow_concert.movement.movement_base import PMovement
 from airflow_concert.config.config_integration import ConfigIntegration
-from airflow_concert.services.tables.tables import TablesService
+from airflow_concert.service.tables.tables import TablesService
 from airflow_concert.entities.table import Table
 
 
