@@ -1,0 +1,9 @@
+project: modular-aileron-191222
+region: us-central1
+zone: us-central1-a
+landing_bucket: dotz-datalake-dev-l1-landing
+artifact_bucket: "dotz-datalake-dev-artifacts"
+staging_bucket: "dotz-datalake-dev-l0-staging"
+landing_dataset: landing
+raw_dataset: raw
+trusted_dataset: trusted
