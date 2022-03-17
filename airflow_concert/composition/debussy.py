@@ -1,7 +1,7 @@
 from airflow_concert.composition.composition_base import CompositionBase
 from airflow_concert.movement.data_ingestion import DataIngestionMovement
 from airflow_concert.phrase.ingestion_to_landing import IngestionSourceToLandingStoragePhrase
-from airflow_concert.phrase.landing_to_raw import LandingStorageToDataWarehouseRawPhrase
+from airflow_concert.phrase.landing_to_raw import LandingStorageExternalTableToDataWarehouseRawPhrase
 from airflow_concert.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhrase
 from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
@@ -19,7 +19,7 @@ class Debussy(CompositionBase):
 
     @property
     def table_prefix(self):
-        return self.config.database.lower()
+        return self.config.table_prefix
 
     def landing_bucket_uri_prefix(self, rdbms: str, table: Table):
         return (f"gs://{self.config.environment.landing_bucket}/"
@@ -70,10 +70,10 @@ class Debussy(CompositionBase):
         )
         return data_warehouse_raw_to_trusted_phrase
 
-    def gcs_landing_to_bigquery_raw_phrase(self, table: Table, rdbms) -> LandingStorageToDataWarehouseRawPhrase:
+    def gcs_landing_to_bigquery_raw_phrase(self, table: Table, rdbms) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
         create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(table, rdbms)
         merge_bigquery_table_motif = self.merge_bigquery_table_motif(table)
-        gcs_landing_to_bigquery_raw_phrase = LandingStorageToDataWarehouseRawPhrase(
+        gcs_landing_to_bigquery_raw_phrase = LandingStorageExternalTableToDataWarehouseRawPhrase(
             name='Landing_to_Raw_Phrase',
             create_external_table_motif=create_external_bigquery_table_motif,
             merge_table_motif=merge_bigquery_table_motif
