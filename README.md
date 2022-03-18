@@ -7,7 +7,7 @@ Mount examples folder on airflow dags folder
 classDiagram
 class CompositionBase {
     <<interface>>
-    ConfigIntegration config
+    ConfigComposition config
     build(Callable movement_builder) DAG
 }
 
@@ -28,7 +28,7 @@ class PhraseBase{
 class MotifBase {
     <<interface>>
     String name
-    ConfigIntegration config
+    ConfigComposition config
     build(DAG dag, TaskGroup task_group) TaskMixin
 }
 

@@ -3,13 +3,13 @@ from typing import Callable, TypeVar, List, Protocol, Sequence
 from airflow import DAG
 
 from airflow_concert.movement.movement_base import PMovement
-from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.config.config_composition import ConfigComposition
 from airflow_concert.service.tables.tables import TablesService
 from airflow_concert.entities.table import Table
 
 
 class PComposition(Protocol):
-    config: ConfigIntegration
+    config: ConfigComposition
     tables_service: TablesService
 
     def play(self, *args, **kwargs) -> DAG:
@@ -26,15 +26,15 @@ class PComposition(Protocol):
 
 
 class CompositionBase(PComposition):
-    def __init__(self, config: ConfigIntegration):
+    def __init__(self, config: ConfigComposition):
         self.config = config
         self.tables_service = TablesService.create_from_dict(config.tables)
 
     @classmethod
-    def create_from_yaml(cls, environment_yaml_filepath, integration_yaml_filepath) -> PComposition:
-        config = ConfigIntegration.load_from_file(
-            integration_file_path=integration_yaml_filepath,
-            env_file_path=environment_yaml_filepath
+    def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> PComposition:
+        config = ConfigComposition.load_from_file(
+            composition_config_file_path=composition_config_yaml_filepath,
+            env_file_path=environment_config_yaml_filepath
         )
         return cls(config)
 

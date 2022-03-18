@@ -1,6 +1,6 @@
 from typing import Callable
 
-from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.config.config_composition import ConfigComposition
 from airflow_concert.entities.table import Table
 
 from airflow_concert.composition.composition_base import CompositionBase
@@ -13,32 +13,45 @@ from airflow_concert.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhras
 from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
 
-from airflow_concert.motif.export_table import ExportMySqlTableToGcsMotif
+from airflow_concert.motif.export_table import ExportFullMySqlTableToGcsMotif
 from airflow_concert.motif.bigquery_job import BigQueryJobMotif
 from airflow_concert.motif.create_external_table import CreateExternalBigQueryTableMotif
 from airflow_concert.motif.merge_table import MergeBigQueryTableMotif
 
 
 class FeuxDArtifice(CompositionBase):
-    def __init__(self, config: ConfigIntegration):
+    def __init__(self, config: ConfigComposition):
         super().__init__(config)
 
-    def mysql_movement_builder(self, table: Table) -> DataIngestionMovement:
-        export_mysql_to_gcs_motif = ExportMySqlTableToGcsMotif(
+    def mysql_full_load_movement_builder(self, table: Table) -> DataIngestionMovement:
+        export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
             config=self.config, table=table)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
         return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, table)
 
+    def postgres_full_load_movement_builder(self, table: Table) -> DataIngestionMovement:
+        export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
+            config=self.config, table=table)
+        ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
+            export_data_to_storage_motif=export_mysql_to_gcs_motif
+        )
+        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, table)
+
+    def auto_play(self):
+        rdbms_builder_fn = self.rdbms_builder_fn()
+        dag = self.play(rdbms_builder_fn)
+        return dag
+
     def rdbms_builder_fn(self) -> Callable[[Table], PMovement]:
         map_ = {
-            'mysql': self.mysql_movement_builder
+            'mysql': self.mysql_full_load_movement_builder
         }
         rdbms_name = self.config.rdbms_name
         builder = map_.get(rdbms_name)
         if not builder:
-            raise RuntimeError(f"Invalid rdbms: {rdbms_name}")
+            raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
         return builder
 
     def rdbms_ingestion_movement_builder(self, ingestion_to_landing_phrase, table: Table) -> DataIngestionMovement:

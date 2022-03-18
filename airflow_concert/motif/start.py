@@ -15,9 +15,9 @@ class StartMotif(MotifBase):
         task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
         start_dag = StartOperator(phase="dag", dag=dag, task_group=task_group)
         log_input = PythonOperator(
-            task_id='log_input2',
+            task_id='log_input',
             python_callable=lambda **x: logging.info(x),
-            op_kwargs={'integration': self.config},
+            op_kwargs={'config': self.config},
             dag=dag,
             task_group=task_group
         )

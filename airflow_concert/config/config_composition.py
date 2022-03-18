@@ -5,7 +5,7 @@ from airflow_concert.config.config_dag_parameters import ConfigDagParameters
 from airflow_concert.config.config_base import ConfigBase
 
 
-class ConfigIntegration(ConfigBase):
+class ConfigComposition(ConfigBase):
     def __init__(
         self,
         name,
@@ -30,11 +30,11 @@ class ConfigIntegration(ConfigBase):
         self.table_prefix = database.lower()
 
     @classmethod
-    def load_from_file(cls, integration_file_path, env_file_path):
+    def load_from_file(cls, composition_config_file_path, env_file_path):
 
         env_config = ConfigEnvironment.load_from_file(env_file_path)
 
-        with open(integration_file_path) as file:
+        with open(composition_config_file_path) as file:
             config = yaml.safe_load(file)
         config["environment"] = env_config
 

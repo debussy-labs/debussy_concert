@@ -5,16 +5,16 @@ from airflow_concert.phrase.landing_to_raw import LandingStorageExternalTableToD
 from airflow_concert.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhrase
 from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
-from airflow_concert.motif.export_table import ExportMySqlTableToGcsMotif
+from airflow_concert.motif.export_table import ExportFullMySqlTableToGcsMotif
 from airflow_concert.motif.bigquery_job import BigQueryJobMotif
 from airflow_concert.motif.create_external_table import CreateExternalBigQueryTableMotif
 from airflow_concert.motif.merge_table import MergeBigQueryTableMotif
-from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.config.config_composition import ConfigComposition
 from airflow_concert.entities.table import Table
 
 
 class Debussy(CompositionBase):
-    def __init__(self, config: ConfigIntegration):
+    def __init__(self, config: ConfigComposition):
         super().__init__(config)
 
     @property
@@ -37,7 +37,7 @@ class Debussy(CompositionBase):
 
     def mysql_movement_builder(self, table: Table) -> DataIngestionMovement:
         rdbms = 'mysql'
-        export_mysql_to_gcs_motif = ExportMySqlTableToGcsMotif(
+        export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
             config=self.config, table=table,
             destination_storage_uri=self.landing_bucket_uri_prefix(rdbms=rdbms, table=table))
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(

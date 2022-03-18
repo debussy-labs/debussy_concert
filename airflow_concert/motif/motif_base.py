@@ -5,11 +5,11 @@ from airflow import DAG
 from airflow.utils.task_group import TaskGroup
 from airflow.models.taskmixin import TaskMixin
 
-from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.config.config_composition import ConfigComposition
 
 
 class PMotif(Protocol):
-    config: ConfigIntegration
+    config: ConfigComposition
     name: str
 
     def play(self, *args, **kwargs) -> TaskMixin:
@@ -25,7 +25,7 @@ class PClusterMotifMixin(PMotif, Protocol):
 
 
 class MotifBase(PMotif, ABC):
-    def __init__(self, config: ConfigIntegration, name=None) -> None:
+    def __init__(self, config: ConfigComposition, name=None) -> None:
         self.config = config
         self.name = name or self.__class__.__name__
 

@@ -4,11 +4,11 @@ from airflow.configuration import conf
 
 dags_folder = conf.get('core', 'dags_folder')
 env_file = f'{dags_folder}/examples/pixdict/environment.yaml'
-integration_file = f'{dags_folder}/examples/pixdict/integration.yaml'
+composition_file = f'{dags_folder}/examples/pixdict/composition.yaml'
 
 
 debussy: Debussy = Debussy.create_from_yaml(
-    environment_yaml_filepath=env_file, integration_yaml_filepath=integration_file)
+    environment_config_yaml_filepath=env_file, composition_config_yaml_filepath=composition_file)
 mysql = debussy.mysql_movement_builder
 dags = debussy.multi_play(mysql)
 

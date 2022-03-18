@@ -7,7 +7,7 @@ from airflow_concert.movement.protocols import (
     PDataWarehouseRawToTrustedPhrase,
     PEndPhrase
 )
-from airflow_concert.config.config_integration import ConfigIntegration
+from airflow_concert.config.config_composition import ConfigComposition
 from airflow_concert.entities.table import Table
 
 
@@ -48,7 +48,7 @@ class DataIngestionMovement(MovementBase):
 
     def setup(
         self,
-        config: ConfigIntegration,
+        config: ConfigComposition,
         table: Table
     ):
         self.config = config

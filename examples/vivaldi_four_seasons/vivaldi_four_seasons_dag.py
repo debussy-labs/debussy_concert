@@ -4,4 +4,4 @@ from airflow.configuration import conf
 
 dags_folder = conf.get('core', 'dags_folder')
 env_file = f'{dags_folder}/examples/vivaldi_four_seasons/environment.yaml'
-integration_file = f'{dags_folder}/examples/vivaldi_four_seasons/integration.yaml'
+composition_file = f'{dags_folder}/examples/vivaldi_four_seasons/composition.yaml'

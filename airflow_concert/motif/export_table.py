@@ -64,7 +64,7 @@ def build_query_from_datastore_entity_json(entity_json_str):
     return query
 
 
-class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
+class ExportFullMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
     def __init__(
             self, config, table: Table,
             destination_storage_uri: str = None,
@@ -174,6 +174,8 @@ class ExportMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PCluste
         task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
 
         start = StartOperator(phase=table.name, dag=dag, task_group=task_group)
+
+        
         get_datastore_entity = self.get_datastore_entity(dag, table, task_group)
         check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
         build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)
