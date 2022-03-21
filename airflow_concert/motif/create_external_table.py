@@ -1,4 +1,5 @@
-from airflow_concert.operators.bigquery import BigQueryCreateExternalTableOperator
+from debussy_framework.v2.operators.bigquery import BigQueryCreateExternalTableOperator
+
 from airflow_concert.motif.motif_base import MotifBase
 from airflow_concert.phrase.protocols import PCreateExternalTableMotif
 from airflow_concert.entities.table import Table

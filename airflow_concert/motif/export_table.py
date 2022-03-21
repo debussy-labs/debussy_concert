@@ -3,13 +3,13 @@ from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
+from debussy_framework.v3.operators.mysql_check import MySQLCheckOperator
+from debussy_framework.v2.operators.basic import StartOperator
+from debussy_framework.v2.operators.datastore import DatastoreGetEntityOperator
 
 from airflow_concert.motif.motif_base import MotifBase, PClusterMotifMixin
 from airflow_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
 from airflow_concert.phrase.protocols import PExportDataToStorageMotif
-from airflow_concert.operators.basic import StartOperator
-from airflow_concert.operators.datastore import DatastoreGetEntityOperator
-from airflow_concert.operators.mysql_check import MySQLCheckOperator
 from airflow_concert.entities.table import Table
 
 
@@ -175,7 +175,6 @@ class ExportFullMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PCl
 
         start = StartOperator(phase=table.name, dag=dag, task_group=task_group)
 
-        
         get_datastore_entity = self.get_datastore_entity(dag, table, task_group)
         check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
         build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)

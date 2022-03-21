@@ -1,5 +1,6 @@
-from airflow_concert.motif.motif_base import MotifBase
 from airflow.operators.dummy import DummyOperator
+
+from airflow_concert.motif.motif_base import MotifBase
 
 
 class EndMotif(MotifBase):
