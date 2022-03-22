@@ -11,9 +11,9 @@ class BigQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
     def setup(self, sql_query: str):
         self.sql_query = sql_query
 
-    def build(self, dag, task_group):
+    def build(self, dag, phrase_group):
         bigquery_job_operator = self.insert_job_operator(
-            dag, task_group,
+            dag, phrase_group,
             self.query_configuration(sql_query=self.sql_query)
         )
         return bigquery_job_operator

@@ -1,6 +1,17 @@
-#  from airflow import DAG  # noqa: F401
+import inject
 from airflow_concert.composition.debussy import Debussy
 from airflow.configuration import conf
+
+from airflow_concert.service.workflow.airflow import AirflowService
+from airflow_concert.service.workflow.protocol import PWorkflowService
+
+
+def config_services(binder: inject.Binder):
+    binder.bind(PWorkflowService, AirflowService())
+
+
+inject.configure(config_services, bind_in_runtime=False)
+
 
 dags_folder = conf.get('core', 'dags_folder')
 env_file = f'{dags_folder}/examples/pixdict/environment.yaml'

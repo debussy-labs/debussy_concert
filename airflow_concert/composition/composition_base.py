@@ -1,4 +1,5 @@
-from typing import Callable, TypeVar, List, Protocol, Sequence
+from typing import Callable, List, Protocol, Sequence
+import inject
 
 from airflow import DAG
 
@@ -6,11 +7,13 @@ from airflow_concert.movement.movement_base import PMovement
 from airflow_concert.config.config_composition import ConfigComposition
 from airflow_concert.service.tables.tables import TablesService
 from airflow_concert.entities.table import Table
+from airflow_concert.service.workflow.protocol import PWorkflowService
 
 
 class PComposition(Protocol):
     config: ConfigComposition
     tables_service: TablesService
+    workflow_service: PWorkflowService
 
     def play(self, *args, **kwargs) -> DAG:
         pass
@@ -26,9 +29,11 @@ class PComposition(Protocol):
 
 
 class CompositionBase(PComposition):
-    def __init__(self, config: ConfigComposition):
+    @inject.autoparams()
+    def __init__(self, config: ConfigComposition, workflow_service: PWorkflowService):
         self.config = config
         self.tables_service = TablesService.create_from_dict(config.tables)
+        self.workflow_service = workflow_service
 
     @classmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> PComposition:
@@ -45,21 +50,23 @@ class CompositionBase(PComposition):
         return self.build_multi_dag(*args, **kwargs)
 
     def build_multi_dag(self, movement_builder: Callable[[Table], PMovement]) -> List[DAG]:
-        from airflow import DAG
         dags = list()
         for table in self.tables_service.tables():
             name = self.config.dag_parameters.dag_id + '.' + table.name
             kwargs = {**self.config.dag_parameters}
             del kwargs['dag_id']
-            dag = DAG(dag_id=name, **kwargs)
-            movement_builder(table).play(dag=dag)
-            dags.append(dag)
+            workflow_dag = self.workflow_service.workflow_dag(group_id=name, **kwargs)
+            movement_builder(table).play(workflow_dag=workflow_dag)
+            dags.append(workflow_dag)
         return dags
 
     def build(self, movement_builder: Callable[[Table], PMovement]) -> DAG:
-        dag = DAG(**self.config.dag_parameters)
+        name = self.config.dag_parameters.dag_id
+        kwargs = {**self.config.dag_parameters}
+        del kwargs['dag_id']
+        workflow_dag = self.workflow_service.workflow_dag(group_id=name, **kwargs)
 
         for table in self.tables_service.tables():
             movement = movement_builder(table)
-            movement.build(dag=dag)
-        return dag
+            movement.build(workflow_dag=workflow_dag)
+        return workflow_dag

@@ -52,5 +52,5 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
         )
         return create_landing_external_table
 
-    def build(self, dag, task_group):
-        return self.create_landing_external_table(dag, task_group)
+    def build(self, dag, phrase_group):
+        return self.create_landing_external_table(dag, phrase_group)
