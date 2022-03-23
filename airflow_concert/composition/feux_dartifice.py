@@ -60,7 +60,7 @@ class FeuxDArtifice(CompositionBase):
         data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
         end_phrase = EndPhrase(config=self.config)
 
-        name = f'Movement_{table.name}'
+        name = f'DataIngestionMovement_{table.name}'
         movement = DataIngestionMovement(
             name=name,
             start_phrase=start_phrase,
