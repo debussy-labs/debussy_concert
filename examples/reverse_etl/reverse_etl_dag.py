@@ -1,8 +1,8 @@
 import inject
 from airflow.configuration import conf
-from airflow_concert.composition.reverse_etl import ReverseEtlComposition
-from airflow_concert.service.workflow.airflow import AirflowService
-from airflow_concert.service.workflow.protocol import PWorkflowService
+from debussy_concert.composition.reverse_etl import ReverseEtlComposition
+from debussy_concert.service.workflow.airflow import AirflowService
+from debussy_concert.service.workflow.protocol import PWorkflowService
 
 
 def config_services(binder: inject.Binder):

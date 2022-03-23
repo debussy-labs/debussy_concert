@@ -1,4 +1,4 @@
-.PHONY: clean-pyc clean-build docs clean
+.PHONY: clean-pyc clean-build docs clean install mypy
 
 clean: clean-build clean-pyc clean-test
 
@@ -21,4 +21,8 @@ clean-test:
 	rm -fr htmlcov/
 
 mypy:
-	mypy --namespace-packages --explicit-package-bases airflow_concert
+	mypy --namespace-packages --explicit-package-bases debussy_concert
+
+install:
+	pip install -e .
+

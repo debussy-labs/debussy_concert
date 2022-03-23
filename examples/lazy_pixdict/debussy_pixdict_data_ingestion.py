@@ -1,8 +1,8 @@
 import inject
 from airflow.configuration import conf
-from airflow_concert.composition.feux_dartifice import FeuxDArtifice
-from airflow_concert.service.workflow.airflow import AirflowService
-from airflow_concert.service.workflow.protocol import PWorkflowService
+from debussy_concert.composition.feux_dartifice import FeuxDArtifice
+from debussy_concert.service.workflow.airflow import AirflowService
+from debussy_concert.service.workflow.protocol import PWorkflowService
 
 
 def config_services(binder: inject.Binder):
