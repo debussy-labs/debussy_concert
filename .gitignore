@@ -1,3 +1,6 @@
+# ignore file with gitignore_ prefix
+gitignore_*
+
 ### VS Code ###
 .vscode
 
