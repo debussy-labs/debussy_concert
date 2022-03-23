@@ -21,7 +21,7 @@ from airflow_concert.motif.merge_table import MergeBigQueryTableMotif
 
 class FeuxDArtifice(CompositionBase):
     def __init__(self, config: ConfigComposition):
-        super().__init__(config)
+        super().__init__(config=config)
 
     def mysql_full_load_movement_builder(self, table: Table) -> DataIngestionMovement:
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
@@ -61,7 +61,7 @@ class FeuxDArtifice(CompositionBase):
         end_phrase = EndPhrase(config=self.config)
 
         name = f'Movement_{table.name}'
-        ingestion = DataIngestionMovement(
+        movement = DataIngestionMovement(
             name=name,
             start_phrase=start_phrase,
             ingestion_source_to_landing_storage_phrase=ingestion_to_landing_phrase,
@@ -69,8 +69,8 @@ class FeuxDArtifice(CompositionBase):
             data_warehouse_raw_to_trusted_phrase=data_warehouse_raw_to_trusted_phrase,
             end_phrase=end_phrase
         )
-        ingestion.setup(self.config, table)
-        return ingestion
+        movement.setup(self.config, table)
+        return movement
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
         bigquery_to_bigquery_motif = BigQueryJobMotif(sql_query='select 1')

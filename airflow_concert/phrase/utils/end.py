@@ -3,8 +3,9 @@ from airflow_concert.motif.end import EndMotif
 
 
 class EndPhrase(PhraseBase):
-    def __init__(self, config, name=None) -> None:
+    def __init__(self, config, end_motif=None, name=None) -> None:
+        self.end_motif = end_motif or EndMotif(config=config)
         super().__init__(
             name=name,
-            motifs=[EndMotif(config=config)]
+            motifs=[self.end_motif]
         )

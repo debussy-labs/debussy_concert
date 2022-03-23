@@ -15,7 +15,7 @@ from airflow_concert.entities.table import Table
 
 class Debussy(CompositionBase):
     def __init__(self, config: ConfigComposition):
-        super().__init__(config)
+        super().__init__(config=config)
 
     @property
     def table_prefix(self):

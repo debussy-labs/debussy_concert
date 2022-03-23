@@ -30,7 +30,9 @@ class PComposition(Protocol):
 
 class CompositionBase(PComposition):
     @inject.autoparams()
-    def __init__(self, config: ConfigComposition, workflow_service: PWorkflowService):
+    def __init__(
+            self, *,
+            config: ConfigComposition, workflow_service: PWorkflowService):
         self.config = config
         self.tables_service = TablesService.create_from_dict(config.tables)
         self.workflow_service = workflow_service

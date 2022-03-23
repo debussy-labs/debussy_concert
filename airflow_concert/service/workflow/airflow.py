@@ -1,6 +1,6 @@
 from enum import Enum
 
-from airflow import DAG
+from airflow.models.dag import DAG
 from airflow.utils.task_group import TaskGroup
 
 from airflow_concert.service.workflow.protocol import PWorkflowService

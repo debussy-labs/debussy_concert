@@ -1,0 +1,35 @@
+name: pixDict
+description: PixDict ingestion
+dag_parameters:
+    dag_id: pixdict
+    schedule_interval: null
+    start_date:
+      year: 2022
+      month: 1
+      day: 1
+    default_args:
+      owner: astro
+tables:
+  - name: key_history
+    primary_key: id
+    offset_type: TIMESTAMP
+    offset_field: created
+    fields:
+      - name: id
+        description: Primary Key
+      - name: user_id
+        description: Identification Dotz.
+      - name: account_id
+        description: Identification code of the account(maxLength = 14).
+      - name: key_type
+        description: DICT key type.
+      - name: key
+        description: DICT key.
+      - name: created
+        description: Creation date.
+      - name: deleted
+        description: Deletion date.
+      - name: bonus_applied
+        description: Bonus applied date.
+      - name: METADATA
+        description: Metadata

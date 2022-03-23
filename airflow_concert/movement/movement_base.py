@@ -1,6 +1,6 @@
 from typing import Protocol, Sequence
 import inject
-from airflow.utils.task_group import TaskGroup
+from airflow_concert.entities.protocols import PMovementGroup
 from airflow_concert.phrase.phrase_base import PPhrase
 from airflow_concert.service.workflow.protocol import PWorkflowService
 
@@ -13,14 +13,14 @@ class PMovement(Protocol):
     def play(self, *args, **kwargs):
         pass
 
-    def build(self, dag) -> TaskGroup:
+    def build(self, dag) -> PMovementGroup:
         pass
 
 
 class MovementBase(PMovement):
     @inject.autoparams()
     def __init__(
-        self,
+        self, *,
         workflow_service: PWorkflowService,
         phrases: Sequence[PPhrase],
         name=None
@@ -32,7 +32,7 @@ class MovementBase(PMovement):
     def play(self, *args, **kwargs):
         return self.build(*args, **kwargs)
 
-    def build(self, workflow_dag) -> TaskGroup:
+    def build(self, workflow_dag) -> PMovementGroup:
         movement_group = self.workflow_service.movement_group(group_id=self.name, workflow_dag=workflow_dag)
         current_task_group = self.phrases[0].build(workflow_dag, movement_group)
 
