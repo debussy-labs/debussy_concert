@@ -105,3 +105,11 @@ class Debussy(CompositionBase):
             destination_project_dataset_table=destination_project_dataset_table
         )
         return create_external_bigquery_table_motif
+
+    @classmethod
+    def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> 'Debussy':
+        config = ConfigComposition.load_from_file(
+            composition_config_file_path=composition_config_yaml_filepath,
+            env_file_path=environment_config_yaml_filepath
+        )
+        return cls(config)

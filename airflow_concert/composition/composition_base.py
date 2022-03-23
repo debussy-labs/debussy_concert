@@ -1,3 +1,4 @@
+from abc import abstractclassmethod, ABC
 from typing import Callable, List, Protocol, Sequence
 import inject
 
@@ -28,7 +29,7 @@ class PComposition(Protocol):
         pass
 
 
-class CompositionBase(PComposition):
+class CompositionBase(ABC, PComposition):
     @inject.autoparams()
     def __init__(
             self, *,
@@ -37,13 +38,9 @@ class CompositionBase(PComposition):
         self.tables_service = TablesService.create_from_dict(config.tables)
         self.workflow_service = workflow_service
 
-    @classmethod
+    @abstractclassmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> PComposition:
-        config = ConfigComposition.load_from_file(
-            composition_config_file_path=composition_config_yaml_filepath,
-            env_file_path=environment_config_yaml_filepath
-        )
-        return cls(config)
+        pass
 
     def play(self, *args, **kwargs):
         return self.build(*args, **kwargs)
