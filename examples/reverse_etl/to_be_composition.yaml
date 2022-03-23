@@ -1,0 +1,25 @@
+name: dev_retl
+description: Example of a reverse ETL from data warehouse to sftp using dummy operators
+dag_parameters:
+    dag_id: reverse_etl_example_dag
+    schedule_interval: null
+    start_date:
+      year: 2022
+      month: 1
+      day: 1
+    description: Example of a reverse ETL from data warehouse to sftp using dummy operators
+    default_args:
+      owner: astro
+extraction_movements:
+  - movement_name: retl_data
+    retl_query: select 1
+    retl_dataset_paritition_type: HOUR
+    retl_dataset_partition_field: execution_date
+    extract_query_from_temp: select 1
+    destination_type: sftp
+    file_type: CSV
+    destination_object_path: /path/to/file.csv
+    bigquery_connection_id: gcp_bq_conn
+    destination_connection_id: sftp_conn
+
+
