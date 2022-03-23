@@ -14,7 +14,7 @@ from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
 
 from airflow_concert.motif.export_table import ExportFullMySqlTableToGcsMotif
-from airflow_concert.motif.bigquery_job import BigQueryJobMotif
+from airflow_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
 from airflow_concert.motif.create_external_table import CreateExternalBigQueryTableMotif
 from airflow_concert.motif.merge_table import MergeBigQueryTableMotif
 
@@ -73,7 +73,7 @@ class FeuxDArtifice(CompositionBase):
         return movement
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
-        bigquery_to_bigquery_motif = BigQueryJobMotif(sql_query='select 1')
+        bigquery_to_bigquery_motif = BigQueryQueryJobMotif(sql_query='select 1')
         data_warehouse_raw_to_trusted_phrase = DataWarehouseRawToTrustedPhrase(
             name='Raw_to_Trusted_Phrase',
             raw_to_trusted_motif=bigquery_to_bigquery_motif
@@ -91,7 +91,7 @@ class FeuxDArtifice(CompositionBase):
         return gcs_landing_to_bigquery_raw_phrase
 
     def execute_query_motif(self, sql_query):
-        execute_query_motif = BigQueryJobMotif(sql_query=sql_query)
+        execute_query_motif = BigQueryQueryJobMotif(sql_query=sql_query)
         return execute_query_motif
 
     def merge_bigquery_table_motif(self, table: Table) -> MergeBigQueryTableMotif:
