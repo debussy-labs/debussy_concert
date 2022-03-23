@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import Optional, List, Union
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 from debussy_concert.entities.table import Table
 from debussy_concert.motif.motif_base import PMotif
@@ -47,7 +47,7 @@ class BigQueryTimePartitioning:
     """
 
     def __init__(self, type: str, expiration_ms: Optional[str] = None, field: Optional[str] = None):
-        if not type in ('DAY', 'HOUR', 'MONTH', 'YEAR'):
+        if type not in ('DAY', 'HOUR', 'MONTH', 'YEAR'):
             raise ValueError(f"Invalid type: {type}")
         self.type = type
         self.expiration_ms = expiration_ms
@@ -82,9 +82,49 @@ class BigQueryJobMixin:
             }
         }
 
-    def extract_configuration(self):
+    def extract_configuration(
+        self,
+        source_table_uri: str,
+        destination_uris: Union[List[str], str],
+        field_delimiter: str = ',',
+        destination_format: str = 'CSV'
+    ):
+        """
+            https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobconfigurationextract
+            {
+            "destinationUri": string,
+            "destinationUris": [
+                string
+            ],
+            "printHeader": boolean,
+            "fieldDelimiter": string,
+            "destinationFormat": string,
+            "compression": string,
+            "useAvroLogicalTypes": boolean,
+
+            // Union field source can be only one of the following:
+            "sourceTable": {
+                object (TableReference)
+            },
+            "sourceModel": {
+                object (ModelReference)
+            }
+            // End of list of possible types for union field source.
+            }
+        """
+        if destination_format not in ('CSV', 'NEWLINE_DELIMITED_JSON', 'PARQUET', 'AVRO'):
+            raise ValueError(f"Invalid destination_format: {destination_format}")
+        source_table_ref = TableReference(source_table_uri).to_dict()
+        if isinstance(destination_uris, str):
+            destination_uris = [destination_uris]
         return {
-            'extract': None
+            'extract': {
+                "sourceTable": source_table_ref,
+                "destinationUris": destination_uris,
+                "printHeader": True,
+                "fieldDelimiter": field_delimiter,
+                "destinationFormat": destination_format
+            }
         }
 
     def insert_job_operator(self: PMotif, dag, task_group, configuration, gcp_conn_id='google_cloud_default'):

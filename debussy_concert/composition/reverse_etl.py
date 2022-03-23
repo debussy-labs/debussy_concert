@@ -9,6 +9,7 @@ from debussy_concert.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPh
 from debussy_concert.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
 from debussy_concert.phrase.storage_to_destination import StorageToDestinationPhrase
 from debussy_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
+from debussy_concert.motif.bigquery_extract_job import BigQueryExtractJobMotif
 
 
 class ReverseEtlComposition(CompositionBase):
@@ -42,7 +43,7 @@ class ReverseEtlComposition(CompositionBase):
 
     def data_warehouse_reverse_etl_to_storage_phrase(self):
         bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif')
-        export_bigquery = self.dummy_motif('export_temp_table_to_storage_motif')
+        export_bigquery = BigQueryExtractJobMotif(name='bq_export_temp_table_to_gcs_motif')
         phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
             name='DataWarehouseReverseEtlToStoragePhrase',
             datawarehouse_reverse_etl_to_temp_table_motif=bigquery_job,

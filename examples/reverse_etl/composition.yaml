@@ -1,5 +1,5 @@
 name: dev_retl
-description: Example of a reverse ETL from datawarehouse to sftp using dummy operators
+description: Example of a reverse ETL from data warehouse to sftp using dummy operators
 dag_parameters:
     dag_id: reverse_etl_example_dag
     schedule_interval: null
@@ -7,30 +7,14 @@ dag_parameters:
       year: 2022
       month: 1
       day: 1
-    description: Example of a reverse ETL from datawarehouse to sftp using dummy operators
+    description: Example of a reverse ETL from data warehouse to sftp using dummy operators
     default_args:
       owner: astro
 tables:
-  - name: key_history
-    primary_key: id
+  - name: retl_data
+    primary_key: placeholder
     offset_type: TIMESTAMP
-    offset_field: created
+    offset_field: placeholder
     fields:
-      - name: id
-        description: Primary Key
-      - name: user_id
-        description: Identification Dotz.
-      - name: account_id
-        description: Identification code of the account(maxLength = 14).
-      - name: key_type
-        description: DICT key type.
-      - name: key
-        description: DICT key.
-      - name: created
-        description: Creation date.
-      - name: deleted
-        description: Deletion date.
-      - name: bonus_applied
-        description: Bonus applied date.
-      - name: METADATA
-        description: Metadata
+      - name: placeholder
+        description: placeholder

@@ -32,5 +32,5 @@ class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
             create_disposition="CREATE_IF_NEEDED",
             write_disposition="WRITE_TRUNCATE")
         self.export_temp_table_to_storage_motif.setup(
-            origin_table_uri=self.temp_table_uri,
-            storage_uri_prefix=storage_uri_prefix)
+            source_table_uri=self.temp_table_uri,
+            destination_uris=[storage_uri_prefix])
