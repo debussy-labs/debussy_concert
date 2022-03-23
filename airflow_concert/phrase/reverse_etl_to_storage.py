@@ -27,8 +27,10 @@ class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
         self.config = config
         self.table = table
         self.datawarehouse_reverse_etl_to_temp_table_motif.setup(
-            extract_query=extract_query,
-            destiny_table_uri=self.temp_table_uri)
+            sql_query=extract_query,
+            destination_table=self.temp_table_uri,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_TRUNCATE")
         self.export_temp_table_to_storage_motif.setup(
             origin_table_uri=self.temp_table_uri,
             storage_uri_prefix=storage_uri_prefix)
