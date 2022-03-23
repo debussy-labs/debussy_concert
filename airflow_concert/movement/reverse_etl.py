@@ -45,11 +45,11 @@ class ReverseEtlMovement(MovementBase):
 
     @property
     def datawarehouse_to_reverse_etl_query(self):
-        return "select 1"
+        return "select 'reverse_etl_composition'"
 
     @property
     def datawarehouse_reverse_etl_extract_query(self):
-        return "select 1"
+        return f"select * from `{self.reverse_etl_table_uri}`"
 
     def setup(
         self,

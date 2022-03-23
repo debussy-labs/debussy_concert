@@ -1,4 +1,4 @@
-name: Reverse ETL Example DAG
+name: dev_retl
 description: Example of a reverse ETL from datawarehouse to sftp using dummy operators
 dag_parameters:
     dag_id: reverse_etl_example_dag
