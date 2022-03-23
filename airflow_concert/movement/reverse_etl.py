@@ -45,7 +45,7 @@ class ReverseEtlMovement(MovementBase):
 
     @property
     def datawarehouse_to_reverse_etl_query(self):
-        return "select 'reverse_etl_composition'"
+        return "select 'reverse_etl_composition_test' as data, '{{ ts_nodash }}' as date"
 
     @property
     def datawarehouse_reverse_etl_extract_query(self):

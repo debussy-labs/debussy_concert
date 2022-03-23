@@ -6,7 +6,8 @@ from airflow_concert.service.workflow.protocol import PWorkflowService
 
 
 def config_services(binder: inject.Binder):
-    binder.bind(PWorkflowService, AirflowService())
+    airflow_service = AirflowService()
+    binder.bind(PWorkflowService, airflow_service)
 
 
 inject.configure(config_services, bind_in_runtime=False)

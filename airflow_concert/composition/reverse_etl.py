@@ -5,7 +5,7 @@ from airflow_concert.entities.table import Table
 
 from airflow_concert.phrase.utils.start import StartPhrase
 from airflow_concert.phrase.utils.end import EndPhrase
-from airflow_concert.phrase.raw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
+from airflow_concert.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
 from airflow_concert.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
 from airflow_concert.phrase.storage_to_destination import StorageToDestinationPhrase
 from airflow_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
@@ -21,7 +21,9 @@ class ReverseEtlComposition(CompositionBase):
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase()
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase()
         storage_to_destination_phrase = self.storage_to_destination_phrase()
+        name = f'ReverseEtlMovement_{table.name}'
         movement = ReverseEtlMovement(
+            name=name,
             start_phrase=start_phrase,
             data_warehouse_to_reverse_etl_phrase=data_warehouse_raw_to_reverse_etl_phrase,
             data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
@@ -32,16 +34,17 @@ class ReverseEtlComposition(CompositionBase):
         return movement
 
     def data_warehouse_raw_to_reverse_etl_phrase(self):
-        bigquery_job = BigQueryQueryJobMotif()
+        bigquery_job = BigQueryQueryJobMotif(name='bq_to_reverse_etl_motif')
         phrase = DataWarehouseToReverseEtlPhrase(
             dw_to_reverse_etl_motif=bigquery_job
         )
         return phrase
 
     def data_warehouse_reverse_etl_to_storage_phrase(self):
-        bigquery_job = self.dummy_motif('dw_reverse_etl_to_temp_table_motif')
+        bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif')
         export_bigquery = self.dummy_motif('export_temp_table_to_storage_motif')
         phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
+            name='DataWarehouseReverseEtlToStoragePhrase',
             datawarehouse_reverse_etl_to_temp_table_motif=bigquery_job,
             export_temp_table_to_storage_motif=export_bigquery
         )
