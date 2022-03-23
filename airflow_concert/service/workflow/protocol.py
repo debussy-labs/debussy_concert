@@ -14,5 +14,5 @@ class PWorkflowService(Protocol):
     def movement_group(self, group_id, workflow_dag) -> PMovementGroup:
         pass
 
-    def workflow_dag(self, group_id, **kwargs) -> PWorkflowDag:
+    def workflow_dag(self, dag_id, **kwargs) -> PWorkflowDag:
         pass

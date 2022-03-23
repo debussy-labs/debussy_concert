@@ -54,7 +54,7 @@ class CompositionBase(ABC, PComposition):
             name = self.config.dag_parameters.dag_id + '.' + table.name
             kwargs = {**self.config.dag_parameters}
             del kwargs['dag_id']
-            workflow_dag = self.workflow_service.workflow_dag(group_id=name, **kwargs)
+            workflow_dag = self.workflow_service.workflow_dag(dag_id=name, **kwargs)
             movement_builder(table).play(workflow_dag=workflow_dag)
             dags.append(workflow_dag)
         return dags
@@ -63,7 +63,7 @@ class CompositionBase(ABC, PComposition):
         name = self.config.dag_parameters.dag_id
         kwargs = {**self.config.dag_parameters}
         del kwargs['dag_id']
-        workflow_dag = self.workflow_service.workflow_dag(group_id=name, **kwargs)
+        workflow_dag = self.workflow_service.workflow_dag(dag_id=name, **kwargs)
 
         for table in self.tables_service.tables():
             movement = movement_builder(table)

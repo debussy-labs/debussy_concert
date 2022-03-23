@@ -39,5 +39,5 @@ class AirflowService(PWorkflowService):
             ui_color=GroupColor.MOVEMENT.value
         )
 
-    def workflow_dag(self, group_id, **kwargs):
-        return DAG(dag_id=group_id, **kwargs)
+    def workflow_dag(self, dag_id, **kwargs):
+        return DAG(dag_id=dag_id, **kwargs)
