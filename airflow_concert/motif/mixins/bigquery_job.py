@@ -83,13 +83,16 @@ class BigQueryJobMixin:
         }
 
     def extract_configuration(self):
-        pass
+        return {
+            'extract': None
+        }
 
-    def insert_job_operator(self: PMotif, dag, task_group, configuration):
+    def insert_job_operator(self: PMotif, dag, task_group, configuration, gcp_conn_id='google_cloud_default'):
         bigquery_job_operator = BigQueryInsertJobOperator(
             task_id=self.name,
             configuration=configuration,
             dag=dag,
-            task_group=task_group
+            task_group=task_group,
+            gcp_conn_id=gcp_conn_id
         )
         return bigquery_job_operator
