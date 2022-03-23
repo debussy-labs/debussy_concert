@@ -10,6 +10,7 @@ dataproc_config:
   parallelism: 60
 dag_parameters:
     dag_id: pixdict
+    description: PixDict ingestion
     schedule_interval: null
     start_date:
       year: 2022

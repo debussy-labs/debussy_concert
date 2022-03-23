@@ -1,12 +1,13 @@
-name: pixDict
-description: PixDict ingestion
+name: Reverse ETL Example DAG
+description: Example of a reverse ETL from datawarehouse to sftp using dummy operators
 dag_parameters:
-    dag_id: pixdict
+    dag_id: reverse_etl_example_dag
     schedule_interval: null
     start_date:
       year: 2022
       month: 1
       day: 1
+    description: Example of a reverse ETL from datawarehouse to sftp using dummy operators
     default_args:
       owner: astro
 tables:
