@@ -10,13 +10,9 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
         self,
         config,
         table: Table,
-        source_bucket_uri_prefix: str = None,
-        destination_project_dataset_table: str = None,
         name=None
     ) -> None:
         self.table = table
-        self.source_storage_uri_prefix = source_bucket_uri_prefix
-        self.destination_table_uri = destination_project_dataset_table
         super().__init__(name=name, config=config)
 
     @property
@@ -40,6 +36,7 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
     ):
         self.source_storage_uri_prefix = source_bucket_uri_prefix
         self.destination_table_uri = destination_project_dataset_table
+        return self
 
     def create_landing_external_table(self, dag, task_group) -> BigQueryCreateExternalTableOperator:
         create_landing_external_table = BigQueryCreateExternalTableOperator(

@@ -13,3 +13,4 @@ class StorageToDestinationPhrase(PhraseBase):
     def setup(self, storage_uri_prefix):
         self.storage_to_destination_motif.setup(
             storage_uri_prefix=storage_uri_prefix)
+        return self

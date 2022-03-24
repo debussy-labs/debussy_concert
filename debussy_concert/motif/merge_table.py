@@ -93,13 +93,9 @@ class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
         self,
         config,
         table: Table,
-        main_table_uri: str = None,
-        delta_table_uri: str = None,
         name=None
     ) -> None:
         self.table = table
-        self.main_table_uri = main_table_uri
-        self.delta_table_uri = delta_table_uri
         super().__init__(name=name, config=config)
 
     def setup(
@@ -109,6 +105,7 @@ class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
     ):
         self.main_table_uri = main_table_uri
         self.delta_table_uri = delta_table_uri
+        return self
 
     def build(self, dag, task_group):
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=task_group)

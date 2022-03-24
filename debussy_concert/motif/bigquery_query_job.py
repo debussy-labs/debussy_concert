@@ -5,28 +5,21 @@ from debussy_concert.phrase.protocols import PExecuteQueryMotif
 
 
 class BigQueryQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
-    def __init__(self, sql_query=None, config=None, name=None,
-                 destination_table=None,
-                 create_disposition=None,
-                 write_disposition=None,
+    def __init__(self, config=None, name=None,
+                 write_disposition="WRITE_APPEND",
+                 create_disposition="CREATE_IF_NEEDED",
                  time_partitioning: Optional[BigQueryTimePartitioning] = None):
         super().__init__(name=name, config=config)
-        self.sql_query = sql_query
-        self.destination_table = destination_table
-        self.create_disposition = create_disposition
+
         self.write_disposition = write_disposition
         self.time_partitioning = time_partitioning
+        self.create_disposition = create_disposition
 
     def setup(self, sql_query,
-              destination_table=None,
-              create_disposition="CREATE_IF_NEEDED",
-              write_disposition=None,
-              time_partitioning: Optional[BigQueryTimePartitioning] = None):
+              destination_table=None):
         self.sql_query = sql_query
         self.destination_table = destination_table
-        self.create_disposition = create_disposition
-        self.write_disposition = write_disposition
-        self.time_partitioning = time_partitioning
+        return self
 
     def build(self, dag, phrase_group):
         bigquery_job_operator = self.insert_job_operator(

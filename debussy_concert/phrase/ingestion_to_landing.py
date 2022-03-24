@@ -17,3 +17,4 @@ class IngestionSourceToLandingStoragePhrase(PhraseBase, PIngestionSourceToLandin
     def setup(self, destination_storage_uri):
         self.export_data_to_storage_motif.setup(
             destination_storage_uri=destination_storage_uri)
+        return self

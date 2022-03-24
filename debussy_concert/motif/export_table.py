@@ -67,11 +67,9 @@ def build_query_from_datastore_entity_json(entity_json_str):
 class ExportFullMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
     def __init__(
             self, config, table: Table,
-            destination_storage_uri: str = None,
             name=None
     ) -> None:
         self.table = table
-        self.destination_storage_uri = destination_storage_uri
         super().__init__(name=name, config=config)
 
     @property
@@ -154,6 +152,7 @@ class ExportFullMySqlTableToGcsMotif(MotifBase, DataprocClusterHandlerMixin, PCl
 
     def setup(self, destination_storage_uri: str):
         self.destination_storage_uri = destination_storage_uri
+        return self
 
     def get_db_conn_data(self):
         """Get database connection data from Secret Manager"""

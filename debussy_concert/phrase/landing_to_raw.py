@@ -29,3 +29,4 @@ class LandingStorageExternalTableToDataWarehouseRawPhrase(PhraseBase, PLandingSt
             destination_project_dataset_table=self.landing_external_table_uri)
         self.merge_table_motif.setup(
             main_table_uri=datawarehouse_raw_uri, delta_table_uri=self.landing_external_table_uri)
+        return self

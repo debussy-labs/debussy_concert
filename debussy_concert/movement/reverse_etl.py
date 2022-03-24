@@ -5,6 +5,7 @@ from debussy_concert.movement.protocols import (
 )
 from debussy_concert.config.reverse_etl import ConfigReverseEtl
 from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 
 class ReverseEtlMovement(MovementBase):
@@ -36,36 +37,36 @@ class ReverseEtlMovement(MovementBase):
     def reverse_etl_table_uri(self):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.reverse_etl_dataset}."
-                f"{self.config.name}_{self.table.name}")
+                f"{self.config.name}_{self.movement_parameters.name}")
 
     @property
     def reverse_etl_bucket_uri_prefix(self):
         return (f"gs://{self.config.environment.reverse_etl_bucket}/"
-                f"{self.config.name}/{self.table.name}/{self.table.name}_"
+                f"{self.config.name}/{self.movement_parameters.name}/{self.movement_parameters.name}_"
                 "{{ execution_date }}.csv")
 
     @property
     def datawarehouse_to_reverse_etl_query(self):
-        return "select 'reverse_etl_composition_test' as data, '{{ ts_nodash }}' as date"
+        return self.movement_parameters.retl_query
 
     @property
     def datawarehouse_reverse_etl_extract_query(self):
-        return f"select * from `{self.reverse_etl_table_uri}`"
+        return self.movement_parameters.extract_query_from_temp.format(reverse_etl_table_uri=self.reverse_etl_table_uri)
 
     def setup(
         self,
         config: ConfigReverseEtl,
-        table: Table
+        movement_parameters: Table
     ):
         self.config = config
-        self.table = table
+        self.movement_parameters = movement_parameters
         self.data_warehouse_to_reverse_etl_phrase.setup(
             reverse_etl_query=self.datawarehouse_to_reverse_etl_query,
             reverse_etl_table_uri=self.reverse_etl_table_uri)
         self.data_warehouse_reverse_etl_to_storage_phrase.setup(
-            config=self.config, table=self.table,
+            config=self.config, table=self.movement_parameters,
             extract_query=self.datawarehouse_reverse_etl_extract_query,
             storage_uri_prefix=self.reverse_etl_bucket_uri_prefix)
         self.storage_to_destination_phrase.setup(
-            storage_uri_prefix=self.reverse_etl_bucket_uri_prefix
-        )
+            storage_uri_prefix=self.reverse_etl_bucket_uri_prefix)
+        return self

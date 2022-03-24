@@ -58,3 +58,4 @@ class DataIngestionMovement(MovementBase):
             config=config, table=table,
             source_storage_uri_prefix=self.landing_bucket_uri_prefix,
             datawarehouse_raw_uri=self.raw_table_uri)
+        return self
