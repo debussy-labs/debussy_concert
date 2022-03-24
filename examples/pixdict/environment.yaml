@@ -1,7 +1,7 @@
 project: modular-aileron-191222
 region: us-central1
 zone: us-central1-a
-reverse_etl_bucket: dotz-datalake-dev-l1-landing
+reverse_etl_bucket: autodelete_dev_bucket
 landing_bucket: dotz-datalake-dev-l1-landing
 artifact_bucket: "dotz-datalake-dev-artifacts"
 staging_bucket: "dotz-datalake-dev-l0-staging"
