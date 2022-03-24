@@ -4,7 +4,7 @@ from airflow.operators.python import PythonOperator
 from debussy_concert.motif.motif_base import MotifBase
 from debussy_concert.motif.mixins.bigquery_job import BigQueryJobMixin
 from debussy_concert.phrase.protocols import PMergeTableMotif
-from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
 def build_bigquery_merge_query(
@@ -92,10 +92,10 @@ class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
     def __init__(
         self,
         config,
-        table: Table,
+        movement_parameters: DataIngestionMovementParameters,
         name=None
     ) -> None:
-        self.table = table
+        self.movement_parameters = movement_parameters
         super().__init__(name=name, config=config)
 
     def setup(
@@ -116,9 +116,9 @@ class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
         return task_group
 
     def build_merge_query(self, dag, task_group) -> PythonOperator:
-        pii_columns = ','.join([column.name for column in self.table.pii_columns])
-        primary_key = self.table.primary_key.name
-        fields_list = [field.name for field in self.table.fields]
+        pii_columns = ','.join([column.name for column in self.movement_parameters.pii_columns])
+        primary_key = self.movement_parameters.primary_key.name
+        fields_list = [field.name for field in self.movement_parameters.fields]
         delta_date_partition = "loadDate"
         delta_date_value = "{{ ds }}"
         delta_time_partition = "loadTimestamp"

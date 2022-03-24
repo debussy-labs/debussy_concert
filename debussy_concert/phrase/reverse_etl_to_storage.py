@@ -1,6 +1,6 @@
 from debussy_concert.phrase.phrase_base import PhraseBase
 from debussy_concert.config.reverse_etl import ConfigReverseEtl
-from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.base import MovementParametersType
 
 
 class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
@@ -21,11 +21,13 @@ class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
     def temp_table_uri(self):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.temp_dataset}."
-                f"{self.config.name}_{self.table.name}")
+                f"{self.config.name}_{self.movement_parameters.name}")
 
-    def setup(self, config: ConfigReverseEtl, table: Table, extract_query, storage_uri_prefix):
+    def setup(self, config: ConfigReverseEtl,
+              movement_parameters: MovementParametersType,
+              extract_query, storage_uri_prefix):
         self.config = config
-        self.table = table
+        self.movement_parameters = movement_parameters
         self.datawarehouse_reverse_etl_to_temp_table_motif.setup(
             sql_query=extract_query,
             destination_table=self.temp_table_uri)

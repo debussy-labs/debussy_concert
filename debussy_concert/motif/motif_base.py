@@ -1,16 +1,22 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Protocol
+from typing import Callable, Protocol, TypeVar
 import inject
 
 from debussy_concert.entities.protocols import PWorkflowDag, PMotifGroup
 from debussy_concert.config.config_composition import ConfigComposition
 from debussy_concert.service.workflow.protocol import PWorkflowService
 
+ConfigCompositionType = TypeVar('ConfigCompositionType', bound=ConfigComposition)
+
 
 class PMotif(Protocol):
-    config: ConfigComposition
+
     name: str
     workflow_service: PWorkflowService
+
+    @property
+    def config(self) -> ConfigCompositionType:
+        pass
 
     def play(self, *args, **kwargs) -> PMotifGroup:
         pass
@@ -28,10 +34,14 @@ class MotifBase(PMotif, ABC):
     @inject.autoparams()
     def __init__(self, *,
                  workflow_service: PWorkflowService,
-                 config: ConfigComposition, name=None) -> None:
+                 config, name=None) -> None:
         self.workflow_service = workflow_service
-        self.config = config
+        self._config = config
         self.name = name or self.__class__.__name__
+
+    @property
+    def config(self) -> ConfigCompositionType:
+        return self._config
 
     def play(self, *args, **kwargs):
         return self.build(*args, **kwargs)

@@ -10,11 +10,12 @@ from debussy_framework.v2.operators.datastore import DatastoreGetEntityOperator
 from debussy_concert.motif.motif_base import MotifBase, PClusterMotifMixin
 from debussy_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
 from debussy_concert.phrase.protocols import PExportDataToStorageMotif
-from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.config.data_ingestion import ConfigDataIngestion
 
 
 class ExportBigQueryTableMotif(MotifBase, PExportDataToStorageMotif):
-    def __init__(self, config, name=None) -> None:
+    def __init__(self, config: ConfigDataIngestion, name=None) -> None:
         super().__init__(name=name, config=config)
 
     def build(self, dag, task_group):
@@ -67,11 +68,16 @@ def build_query_from_datastore_entity_json(entity_json_str):
 class ExportFullMySqlTableToGcsMotif(
         MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
     def __init__(
-            self, config, table: Table,
+            self, config: ConfigDataIngestion,
+            movement_parameters: DataIngestionMovementParameters,
             name=None
     ) -> None:
-        self.table = table
+        self.movement_parameters = movement_parameters
         super().__init__(name=name, config=config)
+
+    @property
+    def config(self) -> ConfigDataIngestion:
+        return super().config
 
     @property
     def cluster_name(self):
@@ -170,12 +176,11 @@ class ExportFullMySqlTableToGcsMotif(
         return db_conn_data
 
     def build(self, dag, parent_task_group: TaskGroup):
-        table = self.table
         task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
 
-        start = StartOperator(phase=table.name, dag=dag, task_group=task_group)
+        start = StartOperator(phase=self.movement_parameters.name, dag=dag, task_group=task_group)
 
-        get_datastore_entity = self.get_datastore_entity(dag, table, task_group)
+        get_datastore_entity = self.get_datastore_entity(dag, self.movement_parameters, task_group)
         check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
         build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
@@ -256,7 +261,7 @@ class ExportFullMySqlTableToGcsMotif(
 
         return check_mysql_table
 
-    def get_datastore_entity(self, dag, table: Table, task_group):
+    def get_datastore_entity(self, dag, movement_parameters: DataIngestionMovementParameters, task_group):
         db_kind = self.config.database[0].upper() + self.config.database[1:]
         kind = f"MySql{db_kind}Tables"
         get_datastore_entity = DatastoreGetEntityOperator(
@@ -264,7 +269,7 @@ class ExportFullMySqlTableToGcsMotif(
             project=self.config.environment.project,
             namespace="TABLE",
             kind=kind,
-            filters=("SourceTable", "=", table.name),
+            filters=("SourceTable", "=", movement_parameters.name),
             dag=dag,
             task_group=task_group
         )

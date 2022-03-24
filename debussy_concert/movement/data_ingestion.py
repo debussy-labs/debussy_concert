@@ -6,8 +6,8 @@ from debussy_concert.movement.protocols import (
     PDataWarehouseRawToTrustedPhrase,
     PEndPhrase
 )
-from debussy_concert.config.config_composition import ConfigComposition
-from debussy_concert.entities.table import Table
+from debussy_concert.config.data_ingestion import ConfigDataIngestion
+from debussy_concert.config.movement_parameters.base import MovementParametersType
 
 
 class DataIngestionMovement(MovementBase):
@@ -37,25 +37,25 @@ class DataIngestionMovement(MovementBase):
     @property
     def landing_bucket_uri_prefix(self):
         return (f"gs://{self.config.environment.landing_bucket}/"
-                f"{self.config.rdbms_name}/{self.config.database}/{self.table.name}")
+                f"{self.config.rdbms_name}/{self.config.database}/{self.movement_parameters.name}")
 
     @property
     def raw_table_uri(self):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.raw_dataset}."
-                f"{self.config.table_prefix}_{self.table.name}")
+                f"{self.config.table_prefix}_{self.movement_parameters.name}")
 
     def setup(
         self,
-        config: ConfigComposition,
-        table: Table
+        config: ConfigDataIngestion,
+        movement_parameters: MovementParametersType
     ):
         self.config = config
-        self.table = table
+        self.movement_parameters = movement_parameters
         self.ingestion_source_to_landing_storage_phrase.setup(
             destination_storage_uri=self.landing_bucket_uri_prefix)
         self.landing_storage_to_data_warehouse_raw_phrase.setup(
-            config=config, table=table,
+            config=config, movement_parameters=movement_parameters,
             source_storage_uri_prefix=self.landing_bucket_uri_prefix,
             datawarehouse_raw_uri=self.raw_table_uri)
         return self

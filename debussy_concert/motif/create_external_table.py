@@ -2,17 +2,14 @@ from debussy_framework.v2.operators.bigquery import BigQueryCreateExternalTableO
 
 from debussy_concert.motif.motif_base import MotifBase
 from debussy_concert.phrase.protocols import PCreateExternalTableMotif
-from debussy_concert.entities.table import Table
 
 
 class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
     def __init__(
         self,
         config,
-        table: Table,
         name=None
     ) -> None:
-        self.table = table
         super().__init__(name=name, config=config)
 
     @property

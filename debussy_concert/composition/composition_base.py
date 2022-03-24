@@ -6,14 +6,12 @@ from airflow import DAG
 
 from debussy_concert.movement.movement_base import PMovement
 from debussy_concert.config.config_composition import ConfigComposition
-from debussy_concert.service.tables.tables import TablesService
-from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.base import MovementParametersType
 from debussy_concert.service.workflow.protocol import PWorkflowService
 
 
 class PComposition(Protocol):
     config: ConfigComposition
-    tables_service: TablesService
     workflow_service: PWorkflowService
 
     def play(self, *args, **kwargs) -> DAG:
@@ -22,10 +20,10 @@ class PComposition(Protocol):
     def multi_play(self, *args, **kwargs) -> Sequence[DAG]:
         pass
 
-    def build_multi_dag(self, movement_builder: Callable[[Table], PMovement]) -> Sequence[DAG]:
+    def build_multi_dag(self, movement_builder: Callable[[MovementParametersType], PMovement]) -> Sequence[DAG]:
         pass
 
-    def build(self, movement_builder: Callable[[Table], PMovement]) -> DAG:
+    def build(self, movement_builder: Callable[[MovementParametersType], PMovement]) -> DAG:
         pass
 
 
@@ -47,7 +45,7 @@ class CompositionBase(ABC, PComposition):
     def multi_play(self, *args, **kwargs):
         return self.build_multi_dag(*args, **kwargs)
 
-    def build_multi_dag(self, movement_builder: Callable[[Table], PMovement]) -> List[DAG]:
+    def build_multi_dag(self, movement_builder: Callable[[MovementParametersType], PMovement]) -> List[DAG]:
         dags = list()
         for movement_parameter in self.config.movements_parameters:
             name = self.config.dag_parameters.dag_id + '.' + movement_parameter.name
@@ -58,7 +56,7 @@ class CompositionBase(ABC, PComposition):
             dags.append(workflow_dag)
         return dags
 
-    def build(self, movement_builder: Callable[[Table], PMovement]) -> DAG:
+    def build(self, movement_builder: Callable[[MovementParametersType], PMovement]) -> DAG:
         name = self.config.dag_parameters.dag_id
         kwargs = {**self.config.dag_parameters}
         del kwargs['dag_id']

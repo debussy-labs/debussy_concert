@@ -1,7 +1,6 @@
 from typing import Optional, Union, List
 from debussy_concert.motif.motif_base import MotifBase
-from debussy_concert.motif.mixins.bigquery_job import BigQueryJobMixin, BigQueryTimePartitioning
-from debussy_concert.phrase.protocols import PExecuteQueryMotif
+from debussy_concert.motif.mixins.bigquery_job import BigQueryJobMixin
 
 
 class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):

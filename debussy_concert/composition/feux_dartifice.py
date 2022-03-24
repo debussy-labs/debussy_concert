@@ -1,7 +1,7 @@
 from typing import Callable
 
 from debussy_concert.config.data_ingestion import ConfigDataIngestion
-from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 from debussy_concert.composition.composition_base import CompositionBase
 from debussy_concert.movement.data_ingestion import DataIngestionMovement
@@ -23,28 +23,30 @@ class FeuxDArtifice(CompositionBase):
     def __init__(self, config: ConfigDataIngestion):
         super().__init__(config=config)
 
-    def mysql_full_load_movement_builder(self, table: Table) -> DataIngestionMovement:
+    def mysql_full_load_movement_builder(
+            self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
-            config=self.config, table=table)
+            config=self.config, movement_parameters=movement_parameters)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
-        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, table)
+        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters)
 
-    def postgres_full_load_movement_builder(self, table: Table) -> DataIngestionMovement:
+    def postgres_full_load_movement_builder(
+            self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
-            config=self.config, table=table)
+            config=self.config, movement_parameters=movement_parameters)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
-        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, table)
+        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters)
 
     def auto_play(self):
         rdbms_builder_fn = self.rdbms_builder_fn()
         dag = self.play(rdbms_builder_fn)
         return dag
 
-    def rdbms_builder_fn(self) -> Callable[[Table], PMovement]:
+    def rdbms_builder_fn(self) -> Callable[[DataIngestionMovementParameters], PMovement]:
         map_ = {
             'mysql': self.mysql_full_load_movement_builder
         }
@@ -54,13 +56,15 @@ class FeuxDArtifice(CompositionBase):
             raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
         return builder
 
-    def rdbms_ingestion_movement_builder(self, ingestion_to_landing_phrase, table: Table) -> DataIngestionMovement:
+    def rdbms_ingestion_movement_builder(
+            self, ingestion_to_landing_phrase,
+            movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
         start_phrase = StartPhrase(config=self.config)
-        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(table)
+        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
         data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
         end_phrase = EndPhrase(config=self.config)
 
-        name = f'DataIngestionMovement_{table.name}'
+        name = f'DataIngestionMovement_{movement_parameters.name}'
         movement = DataIngestionMovement(
             name=name,
             start_phrase=start_phrase,
@@ -69,7 +73,7 @@ class FeuxDArtifice(CompositionBase):
             data_warehouse_raw_to_trusted_phrase=data_warehouse_raw_to_trusted_phrase,
             end_phrase=end_phrase
         )
-        movement.setup(self.config, table)
+        movement.setup(self.config, movement_parameters)
         return movement
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
@@ -80,9 +84,11 @@ class FeuxDArtifice(CompositionBase):
         )
         return data_warehouse_raw_to_trusted_phrase
 
-    def gcs_landing_to_bigquery_raw_phrase(self, table: Table) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
-        create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(table)
-        merge_bigquery_table_motif = self.merge_bigquery_table_motif(table)
+    def gcs_landing_to_bigquery_raw_phrase(
+            self, movement_parameters: DataIngestionMovementParameters
+    ) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
+        create_external_bigquery_table_motif = self.create_external_bigquery_table_motif()
+        merge_bigquery_table_motif = self.merge_bigquery_table_motif(movement_parameters)
         gcs_landing_to_bigquery_raw_phrase = LandingStorageExternalTableToDataWarehouseRawPhrase(
             name='Landing_to_Raw_Phrase',
             create_external_table_motif=create_external_bigquery_table_motif,
@@ -94,17 +100,18 @@ class FeuxDArtifice(CompositionBase):
         execute_query_motif = BigQueryQueryJobMotif().setup(sql_query=sql_query)
         return execute_query_motif
 
-    def merge_bigquery_table_motif(self, table: Table) -> MergeBigQueryTableMotif:
+    def merge_bigquery_table_motif(
+            self, movement_parameters: DataIngestionMovementParameters) -> MergeBigQueryTableMotif:
         merge_bigquery_table_motif = MergeBigQueryTableMotif(
             config=self.config,
-            table=table
+            movement_parameters=movement_parameters
         )
         return merge_bigquery_table_motif
 
-    def create_external_bigquery_table_motif(self, table: Table) -> CreateExternalBigQueryTableMotif:
+    def create_external_bigquery_table_motif(
+            self) -> CreateExternalBigQueryTableMotif:
         create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif(
-            config=self.config,
-            table=table
+            config=self.config
         )
         return create_external_bigquery_table_motif
 

@@ -10,7 +10,7 @@ from debussy_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.motif.create_external_table import CreateExternalBigQueryTableMotif
 from debussy_concert.motif.merge_table import MergeBigQueryTableMotif
 from debussy_concert.config.data_ingestion import ConfigDataIngestion
-from debussy_concert.entities.table import Table
+from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
 class Debussy(CompositionBase):
@@ -21,38 +21,40 @@ class Debussy(CompositionBase):
     def table_prefix(self):
         return self.config.table_prefix
 
-    def landing_bucket_uri_prefix(self, rdbms: str, table: Table):
+    def landing_bucket_uri_prefix(self, rdbms: str, movement_parameters: DataIngestionMovementParameters):
         return (f"gs://{self.config.environment.landing_bucket}/"
-                f"{rdbms}/{self.config.database}/{table.name}")
+                f"{rdbms}/{self.config.database}/{movement_parameters.name}")
 
-    def landing_external_table_uri(self, table: Table):
+    def landing_external_table_uri(self, movement_parameters: DataIngestionMovementParameters):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.landing_dataset}."
-                f"{self.table_prefix}_{table.name}")
+                f"{self.table_prefix}_{movement_parameters.name}")
 
-    def raw_table_uri(self, table: Table):
+    def raw_table_uri(self, movement_parameters: DataIngestionMovementParameters):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.raw_dataset}."
-                f"{self.table_prefix}_{table.name}")
+                f"{self.table_prefix}_{movement_parameters.name}")
 
-    def mysql_movement_builder(self, table: Table) -> DataIngestionMovement:
+    def mysql_movement_builder(self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
         rdbms = 'mysql'
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
-            config=self.config, table=table).setup(
-            destination_storage_uri=self.landing_bucket_uri_prefix(rdbms=rdbms, table=table))
+            config=self.config, movement_parameters=movement_parameters).setup(
+            destination_storage_uri=self.landing_bucket_uri_prefix(
+                rdbms=rdbms, movement_parameters=movement_parameters))
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
-        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, table, rdbms=rdbms)
+        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters, rdbms=rdbms)
 
     def rdbms_ingestion_movement_builder(
-            self, ingestion_to_landing_phrase, table: Table, rdbms: str) -> DataIngestionMovement:
+            self, ingestion_to_landing_phrase,
+            movement_parameters: DataIngestionMovementParameters, rdbms: str) -> DataIngestionMovement:
         start_phrase = StartPhrase(config=self.config)
-        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(table, rdbms)
+        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters, rdbms)
         data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
         end_phrase = EndPhrase(config=self.config)
 
-        name = f'Movement_{table.name}'
+        name = f'Movement_{movement_parameters.name}'
         ingestion = DataIngestionMovement(
             name=name,
             start_phrase=start_phrase,
@@ -72,9 +74,10 @@ class Debussy(CompositionBase):
         return data_warehouse_raw_to_trusted_phrase
 
     def gcs_landing_to_bigquery_raw_phrase(
-            self, table: Table, rdbms) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
-        create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(table, rdbms)
-        merge_bigquery_table_motif = self.merge_bigquery_table_motif(table)
+            self, movement_parameters: DataIngestionMovementParameters,
+            rdbms) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
+        create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(movement_parameters, rdbms)
+        merge_bigquery_table_motif = self.merge_bigquery_table_motif(movement_parameters)
         gcs_landing_to_bigquery_raw_phrase = LandingStorageExternalTableToDataWarehouseRawPhrase(
             name='Landing_to_Raw_Phrase',
             create_external_table_motif=create_external_bigquery_table_motif,
@@ -82,22 +85,25 @@ class Debussy(CompositionBase):
         )
         return gcs_landing_to_bigquery_raw_phrase
 
-    def merge_bigquery_table_motif(self, table: Table) -> MergeBigQueryTableMotif:
-        main_table = self.raw_table_uri(table)
-        delta_table = self.landing_external_table_uri(table)
+    def merge_bigquery_table_motif(
+            self,
+            movement_parameters: DataIngestionMovementParameters) -> MergeBigQueryTableMotif:
+        main_table = self.raw_table_uri(movement_parameters)
+        delta_table = self.landing_external_table_uri(movement_parameters)
         merge_bigquery_table_motif = MergeBigQueryTableMotif(
             config=self.config,
-            table=table).setup(
+            movement_parameters=movement_parameters).setup(
             main_table_uri=main_table,
             delta_table_uri=delta_table)
         return merge_bigquery_table_motif
 
-    def create_external_bigquery_table_motif(self, table: Table, rdbms) -> CreateExternalBigQueryTableMotif:
-        source_bucket_uri_prefix = self.landing_bucket_uri_prefix(rdbms=rdbms, table=table)
-        destination_project_dataset_table = self.landing_external_table_uri(table)
+    def create_external_bigquery_table_motif(self,
+                                             movement_parameters: DataIngestionMovementParameters,
+                                             rdbms) -> CreateExternalBigQueryTableMotif:
+        source_bucket_uri_prefix = self.landing_bucket_uri_prefix(rdbms=rdbms, movement_parameters=movement_parameters)
+        destination_project_dataset_table = self.landing_external_table_uri(movement_parameters)
         create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif(
-            config=self.config,
-            table=table).setup(
+            config=self.config).setup(
             source_bucket_uri_prefix=source_bucket_uri_prefix,
             destination_project_dataset_table=destination_project_dataset_table)
         return create_external_bigquery_table_motif
