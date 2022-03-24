@@ -1,11 +1,13 @@
+from typing import List
 import yaml
 
 from debussy_concert.config.config_environment import ConfigEnvironment
 from debussy_concert.config.config_dag_parameters import ConfigDagParameters
-from debussy_concert.config.config_base import ConfigBase
+from debussy_concert.config.config_composition import ConfigComposition
+from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
-class ConfigDataIngestion(ConfigBase):
+class ConfigDataIngestion(ConfigComposition):
     def __init__(
         self,
         name,
@@ -14,18 +16,15 @@ class ConfigDataIngestion(ConfigBase):
         secret_id,
         dag_parameters,
         environment: ConfigEnvironment,
-        tables,
+        ingestion_parameters: List[DataIngestionMovementParameters],
         rdbms_name,
         dataproc_config=None,
     ):
-        self.name = name
+        super().__init__(name=name, description=description, movements_parameters=ingestion_parameters,
+                         environment=environment, dag_parameters=dag_parameters)
         self.database = database
         self.secret_id = secret_id
-        self.description = description
-        self.environment = environment
-        self.movements_parameters = tables
         self.rdbms_name = rdbms_name
-        self.dag_parameters = ConfigDagParameters.create_from_dict(dag_parameters)
         self.dataproc_config = dataproc_config
         self.table_prefix = database.lower()
 
@@ -37,5 +36,7 @@ class ConfigDataIngestion(ConfigBase):
         with open(composition_config_file_path) as file:
             config = yaml.safe_load(file)
         config["environment"] = env_config
-
+        extract_movements = [DataIngestionMovementParameters.load_from_dict(parameters)
+                             for parameters in config["ingestion_parameters"]]
+        config["ingestion_parameters"] = extract_movements
         return cls(**config)

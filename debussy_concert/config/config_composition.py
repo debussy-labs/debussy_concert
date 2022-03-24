@@ -1,7 +1,9 @@
-import yaml
+from abc import abstractclassmethod
+from typing import List
 
 from debussy_concert.config.config_environment import ConfigEnvironment
 from debussy_concert.config.config_dag_parameters import ConfigDagParameters
+from debussy_concert.config.movement_parameters.base import MovementParametersBase
 from debussy_concert.config.config_base import ConfigBase
 
 
@@ -10,32 +12,16 @@ class ConfigComposition(ConfigBase):
         self,
         name,
         description,
-        database,
-        secret_id,
-        dag_parameters,
+        movements_parameters: List[MovementParametersBase],
         environment: ConfigEnvironment,
-        tables,
-        rdbms_name,
-        dataproc_config=None,
+        dag_parameters
     ):
         self.name = name
-        self.database = database
-        self.secret_id = secret_id
         self.description = description
+        self.movements_parameters = movements_parameters
         self.environment = environment
-        self.tables = tables
-        self.rdbms_name = rdbms_name
         self.dag_parameters = ConfigDagParameters.create_from_dict(dag_parameters)
-        self.dataproc_config = dataproc_config
-        self.table_prefix = database.lower()
 
-    @classmethod
+    @abstractclassmethod
     def load_from_file(cls, composition_config_file_path, env_file_path):
-
-        env_config = ConfigEnvironment.load_from_file(env_file_path)
-
-        with open(composition_config_file_path) as file:
-            config = yaml.safe_load(file)
-        config["environment"] = env_config
-
-        return cls(**config)
+        pass
