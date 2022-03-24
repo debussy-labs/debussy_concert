@@ -53,7 +53,9 @@ class ReverseEtlComposition(CompositionBase):
         return phrase
 
     def data_warehouse_reverse_etl_to_storage_phrase(self, destination_format, field_delimiter):
-        bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif')
+        bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif',
+                                             write_disposition="WRITE_TRUNCATE",
+                                             create_disposition="CREATE_IF_NEEDED")
         export_bigquery = BigQueryExtractJobMotif(name='bq_export_temp_table_to_gcs_motif',
                                                   destination_format=destination_format,
                                                   field_delimiter=field_delimiter)
