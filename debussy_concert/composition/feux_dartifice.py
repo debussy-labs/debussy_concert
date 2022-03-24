@@ -1,6 +1,6 @@
 from typing import Callable
 
-from debussy_concert.config.config_composition import ConfigComposition
+from debussy_concert.config.data_ingestion import ConfigDataIngestion
 from debussy_concert.entities.table import Table
 
 from debussy_concert.composition.composition_base import CompositionBase
@@ -20,7 +20,7 @@ from debussy_concert.motif.merge_table import MergeBigQueryTableMotif
 
 
 class FeuxDArtifice(CompositionBase):
-    def __init__(self, config: ConfigComposition):
+    def __init__(self, config: ConfigDataIngestion):
         super().__init__(config=config)
 
     def mysql_full_load_movement_builder(self, table: Table) -> DataIngestionMovement:
@@ -73,7 +73,7 @@ class FeuxDArtifice(CompositionBase):
         return movement
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
-        bigquery_to_bigquery_motif = BigQueryQueryJobMotif(sql_query='select 1')
+        bigquery_to_bigquery_motif = BigQueryQueryJobMotif().setup(sql_query='select 1')
         data_warehouse_raw_to_trusted_phrase = DataWarehouseRawToTrustedPhrase(
             name='Raw_to_Trusted_Phrase',
             raw_to_trusted_motif=bigquery_to_bigquery_motif
@@ -91,7 +91,7 @@ class FeuxDArtifice(CompositionBase):
         return gcs_landing_to_bigquery_raw_phrase
 
     def execute_query_motif(self, sql_query):
-        execute_query_motif = BigQueryQueryJobMotif(sql_query=sql_query)
+        execute_query_motif = BigQueryQueryJobMotif().setup(sql_query=sql_query)
         return execute_query_motif
 
     def merge_bigquery_table_motif(self, table: Table) -> MergeBigQueryTableMotif:
@@ -110,7 +110,7 @@ class FeuxDArtifice(CompositionBase):
 
     @classmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> 'FeuxDArtifice':
-        config = ConfigComposition.load_from_file(
+        config = ConfigDataIngestion.load_from_file(
             composition_config_file_path=composition_config_yaml_filepath,
             env_file_path=environment_config_yaml_filepath
         )

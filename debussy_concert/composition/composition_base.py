@@ -35,7 +35,6 @@ class CompositionBase(ABC, PComposition):
             self, *,
             config: ConfigComposition, workflow_service: PWorkflowService):
         self.config = config
-        self.tables_service = TablesService.create_from_dict(config.tables)
         self.workflow_service = workflow_service
 
     @abstractclassmethod
@@ -50,12 +49,12 @@ class CompositionBase(ABC, PComposition):
 
     def build_multi_dag(self, movement_builder: Callable[[Table], PMovement]) -> List[DAG]:
         dags = list()
-        for table in self.tables_service.tables():
-            name = self.config.dag_parameters.dag_id + '.' + table.name
+        for movement_parameter in self.config.movements_parameters:
+            name = self.config.dag_parameters.dag_id + '.' + movement_parameter.name
             kwargs = {**self.config.dag_parameters}
             del kwargs['dag_id']
             workflow_dag = self.workflow_service.workflow_dag(dag_id=name, **kwargs)
-            movement_builder(table).play(workflow_dag=workflow_dag)
+            movement_builder(movement_parameter).play(workflow_dag=workflow_dag)
             dags.append(workflow_dag)
         return dags
 
@@ -65,7 +64,7 @@ class CompositionBase(ABC, PComposition):
         del kwargs['dag_id']
         workflow_dag = self.workflow_service.workflow_dag(dag_id=name, **kwargs)
 
-        for table in self.tables_service.tables():
-            movement = movement_builder(table)
+        for movement_parameter in self.config.movements_parameters:
+            movement = movement_builder(movement_parameter)
             movement.build(workflow_dag=workflow_dag)
         return workflow_dag

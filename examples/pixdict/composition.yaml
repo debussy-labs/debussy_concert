@@ -18,7 +18,7 @@ dag_parameters:
       day: 1
     default_args:
       owner: astro
-tables:
+ingestion_parameters:
   - name: key_history
     primary_key: id
     offset_type: TIMESTAMP

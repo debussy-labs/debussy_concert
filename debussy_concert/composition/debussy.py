@@ -9,12 +9,12 @@ from debussy_concert.motif.export_table import ExportFullMySqlTableToGcsMotif
 from debussy_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.motif.create_external_table import CreateExternalBigQueryTableMotif
 from debussy_concert.motif.merge_table import MergeBigQueryTableMotif
-from debussy_concert.config.config_composition import ConfigComposition
+from debussy_concert.config.data_ingestion import ConfigDataIngestion
 from debussy_concert.entities.table import Table
 
 
 class Debussy(CompositionBase):
-    def __init__(self, config: ConfigComposition):
+    def __init__(self, config: ConfigDataIngestion):
         super().__init__(config=config)
 
     @property
@@ -38,7 +38,7 @@ class Debussy(CompositionBase):
     def mysql_movement_builder(self, table: Table) -> DataIngestionMovement:
         rdbms = 'mysql'
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
-            config=self.config, table=table,
+            config=self.config, table=table).setup(
             destination_storage_uri=self.landing_bucket_uri_prefix(rdbms=rdbms, table=table))
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
@@ -63,7 +63,7 @@ class Debussy(CompositionBase):
         return ingestion
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
-        bigquery_to_bigquery_motif = BigQueryQueryJobMotif(sql_query='')
+        bigquery_to_bigquery_motif = BigQueryQueryJobMotif().setup(sql_query='select 1')
         data_warehouse_raw_to_trusted_phrase = DataWarehouseRawToTrustedPhrase(
             name='Raw_to_Trusted_Phrase',
             raw_to_trusted_motif=bigquery_to_bigquery_motif
@@ -80,19 +80,14 @@ class Debussy(CompositionBase):
         )
         return gcs_landing_to_bigquery_raw_phrase
 
-    def execute_query_motif(self, sql_query):
-        execute_query_motif = BigQueryQueryJobMotif(sql_query=sql_query)
-        return execute_query_motif
-
     def merge_bigquery_table_motif(self, table: Table) -> MergeBigQueryTableMotif:
         main_table = self.raw_table_uri(table)
         delta_table = self.landing_external_table_uri(table)
         merge_bigquery_table_motif = MergeBigQueryTableMotif(
             config=self.config,
-            table=table,
+            table=table).setup(
             main_table_uri=main_table,
-            delta_table_uri=delta_table
-        )
+            delta_table_uri=delta_table)
         return merge_bigquery_table_motif
 
     def create_external_bigquery_table_motif(self, table: Table, rdbms) -> CreateExternalBigQueryTableMotif:
@@ -100,15 +95,14 @@ class Debussy(CompositionBase):
         destination_project_dataset_table = self.landing_external_table_uri(table)
         create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif(
             config=self.config,
-            table=table,
+            table=table).setup(
             source_bucket_uri_prefix=source_bucket_uri_prefix,
-            destination_project_dataset_table=destination_project_dataset_table
-        )
+            destination_project_dataset_table=destination_project_dataset_table)
         return create_external_bigquery_table_motif
 
     @classmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> 'Debussy':
-        config = ConfigComposition.load_from_file(
+        config = ConfigDataIngestion.load_from_file(
             composition_config_file_path=composition_config_yaml_filepath,
             env_file_path=environment_config_yaml_filepath
         )
