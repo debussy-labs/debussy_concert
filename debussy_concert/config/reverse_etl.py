@@ -2,7 +2,6 @@ from typing import List
 import yaml
 
 from debussy_concert.config.config_environment import ConfigEnvironment
-from debussy_concert.config.config_dag_parameters import ConfigDagParameters
 from debussy_concert.config.config_composition import ConfigComposition
 from debussy_concert.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 

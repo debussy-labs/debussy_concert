@@ -13,7 +13,7 @@ dag_parameters:
 extraction_movements:
   - name: retl_data
     retl_query: select 'reverse_etl_composition_test' as data, '{{ ts_nodash }}' as date, TIMESTAMP('{{ execution_date }}') as execution_date
-    retl_dataset_paritition_type: DAY
+    retl_dataset_partition_type: DAY
     retl_dataset_partition_field: execution_date
     extract_query_from_temp: select * from `{reverse_etl_table_uri}`
     file_format: CSV

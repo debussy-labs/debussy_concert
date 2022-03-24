@@ -1,4 +1,3 @@
-from pyrsistent import field
 from debussy_concert.composition.composition_base import CompositionBase
 from debussy_concert.movement.reverse_etl import ReverseEtlMovement
 from debussy_concert.config.reverse_etl import ConfigReverseEtl
@@ -22,7 +21,7 @@ class ReverseEtlComposition(CompositionBase):
         start_phrase = StartPhrase(config=self.config)
         end_phrase = EndPhrase(config=self.config)
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
-            partition_type=movement_parameters.retl_dataset_paritition_type,
+            partition_type=movement_parameters.retl_dataset_partition_type,
             partition_field=movement_parameters.retl_dataset_partition_field
         )
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(

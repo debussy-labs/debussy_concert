@@ -45,7 +45,8 @@ class Debussy(CompositionBase):
         )
         return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, table, rdbms=rdbms)
 
-    def rdbms_ingestion_movement_builder(self, ingestion_to_landing_phrase, table: Table, rdbms: str) -> DataIngestionMovement:
+    def rdbms_ingestion_movement_builder(
+            self, ingestion_to_landing_phrase, table: Table, rdbms: str) -> DataIngestionMovement:
         start_phrase = StartPhrase(config=self.config)
         gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(table, rdbms)
         data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
@@ -70,7 +71,8 @@ class Debussy(CompositionBase):
         )
         return data_warehouse_raw_to_trusted_phrase
 
-    def gcs_landing_to_bigquery_raw_phrase(self, table: Table, rdbms) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
+    def gcs_landing_to_bigquery_raw_phrase(
+            self, table: Table, rdbms) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
         create_external_bigquery_table_motif = self.create_external_bigquery_table_motif(table, rdbms)
         merge_bigquery_table_motif = self.merge_bigquery_table_motif(table)
         gcs_landing_to_bigquery_raw_phrase = LandingStorageExternalTableToDataWarehouseRawPhrase(

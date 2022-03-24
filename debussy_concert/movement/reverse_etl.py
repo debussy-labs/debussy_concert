@@ -4,7 +4,6 @@ from debussy_concert.movement.protocols import (
     PEndPhrase
 )
 from debussy_concert.config.reverse_etl import ConfigReverseEtl
-from debussy_concert.entities.table import Table
 from debussy_concert.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 
@@ -56,7 +55,7 @@ class ReverseEtlMovement(MovementBase):
     def setup(
         self,
         config: ConfigReverseEtl,
-        movement_parameters: Table
+        movement_parameters: ReverseEtlMovementParameters
     ):
         self.config = config
         self.movement_parameters = movement_parameters
