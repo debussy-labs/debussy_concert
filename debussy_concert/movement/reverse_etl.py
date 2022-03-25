@@ -46,7 +46,7 @@ class ReverseEtlMovement(MovementBase):
 
     @property
     def datawarehouse_to_reverse_etl_query(self):
-        return self.movement_parameters.retl_query
+        return self.movement_parameters.reverse_etl_query
 
     @property
     def datawarehouse_reverse_etl_extract_query(self):

@@ -11,7 +11,7 @@ from debussy_concert.phrase.storage_to_destination import StorageToDestinationPh
 from debussy_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.motif.bigquery_extract_job import BigQueryExtractJobMotif
 from debussy_concert.motif.mixins.bigquery_job import BigQueryTimePartitioning
-from debussy_concert.motif.storage_to_storage_motif import add
+from debussy_concert.motif.storage_to_storage_motif import StorageToStorageMotif
 from debussy_framework.v3.hooks.storage_hook import GCSHook
 
 
@@ -30,7 +30,7 @@ class ReverseEtlComposition(CompositionBase):
         start_phrase = StartPhrase(config=self.config)
         end_phrase = EndPhrase(config=self.config)
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
-            partition_type=movement_parameters.retl_dataset_partition_type,
+            partition_type=movement_parameters.reverse_etl_dataset_partition_type,
             partition_field=movement_parameters.reverse_etl_dataset_partition_field
         )
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
