@@ -3,9 +3,9 @@ from debussy_concert.config.movement_parameters.base import MovementParametersBa
 
 class ReverseEtlMovementParameters(MovementParametersBase):
     def __init__(self, name,
-                 retl_query,
-                 retl_dataset_partition_type,
-                 retl_dataset_partition_field,
+                 reverse_etl_query,
+                 reverse_etl_dataset_partition_type,
+                 reverse_etl_dataset_partition_field,
                  extract_query_from_temp,
                  destination_type,
                  file_format,
@@ -14,9 +14,9 @@ class ReverseEtlMovementParameters(MovementParametersBase):
                  bigquery_connection_id,
                  destination_connection_id):
         super().__init__(name)
-        self.retl_query = retl_query
-        self.retl_dataset_partition_type = retl_dataset_partition_type
-        self.retl_dataset_partition_field = retl_dataset_partition_field
+        self.reverse_etl_query = reverse_etl_query
+        self.reverse_etl_dataset_partition_type = reverse_etl_dataset_partition_type
+        self.reverse_etl_dataset_partition_field = reverse_etl_dataset_partition_field
         self.extract_query_from_temp = extract_query_from_temp
         self.destination_type = destination_type
         self.file_format = file_format
