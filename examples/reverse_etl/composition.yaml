@@ -27,9 +27,9 @@ extraction_movements:
       QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
     file_format: CSV
     field_delimiter: ','
-    destination_type: sftp
-    destination_object_path: /path/to/file.csv
-    bigquery_connection_id: gcp_bq_conn
-    destination_connection_id: sftp_conn
+    destination_type: gcs
+    destination_object_path: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
+    bigquery_connection_id: 1
+    destination_connection_id: google_cloud_debussy
 
 

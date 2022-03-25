@@ -24,5 +24,5 @@ if __name__ == '__main__':
 
 composition: ReverseEtlComposition = ReverseEtlComposition.create_from_yaml(
     environment_config_yaml_filepath=env_file, composition_config_yaml_filepath=composition_file)
-reverse_etl_movement_fn = composition.reverse_etl_movement_builder
+reverse_etl_movement_fn = composition.gcs_reverse_etl_movement_builder
 dag = composition.play(reverse_etl_movement_fn)

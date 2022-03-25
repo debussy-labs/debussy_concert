@@ -10,7 +10,6 @@ ConfigCompositionType = TypeVar('ConfigCompositionType', bound=ConfigComposition
 
 
 class PMotif(Protocol):
-
     name: str
     workflow_service: PWorkflowService
 

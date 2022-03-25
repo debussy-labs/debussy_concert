@@ -11,24 +11,33 @@ from debussy_concert.phrase.storage_to_destination import StorageToDestinationPh
 from debussy_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.motif.bigquery_extract_job import BigQueryExtractJobMotif
 from debussy_concert.motif.mixins.bigquery_job import BigQueryTimePartitioning
+from debussy_concert.motif.storage_to_storage_motif import add
+from debussy_framework.v3.hooks.storage_hook import GCSHook
 
 
 class ReverseEtlComposition(CompositionBase):
     def __init__(self, config: ConfigReverseEtl):
         super().__init__(config=config)
 
-    def reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters) -> ReverseEtlMovement:
+    def gcs_reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters):
+        storage_to_destination_phrase = self.storage_to_destination_phrase(movement_parameters)
+        return self.reverse_etl_movement_builder(
+            storage_to_destination_phrase=storage_to_destination_phrase,
+            movement_parameters=movement_parameters)
+
+    def reverse_etl_movement_builder(self, storage_to_destination_phrase,
+                                     movement_parameters: ReverseEtlMovementParameters) -> ReverseEtlMovement:
         start_phrase = StartPhrase(config=self.config)
         end_phrase = EndPhrase(config=self.config)
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
             partition_type=movement_parameters.retl_dataset_partition_type,
-            partition_field=movement_parameters.retl_dataset_partition_field
+            partition_field=movement_parameters.reverse_etl_dataset_partition_field
         )
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
             destination_format=movement_parameters.file_format,
             field_delimiter=movement_parameters.field_delimiter
         )
-        storage_to_destination_phrase = self.storage_to_destination_phrase()
+
         name = f'ReverseEtlMovement_{movement_parameters.name}'
         movement = ReverseEtlMovement(
             name=name,
@@ -66,8 +75,18 @@ class ReverseEtlComposition(CompositionBase):
         )
         return phrase
 
-    def storage_to_destination_phrase(self):
-        storage_to_sftp = self.dummy_motif('storage_to_sftp')
+    def storage_to_destination_phrase(self, movement_parameters: ReverseEtlMovementParameters):
+        dest_conn_id = movement_parameters.destination_connection_id
+        destiny_file_uri = movement_parameters.destination_object_path
+        origin_gcs_hook = GCSHook(gcp_conn_id=dest_conn_id)
+        destiny_gcs_hook = GCSHook(gcp_conn_id=dest_conn_id)
+        storage_to_sftp = StorageToStorageMotif(
+            name='gcs_to_gcs_motif',
+            config=self.config,
+            origin_storage_hook=origin_gcs_hook,
+            destiny_storage_hook=destiny_gcs_hook,
+            destiny_file_uri=destiny_file_uri
+        )
         phrase = StorageToDestinationPhrase(
             storage_to_destination_motif=storage_to_sftp)
         return phrase
