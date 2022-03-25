@@ -25,21 +25,17 @@ class FeuxDArtifice(CompositionBase):
 
     def mysql_full_load_movement_builder(
             self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
-        export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
-            config=self.config, movement_parameters=movement_parameters)
-        ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
-            export_data_to_storage_motif=export_mysql_to_gcs_motif
-        )
+        ingestion_to_landing_phrase = self.mysql_ingestion_to_landing_phrase(movement_parameters)
         return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters)
 
-    def postgres_full_load_movement_builder(
-            self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
+    def mysql_ingestion_to_landing_phrase(self, movement_parameters):
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
             config=self.config, movement_parameters=movement_parameters)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
-        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters)
+
+        return ingestion_to_landing_phrase
 
     def auto_play(self):
         rdbms_builder_fn = self.rdbms_builder_fn()
