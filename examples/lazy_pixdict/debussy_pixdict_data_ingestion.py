@@ -1,6 +1,6 @@
 import inject
 from airflow.configuration import conf
-from debussy_concert.composition.feux_dartifice import FeuxDArtifice
+from debussy_concert.data_ingestion.composition.feux_dartifice import FeuxDArtifice
 from debussy_concert.service.workflow.airflow import AirflowService
 from debussy_concert.service.workflow.protocol import PWorkflowService
 

@@ -1,5 +1,5 @@
 import inject
-from debussy_concert.composition.debussy import Debussy
+from debussy_concert.data_ingestion.composition.debussy import Debussy
 from airflow.configuration import conf
 
 from debussy_concert.service.workflow.airflow import AirflowService

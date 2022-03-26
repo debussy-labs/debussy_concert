@@ -1,21 +1,21 @@
 from debussy_concert.composition.composition_base import CompositionBase
-from debussy_concert.movement.reverse_etl import ReverseEtlMovement
+from debussy_concert.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 from debussy_concert.config.reverse_etl import ConfigReverseEtl
 from debussy_concert.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 from debussy_concert.phrase.utils.start import StartPhrase
 from debussy_concert.phrase.utils.end import EndPhrase
-from debussy_concert.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
-from debussy_concert.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
-from debussy_concert.phrase.storage_to_destination import StorageToDestinationPhrase
-from debussy_concert.motif.bigquery_query_job import BigQueryQueryJobMotif
-from debussy_concert.motif.bigquery_extract_job import BigQueryExtractJobMotif
+from debussy_concert.reverse_etl.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
+from debussy_concert.reverse_etl.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
+from debussy_concert.reverse_etl.phrase.storage_to_destination import StorageToDestinationPhrase
+from debussy_concert.reverse_etl.motif.bigquery_query_job import BigQueryQueryJobMotif
+from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
 from debussy_concert.motif.mixins.bigquery_job import BigQueryTimePartitioning
-from debussy_concert.motif.storage_to_storage_motif import StorageToStorageMotif
+from debussy_concert.reverse_etl.motif.storage_to_storage_motif import StorageToStorageMotif
 from debussy_framework.v3.hooks.storage_hook import GCSHook
 
 
-class ReverseEtlComposition(CompositionBase):
+class ChildrensCorner(CompositionBase):
     def __init__(self, config: ConfigReverseEtl):
         super().__init__(config=config)
 

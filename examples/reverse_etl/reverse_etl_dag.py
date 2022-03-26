@@ -1,6 +1,6 @@
 import inject
 from airflow.configuration import conf
-from debussy_concert.composition.reverse_etl import ReverseEtlComposition
+from debussy_concert.reverse_etl.composition.childrens_corner import ChildrensCorner
 from debussy_concert.service.workflow.airflow import AirflowService
 from debussy_concert.service.workflow.protocol import PWorkflowService
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     composition_file = f'{path}/composition.yaml'
 
 
-composition: ReverseEtlComposition = ReverseEtlComposition.create_from_yaml(
+composition: ChildrensCorner = ChildrensCorner.create_from_yaml(
     environment_config_yaml_filepath=env_file, composition_config_yaml_filepath=composition_file)
 reverse_etl_movement_fn = composition.gcs_reverse_etl_movement_builder
 dag = composition.play(reverse_etl_movement_fn)
