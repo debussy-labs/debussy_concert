@@ -1,6 +1,6 @@
-from debussy_concert.movement.protocols import PLandingStorageToDataWarehouseRawPhrase
-from debussy_concert.phrase.protocols import PMergeTableMotif, PCreateExternalTableMotif, PExecuteQueryMotif
-from debussy_concert.phrase.phrase_base import PhraseBase
+from debussy_concert.core.movement.protocols import PLandingStorageToDataWarehouseRawPhrase
+from debussy_concert.core.phrase.protocols import PMergeTableMotif, PCreateExternalTableMotif, PExecuteQueryMotif
+from debussy_concert.core.phrase.phrase_base import PhraseBase
 
 
 class LandingStorageExternalTableToDataWarehouseRawPhrase(PhraseBase, PLandingStorageToDataWarehouseRawPhrase):

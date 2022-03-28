@@ -1,5 +1,5 @@
-from debussy_concert.phrase.phrase_base import PhraseBase
-from debussy_concert.reverse_etl.motif.start import StartMotif
+from debussy_concert.core.phrase.phrase_base import PhraseBase
+from debussy_concert.core.motif.start import StartMotif
 
 
 class StartPhrase(PhraseBase):

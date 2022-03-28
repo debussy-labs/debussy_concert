@@ -1,5 +1,5 @@
-from debussy_concert.phrase.phrase_base import PhraseBase
-from debussy_concert.motif.end import EndMotif
+from debussy_concert.core.phrase.phrase_base import PhraseBase
+from debussy_concert.core.motif.end import EndMotif
 
 
 class EndPhrase(PhraseBase):

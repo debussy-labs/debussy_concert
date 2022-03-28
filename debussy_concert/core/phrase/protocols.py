@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from debussy_concert.motif.motif_base import PMotif
+from debussy_concert.core.motif.motif_base import PMotif
 
 
 class PExportDataToStorageMotif(PMotif, Protocol):

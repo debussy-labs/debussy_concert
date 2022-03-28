@@ -1,5 +1,5 @@
-from debussy_concert.movement.movement_base import MovementBase
-from debussy_concert.movement.protocols import (
+from debussy_concert.core.movement.movement_base import MovementBase
+from debussy_concert.core.movement.protocols import (
     PStartPhrase,
     PIngestionSourceToLandingStoragePhrase,
     PLandingStorageToDataWarehouseRawPhrase,

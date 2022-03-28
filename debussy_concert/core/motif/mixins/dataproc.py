@@ -2,7 +2,7 @@ from airflow.utils.trigger_rule import TriggerRule
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator, DataprocDeleteClusterOperator)
 
-from debussy_concert.motif.motif_base import PClusterMotifMixin
+from debussy_concert.core.motif.motif_base import PClusterMotifMixin
 
 
 class DataprocClusterHandlerMixin:

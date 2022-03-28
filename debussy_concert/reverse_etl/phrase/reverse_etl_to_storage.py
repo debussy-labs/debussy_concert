@@ -1,4 +1,4 @@
-from debussy_concert.phrase.phrase_base import PhraseBase
+from debussy_concert.core.phrase.phrase_base import PhraseBase
 from debussy_concert.config.reverse_etl import ConfigReverseEtl
 from debussy_concert.config.movement_parameters.base import MovementParametersType
 

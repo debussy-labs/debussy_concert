@@ -3,7 +3,7 @@ from enum import Enum
 from airflow.models.dag import DAG
 from airflow.utils.task_group import TaskGroup
 
-from debussy_concert.service.workflow.protocol import PWorkflowService
+from debussy_concert.core.service.workflow.protocol import PWorkflowService
 
 
 class GroupColor(Enum):

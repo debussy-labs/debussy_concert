@@ -3,15 +3,15 @@ from typing import Callable
 from debussy_concert.config.data_ingestion import ConfigDataIngestion
 from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
-from debussy_concert.composition.composition_base import CompositionBase
+from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement
-from debussy_concert.movement.movement_base import PMovement
+from debussy_concert.core.movement.movement_base import PMovement
 
 from debussy_concert.data_ingestion.phrase.ingestion_to_landing import IngestionSourceToLandingStoragePhrase
 from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageExternalTableToDataWarehouseRawPhrase
 from debussy_concert.data_ingestion.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhrase
-from debussy_concert.phrase.utils.start import StartPhrase
-from debussy_concert.phrase.utils.end import EndPhrase
+from debussy_concert.core.phrase.utils.start import StartPhrase
+from debussy_concert.core.phrase.utils.end import EndPhrase
 
 from debussy_concert.data_ingestion.motif.export_table import ExportFullMySqlTableToGcsMotif
 from debussy_concert.data_ingestion.motif.bigquery_query_job import BigQueryQueryJobMotif

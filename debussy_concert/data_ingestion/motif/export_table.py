@@ -7,9 +7,9 @@ from debussy_framework.v3.operators.mysql_check import MySQLCheckOperator
 from debussy_framework.v2.operators.basic import StartOperator
 from debussy_framework.v2.operators.datastore import DatastoreGetEntityOperator
 
-from debussy_concert.motif.motif_base import MotifBase, PClusterMotifMixin
-from debussy_concert.motif.mixins.dataproc import DataprocClusterHandlerMixin
-from debussy_concert.phrase.protocols import PExportDataToStorageMotif
+from debussy_concert.core.motif.motif_base import MotifBase, PClusterMotifMixin
+from debussy_concert.core.motif.mixins.dataproc import DataprocClusterHandlerMixin
+from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
 from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 from debussy_concert.config.data_ingestion import ConfigDataIngestion
 

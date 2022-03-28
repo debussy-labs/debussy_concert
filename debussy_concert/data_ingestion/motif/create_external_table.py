@@ -1,7 +1,7 @@
 from debussy_framework.v2.operators.bigquery import BigQueryCreateExternalTableOperator
 
-from debussy_concert.motif.motif_base import MotifBase
-from debussy_concert.phrase.protocols import PCreateExternalTableMotif
+from debussy_concert.core.motif.motif_base import MotifBase
+from debussy_concert.core.phrase.protocols import PCreateExternalTableMotif
 
 
 class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):

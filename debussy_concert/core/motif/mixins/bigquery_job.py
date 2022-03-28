@@ -1,7 +1,7 @@
 import re
 from typing import Optional, List, Union
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
-from debussy_concert.motif.motif_base import PMotif
+from debussy_concert.core.motif.motif_base import PMotif
 
 
 class TableReference:

@@ -4,7 +4,7 @@ from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 from debussy_framework.v2.operators.basic import StartOperator
 
-from debussy_concert.motif.motif_base import MotifBase
+from debussy_concert.core.motif.motif_base import MotifBase
 
 
 class StartMotif(MotifBase):

@@ -1,5 +1,5 @@
 from typing import List, Iterator, Dict
-from debussy_concert.entities.table import Table
+from debussy_concert.core.entities.table import Table
 
 
 class TablesService:

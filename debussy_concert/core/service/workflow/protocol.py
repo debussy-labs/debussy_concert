@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from debussy_concert.entities.protocols import (
+from debussy_concert.core.entities.protocols import (
     PMotifGroup, PPhraseGroup, PMovementGroup, PWorkflowDag)
 
 

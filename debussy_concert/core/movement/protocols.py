@@ -1,8 +1,8 @@
 from typing import Protocol
-from debussy_concert.phrase.protocols import (PExportDataToStorageMotif,
-                                              PCreateExternalTableMotif,
-                                              PMergeTableMotif)
-from debussy_concert.phrase.phrase_base import PPhrase
+from debussy_concert.core.phrase.protocols import (PExportDataToStorageMotif,
+                                                   PCreateExternalTableMotif,
+                                                   PMergeTableMotif)
+from debussy_concert.core.phrase.phrase_base import PPhrase
 from debussy_concert.config.config_composition import ConfigComposition
 from debussy_concert.config.movement_parameters.base import MovementParametersType
 #

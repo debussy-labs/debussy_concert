@@ -1,8 +1,8 @@
 from typing import Protocol, Sequence
 import inject
-from debussy_concert.entities.protocols import PPhraseGroup
-from debussy_concert.motif.motif_base import PMotif
-from debussy_concert.service.workflow.protocol import PWorkflowService
+from debussy_concert.core.entities.protocols import PPhraseGroup
+from debussy_concert.core.motif.motif_base import PMotif
+from debussy_concert.core.service.workflow.protocol import PWorkflowService
 
 
 class PPhrase(Protocol):

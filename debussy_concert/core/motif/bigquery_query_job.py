@@ -1,7 +1,7 @@
 from typing import Optional
-from debussy_concert.motif.motif_base import MotifBase
-from debussy_concert.motif.mixins.bigquery_job import BigQueryJobMixin, BigQueryTimePartitioning
-from debussy_concert.phrase.protocols import PExecuteQueryMotif
+from debussy_concert.core.motif.motif_base import MotifBase
+from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin, BigQueryTimePartitioning
+from debussy_concert.core.phrase.protocols import PExecuteQueryMotif
 
 
 class BigQueryQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):

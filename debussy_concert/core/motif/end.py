@@ -1,6 +1,6 @@
 from airflow.operators.dummy import DummyOperator
 
-from debussy_concert.motif.motif_base import MotifBase
+from debussy_concert.core.motif.motif_base import MotifBase
 
 
 class EndMotif(MotifBase):

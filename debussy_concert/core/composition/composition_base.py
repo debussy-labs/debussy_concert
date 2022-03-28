@@ -4,10 +4,10 @@ import inject
 
 from airflow import DAG
 
-from debussy_concert.movement.movement_base import PMovement
+from debussy_concert.core.movement.movement_base import PMovement
 from debussy_concert.config.config_composition import ConfigComposition
 from debussy_concert.config.movement_parameters.base import MovementParametersType
-from debussy_concert.service.workflow.protocol import PWorkflowService
+from debussy_concert.core.service.workflow.protocol import PWorkflowService
 
 
 class PComposition(Protocol):

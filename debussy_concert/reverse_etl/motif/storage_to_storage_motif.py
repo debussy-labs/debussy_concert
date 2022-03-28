@@ -2,7 +2,7 @@ from airflow.utils.task_group import TaskGroup
 
 from debussy_framework.v3.operators.storage_to_storage import StorageToStorageOperator, StorageHookInterface
 
-from debussy_concert.motif.motif_base import MotifBase
+from debussy_concert.core.motif.motif_base import MotifBase
 
 
 class StorageToStorageMotif(MotifBase):
