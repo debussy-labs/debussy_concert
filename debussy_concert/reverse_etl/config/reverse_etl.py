@@ -3,6 +3,7 @@ import yaml
 
 from debussy_concert.config.config_environment import ConfigEnvironment
 from debussy_concert.config.config_composition import ConfigComposition
+from debussy_concert.config.config_dag_parameters import ConfigDagParameters
 from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 
@@ -29,5 +30,6 @@ class ConfigReverseEtl(ConfigComposition):
         extract_movements = [ReverseEtlMovementParameters.load_from_dict(parameters)
                              for parameters in config["extraction_movements"]]
         config["extraction_movements"] = extract_movements
+        config["dag_parameters"] = ConfigDagParameters.create_from_dict(config["dag_parameters"])
 
         return cls(**config)

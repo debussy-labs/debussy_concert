@@ -1,6 +1,6 @@
 name: pixDict
 database: pixDict
-secret_id: dotz-mysql-prod
+secret_manager_uri: projects/modular-aileron-191222/secrets/dotz-mysql-prod 
 description: PixDict ingestion
 rdbms_name: mysql
 dataproc_config:

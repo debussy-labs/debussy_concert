@@ -1,8 +1,7 @@
 import datetime as dt
-from debussy_concert.config.config_base import ConfigBase
 
 
-class ConfigDagParameters(ConfigBase):
+class ConfigDagParameters:
     def __init__(
             self,
             **kwargs

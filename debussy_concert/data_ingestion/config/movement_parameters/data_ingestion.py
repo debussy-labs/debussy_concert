@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Optional
+from dataclasses import dataclass
 import warnings
 from debussy_concert.config.movement_parameters.base import MovementParametersBase
 
@@ -23,40 +24,39 @@ class TableField:
         return id(self)
 
 
+@dataclass(frozen=True)
 class DataIngestionMovementParameters(MovementParametersBase):
-    def __init__(self, name: str,
-                 fields: List[TableField],
-                 primary_key: TableField = None,
-                 pii_columns: List[TableField] = None,
-                 data_tracking_tag: str = None,
-                 offset_type: str = None,
-                 offset_field: TableField = None,
-                 business_partition_column: TableField = None
-                 ) -> None:
-        super().__init__(name)
-        self.fields = fields
-        self.primary_key = primary_key
-        self._pii_columns = pii_columns or []
-        self.data_tracking_tag = data_tracking_tag
-        self.offset_type = offset_type
-        self.offset_field = offset_field
-        self.business_partition_column = business_partition_column
+    fields: List[TableField]
+    primary_key: Optional[TableField] = None
+    pii_columns: Optional[List[TableField]] = None
+    data_tracking_tag: Optional[str] = None
+    offset_type: Optional[str] = None
+    offset_field: Optional[TableField] = None
+    business_partition_column: Optional[TableField] = None
 
-    @property
-    def pii_columns(self):
-        pii_columns = self._pii_columns
+    def __post_init__(self):
+        pii_columns_joined = self.pii_columns_join()
+        # hack for frozen dataclass https://stackoverflow.com/a/54119384
+        # overwriting pii_columns with pii_columns_joined
+        object.__setattr__(self, 'pii_columns', pii_columns_joined)
+
+    def pii_columns_join(self):
+        # pii column can be set both on pii_columns argument or on a flag in field
+        # this function join those two methods
+        pii_columns = self.pii_columns or []
         for field in self.fields:
             if field.is_pii:
                 pii_columns.append(field)
         # cast to set to remove duplicates fields
+        print(pii_columns)
         pii_columns = set(pii_columns)
         return pii_columns
 
-    def pii_columns_names(self):
+    def pii_columns_names(self) -> List[str]:
         return [column.name for column in self.pii_columns]
 
     # alias
-    pii_fields = pii_columns
+    pii_fields: List[TableField] = pii_columns
     pii_fields_names = pii_columns_names
 
     @classmethod

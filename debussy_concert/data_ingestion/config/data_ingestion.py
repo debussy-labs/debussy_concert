@@ -1,31 +1,23 @@
 from typing import List
+from dataclasses import dataclass
 import yaml
 
 from debussy_concert.config.config_environment import ConfigEnvironment
 from debussy_concert.config.config_composition import ConfigComposition
+from debussy_concert.config.config_dag_parameters import ConfigDagParameters
 from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
+@dataclass(frozen=True)
 class ConfigDataIngestion(ConfigComposition):
-    def __init__(
-        self,
-        name,
-        description,
-        database,
-        secret_id,
-        dag_parameters,
-        environment: ConfigEnvironment,
-        ingestion_parameters: List[DataIngestionMovementParameters],
-        rdbms_name,
-        dataproc_config=None,
-    ):
-        super().__init__(name=name, description=description, movements_parameters=ingestion_parameters,
-                         environment=environment, dag_parameters=dag_parameters)
-        self.database = database
-        self.secret_id = secret_id
-        self.rdbms_name = rdbms_name
-        self.dataproc_config = dataproc_config
-        self.table_prefix = database.lower()
+    database: str
+    secret_manager_uri: str
+    rdbms_name: str
+    dataproc_config: dict
+
+    @property
+    def table_prefix(self):
+        return self.database.lower()
 
     @classmethod
     def load_from_file(cls, composition_config_file_path, env_file_path):
@@ -37,5 +29,7 @@ class ConfigDataIngestion(ConfigComposition):
         config["environment"] = env_config
         extract_movements = [DataIngestionMovementParameters.load_from_dict(parameters)
                              for parameters in config["ingestion_parameters"]]
-        config["ingestion_parameters"] = extract_movements
+        del config["ingestion_parameters"]
+        config["movements_parameters"] = extract_movements
+        config["dag_parameters"] = ConfigDagParameters.create_from_dict(config["dag_parameters"])
         return cls(**config)

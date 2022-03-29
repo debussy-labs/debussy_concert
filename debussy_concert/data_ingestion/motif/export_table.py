@@ -168,7 +168,7 @@ class ExportFullMySqlTableToGcsMotif(
 
         client = secretmanager.SecretManagerServiceClient()
 
-        name = f"projects/{self.config.environment.project}/secrets/{self.config.secret_id}/versions/latest"
+        name = f"{self.config.secret_manager_uri}/versions/latest"
         response = client.access_secret_version(name=name)
         secret = response.payload.data.decode("UTF-8")
         db_conn_data = json.loads(secret)
@@ -198,7 +198,7 @@ class ExportFullMySqlTableToGcsMotif(
         return task_group
 
     def jdbc_to_landing(self, dag, task_group, build_extract_query_id):
-        secret_uri = f"projects/{self.config.environment.project}/secrets/{self.config.secret_id}/versions/latest"
+        secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
         # path and naming parameters
