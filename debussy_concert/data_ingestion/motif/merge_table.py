@@ -4,7 +4,7 @@ from airflow.operators.python import PythonOperator
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin
 from debussy_concert.core.phrase.protocols import PMergeTableMotif
-from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
 def build_bigquery_merge_query(

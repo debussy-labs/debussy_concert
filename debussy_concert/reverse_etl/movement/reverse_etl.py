@@ -3,8 +3,8 @@ from debussy_concert.core.movement.protocols import (
     PStartPhrase,
     PEndPhrase
 )
-from debussy_concert.config.reverse_etl import ConfigReverseEtl
-from debussy_concert.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
+from debussy_concert.reverse_etl.config.reverse_etl import ConfigReverseEtl
+from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 
 class ReverseEtlMovement(MovementBase):

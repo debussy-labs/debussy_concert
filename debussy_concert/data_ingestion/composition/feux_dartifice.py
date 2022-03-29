@@ -1,7 +1,7 @@
 from typing import Callable
 
-from debussy_concert.config.data_ingestion import ConfigDataIngestion
-from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
+from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement

@@ -9,8 +9,8 @@ from debussy_concert.data_ingestion.motif.export_table import ExportFullMySqlTab
 from debussy_concert.core.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.data_ingestion.motif.create_external_table import CreateExternalBigQueryTableMotif
 from debussy_concert.data_ingestion.motif.merge_table import MergeBigQueryTableMotif
-from debussy_concert.config.data_ingestion import ConfigDataIngestion
-from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
+from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
 class Debussy(CompositionBase):

@@ -6,7 +6,7 @@ from debussy_concert.core.movement.protocols import (
     PDataWarehouseRawToTrustedPhrase,
     PEndPhrase
 )
-from debussy_concert.config.data_ingestion import ConfigDataIngestion
+from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
 from debussy_concert.config.movement_parameters.base import MovementParametersType
 
 
