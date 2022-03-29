@@ -3,7 +3,7 @@ import yaml
 
 from debussy_concert.config.config_environment import ConfigEnvironment
 from debussy_concert.config.config_composition import ConfigComposition
-from debussy_concert.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 
 
 class ConfigDataIngestion(ConfigComposition):

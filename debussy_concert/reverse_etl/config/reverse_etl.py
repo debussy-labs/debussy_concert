@@ -3,7 +3,7 @@ import yaml
 
 from debussy_concert.config.config_environment import ConfigEnvironment
 from debussy_concert.config.config_composition import ConfigComposition
-from debussy_concert.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
+from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 
 class ConfigReverseEtl(ConfigComposition):

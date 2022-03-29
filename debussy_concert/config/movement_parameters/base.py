@@ -1,9 +1,11 @@
+from dataclasses import dataclass
+#import json
 from typing import TypeVar
 
 
+@dataclass(frozen=True)
 class MovementParametersBase:
-    def __init__(self, name):
-        self.name = name
+    name: str
 
 
 MovementParametersType = TypeVar('MovementParametersType', bound=MovementParametersBase)
