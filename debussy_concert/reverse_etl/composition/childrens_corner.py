@@ -31,11 +31,13 @@ class ChildrensCorner(CompositionBase):
         end_phrase = EndPhrase(config=self.config)
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
             partition_type=movement_parameters.reverse_etl_dataset_partition_type,
-            partition_field=movement_parameters.reverse_etl_dataset_partition_field
+            partition_field=movement_parameters.reverse_etl_dataset_partition_field,
+            gcp_conn_id=movement_parameters.gcp_connection_id
         )
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
             destination_format=movement_parameters.file_format,
-            field_delimiter=movement_parameters.field_delimiter
+            field_delimiter=movement_parameters.field_delimiter,
+            gcp_conn_id=movement_parameters.gcp_connection_id
         )
 
         name = f'ReverseEtlMovement_{movement_parameters.name}'
@@ -50,24 +52,27 @@ class ChildrensCorner(CompositionBase):
         movement.setup(self.config, movement_parameters)
         return movement
 
-    def data_warehouse_raw_to_reverse_etl_phrase(self, partition_type, partition_field):
+    def data_warehouse_raw_to_reverse_etl_phrase(self, partition_type, partition_field, gcp_conn_id):
         time_partitioning = BigQueryTimePartitioning(type=partition_type, field=partition_field)
         bigquery_job = BigQueryQueryJobMotif(name='bq_to_reverse_etl_motif',
                                              write_disposition="WRITE_APPEND",
                                              create_disposition="CREATE_IF_NEEDED",
-                                             time_partitioning=time_partitioning)
+                                             time_partitioning=time_partitioning,
+                                             gcp_conn_id=gcp_conn_id)
         phrase = DataWarehouseToReverseEtlPhrase(
             dw_to_reverse_etl_motif=bigquery_job
         )
         return phrase
 
-    def data_warehouse_reverse_etl_to_storage_phrase(self, destination_format, field_delimiter):
+    def data_warehouse_reverse_etl_to_storage_phrase(self, destination_format, field_delimiter, gcp_conn_id):
         bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif',
                                              write_disposition="WRITE_TRUNCATE",
-                                             create_disposition="CREATE_IF_NEEDED")
+                                             create_disposition="CREATE_IF_NEEDED",
+                                             gcp_conn_id=gcp_conn_id)
         export_bigquery = BigQueryExtractJobMotif(name='bq_export_temp_table_to_gcs_motif',
                                                   destination_format=destination_format,
-                                                  field_delimiter=field_delimiter)
+                                                  field_delimiter=field_delimiter,
+                                                  gcp_conn_id=gcp_conn_id)
         phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
             name='DataWarehouseReverseEtlToStoragePhrase',
             datawarehouse_reverse_etl_to_temp_table_motif=bigquery_job,

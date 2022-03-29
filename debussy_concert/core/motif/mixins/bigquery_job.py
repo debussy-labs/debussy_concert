@@ -126,12 +126,16 @@ class BigQueryJobMixin:
             }
         }
 
-    def insert_job_operator(self: PMotif, dag, task_group, configuration, gcp_conn_id='google_cloud_default'):
+    def insert_job_operator(self: PMotif, dag, task_group,
+                            configuration,
+                            gcp_conn_id='google_cloud_default',
+                            **op_kw_args):
         bigquery_job_operator = BigQueryInsertJobOperator(
             task_id=self.name,
             configuration=configuration,
             dag=dag,
             task_group=task_group,
-            gcp_conn_id=gcp_conn_id
+            gcp_conn_id=gcp_conn_id,
+            **op_kw_args
         )
         return bigquery_job_operator

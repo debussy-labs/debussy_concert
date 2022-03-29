@@ -8,12 +8,16 @@ class BigQueryQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
     def __init__(self, config=None, name=None,
                  write_disposition="WRITE_APPEND",
                  create_disposition="CREATE_IF_NEEDED",
-                 time_partitioning: Optional[BigQueryTimePartitioning] = None):
+                 time_partitioning: Optional[BigQueryTimePartitioning] = None,
+                 gcp_conn_id='google_cloud_default',
+                 **op_kw_args):
         super().__init__(name=name, config=config)
 
         self.write_disposition = write_disposition
         self.time_partitioning = time_partitioning
         self.create_disposition = create_disposition
+        self.gcp_conn_id = gcp_conn_id
+        self.op_kw_args = op_kw_args
 
     def setup(self, sql_query,
               destination_table=None):
@@ -30,6 +34,8 @@ class BigQueryQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
                 create_disposition=self.create_disposition,
                 write_disposition=self.write_disposition,
                 time_partitioning=self.time_partitioning
-            )
+            ),
+            self.gcp_conn_id,
+            **self.op_kw_args
         )
         return bigquery_job_operator

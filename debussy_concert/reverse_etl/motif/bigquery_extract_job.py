@@ -7,10 +7,12 @@ class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):
     def __init__(self,
                  field_delimiter: Optional[str] = ',',
                  destination_format: Optional[str] = 'CSV',
+                 gcp_conn_id='google_cloud_default',
                  config=None, name=None):
         super().__init__(name=name, config=config)
         self.field_delimiter = field_delimiter
         self.destination_format = destination_format
+        self.gcp_conn_id = gcp_conn_id
 
     def setup(self,
               source_table_uri: str,
@@ -31,6 +33,7 @@ class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):
                 self.destination_uris,
                 self.field_delimiter,
                 self.destination_format
-            )
+            ),
+            self.gcp_conn_id
         )
         return bigquery_job_operator
