@@ -10,14 +10,16 @@ dag_parameters:
     description: Example of a reverse ETL from data warehouse to sftp using dummy operators
     default_args:
       owner: astro
+    tags:
+      - example
+      - reverse_etl
 extraction_movements:
   - name: retl_data
     reverse_etl_query: >
-      SELECT 
-      'reverse_etl_composition_test' as data, 
+      SELECT
+      CURRENT_TIMESTAMP as load_ts,
       '{{ ts_nodash }}' as date, 
       TIMESTAMP('{{ execution_date }}') as execution_date, 
-      CURRENT_TIMESTAMP as load_ts
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: execution_date
     extract_query_from_temp: >
@@ -27,9 +29,9 @@ extraction_movements:
       QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
     file_format: CSV
     field_delimiter: ','
-    destination_type: gcs
+    destination_type: not_used_yet
     destination_object_path: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
-    bigquery_connection_id: 1
+    gcp_connection_id: google_cloud_debussy
     destination_connection_id: google_cloud_debussy
 
 
