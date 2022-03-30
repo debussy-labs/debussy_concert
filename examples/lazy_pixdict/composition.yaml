@@ -1,4 +1,4 @@
-name: lazy pixDict
+name: lazy_pixDict
 database: pixDict
 secret_manager_uri: projects/modular-aileron-191222/secrets/dotz-mysql-prod 
 description: PixDict ingestion
