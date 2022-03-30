@@ -65,7 +65,7 @@ class BigQueryJobMixin:
     def query_configuration(
             self, sql_query,
             destination_table: Optional[str] = None,
-            create_disposition: Optional[str] = "CREATE_IF_NEEDED",
+            create_disposition: Optional[str] = None,
             write_disposition: Optional[str] = None,
             time_partitioning: Optional[BigQueryTimePartitioning] = None):
         time_partitioning_ref = time_partitioning.to_dict() if time_partitioning else None
