@@ -4,6 +4,8 @@ from debussy_concert.core.config.movement_parameters.base import MovementParamet
 
 
 class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
+    config: ConfigReverseEtl
+
     def __init__(
         self,
         datawarehouse_reverse_etl_to_temp_table_motif,
@@ -23,10 +25,9 @@ class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
                 f"{self.config.environment.temp_dataset}."
                 f"{self.config.name}_{self.movement_parameters.name}")
 
-    def setup(self, config: ConfigReverseEtl,
+    def setup(self,
               movement_parameters: MovementParametersType,
               extract_query, storage_uri_prefix):
-        self.config = config
         self.movement_parameters = movement_parameters
         self.datawarehouse_reverse_etl_to_temp_table_motif.setup(
             sql_query=extract_query,

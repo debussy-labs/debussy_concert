@@ -16,8 +16,7 @@ from debussy_framework.v3.hooks.storage_hook import GCSHook
 
 
 class ChildrensCorner(CompositionBase):
-    def __init__(self, config: ConfigReverseEtl):
-        super().__init__(config=config)
+    config: ConfigReverseEtl
 
     def gcs_reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters):
         storage_to_destination_phrase = self.storage_to_destination_phrase(movement_parameters)
@@ -27,8 +26,8 @@ class ChildrensCorner(CompositionBase):
 
     def reverse_etl_movement_builder(self, storage_to_destination_phrase,
                                      movement_parameters: ReverseEtlMovementParameters) -> ReverseEtlMovement:
-        start_phrase = StartPhrase(config=self.config)
-        end_phrase = EndPhrase(config=self.config)
+        start_phrase = StartPhrase()
+        end_phrase = EndPhrase()
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
             partition_type=movement_parameters.reverse_etl_dataset_partition_type,
             partition_field=movement_parameters.reverse_etl_dataset_partition_field,
@@ -49,7 +48,7 @@ class ChildrensCorner(CompositionBase):
             storage_to_destination_phrase=storage_to_destination_phrase,
             end_phrase=end_phrase
         )
-        movement.setup(self.config, movement_parameters)
+        movement.setup(movement_parameters)
         return movement
 
     def data_warehouse_raw_to_reverse_etl_phrase(self, partition_type, partition_field, gcp_conn_id):
@@ -87,7 +86,6 @@ class ChildrensCorner(CompositionBase):
         destiny_gcs_hook = GCSHook(gcp_conn_id=dest_conn_id)
         storage_to_sftp = StorageToStorageMotif(
             name='gcs_to_gcs_motif',
-            config=self.config,
             origin_storage_hook=origin_gcs_hook,
             destiny_storage_hook=destiny_gcs_hook,
             destiny_file_uri=destiny_file_uri
@@ -95,10 +93,6 @@ class ChildrensCorner(CompositionBase):
         phrase = StorageToDestinationPhrase(
             storage_to_destination_motif=storage_to_sftp)
         return phrase
-
-    def dummy_motif(self, name):
-        from debussy_concert.core.motif.motif_base import DummyMotif
-        return DummyMotif(config=None, name=name)
 
     @classmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath):

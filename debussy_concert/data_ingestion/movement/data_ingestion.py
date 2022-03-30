@@ -11,6 +11,8 @@ from debussy_concert.core.config.movement_parameters.base import MovementParamet
 
 
 class DataIngestionMovement(MovementBase):
+    config: ConfigDataIngestion
+
     def __init__(
         self, name,
         start_phrase: PStartPhrase,
@@ -47,15 +49,13 @@ class DataIngestionMovement(MovementBase):
 
     def setup(
         self,
-        config: ConfigDataIngestion,
         movement_parameters: MovementParametersType
     ):
-        self.config = config
         self.movement_parameters = movement_parameters
         self.ingestion_source_to_landing_storage_phrase.setup(
             destination_storage_uri=self.landing_bucket_uri_prefix)
         self.landing_storage_to_data_warehouse_raw_phrase.setup(
-            config=config, movement_parameters=movement_parameters,
+            movement_parameters=movement_parameters,
             source_storage_uri_prefix=self.landing_bucket_uri_prefix,
             datawarehouse_raw_uri=self.raw_table_uri)
         return self

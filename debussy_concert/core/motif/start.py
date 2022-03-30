@@ -8,8 +8,8 @@ from debussy_concert.core.motif.motif_base import MotifBase
 
 
 class StartMotif(MotifBase):
-    def __init__(self, config, name=None) -> None:
-        super().__init__(name=name, config=config)
+    def __init__(self, name=None) -> None:
+        super().__init__(name=name)
 
     def build(self, dag, parent_task_group):
         task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)

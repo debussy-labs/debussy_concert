@@ -5,13 +5,13 @@ from debussy_concert.core.phrase.protocols import PExecuteQueryMotif
 
 
 class BigQueryQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
-    def __init__(self, config=None, name=None,
+    def __init__(self, name=None,
                  write_disposition="WRITE_APPEND",
                  create_disposition="CREATE_IF_NEEDED",
                  time_partitioning: Optional[BigQueryTimePartitioning] = None,
                  gcp_conn_id='google_cloud_default',
                  **op_kw_args):
-        super().__init__(name=name, config=config)
+        super().__init__(name=name)
 
         self.write_disposition = write_disposition
         self.time_partitioning = time_partitioning

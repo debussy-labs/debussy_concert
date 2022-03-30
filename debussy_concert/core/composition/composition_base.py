@@ -31,7 +31,8 @@ class CompositionBase(ABC, PComposition):
     @inject.autoparams()
     def __init__(
             self, *,
-            config: ConfigComposition, workflow_service: PWorkflowService):
+            config: ConfigComposition,
+            workflow_service: PWorkflowService):
         self.config = config
         self.workflow_service = workflow_service
 

@@ -1,5 +1,6 @@
 from typing import Protocol, Sequence
 import inject
+from debussy_concert.core.config.config_composition import ConfigComposition
 from debussy_concert.core.entities.protocols import PPhraseGroup
 from debussy_concert.core.motif.motif_base import PMotif
 from debussy_concert.core.service.workflow.protocol import PWorkflowService
@@ -16,10 +17,12 @@ class PhraseBase(PPhrase):
     @inject.autoparams()
     def __init__(
             self, *,
+            config: ConfigComposition,
             workflow_service: PWorkflowService,
             motifs: Sequence[PMotif] = None,
             name=None) -> None:
         self.name = name or self.__class__.__name__
+        self.config = config
         self.motifs = motifs or list()
         self.workflow_service = workflow_service
 

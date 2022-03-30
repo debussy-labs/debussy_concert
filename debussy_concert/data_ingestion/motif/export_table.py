@@ -15,8 +15,10 @@ from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataInges
 
 
 class ExportBigQueryTableMotif(MotifBase, PExportDataToStorageMotif):
-    def __init__(self, config: ConfigDataIngestion, name=None) -> None:
-        super().__init__(name=name, config=config)
+    config: ConfigDataIngestion
+
+    def __init__(self, name=None) -> None:
+        super().__init__(name=name)
 
     def build(self, dag, task_group):
         operator = DummyOperator(task_id=self.name, dag=dag, task_group=task_group)
@@ -67,13 +69,15 @@ def build_query_from_datastore_entity_json(entity_json_str):
 
 class ExportFullMySqlTableToGcsMotif(
         MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
+    config: ConfigDataIngestion
+
     def __init__(
-            self, config: ConfigDataIngestion,
+            self,
             movement_parameters: DataIngestionMovementParameters,
             name=None
     ) -> None:
         self.movement_parameters = movement_parameters
-        super().__init__(name=name, config=config)
+        super().__init__(name=name)
 
     @property
     def config(self) -> ConfigDataIngestion:

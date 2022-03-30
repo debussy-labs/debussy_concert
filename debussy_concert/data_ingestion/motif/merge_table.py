@@ -91,12 +91,11 @@ MERGE = """
 class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
     def __init__(
         self,
-        config,
         movement_parameters: DataIngestionMovementParameters,
         name=None
     ) -> None:
         self.movement_parameters = movement_parameters
-        super().__init__(name=name, config=config)
+        super().__init__(name=name)
 
     def setup(
         self,

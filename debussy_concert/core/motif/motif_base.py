@@ -33,7 +33,8 @@ class MotifBase(PMotif, ABC):
     @inject.autoparams()
     def __init__(self, *,
                  workflow_service: PWorkflowService,
-                 config, name=None) -> None:
+                 config: ConfigComposition,
+                 name=None) -> None:
         self.workflow_service = workflow_service
         self._config = config
         self.name = name or self.__class__.__name__
@@ -57,8 +58,8 @@ class MotifBase(PMotif, ABC):
 
 
 class DummyMotif(MotifBase):
-    def __init__(self, config: ConfigComposition, name=None) -> None:
-        super().__init__(config=config, name=name)
+    def __init__(self, name=None) -> None:
+        super().__init__(name=name)
 
     def build(self, workflow_dag, phrase_group):
         from airflow.operators.dummy import DummyOperator

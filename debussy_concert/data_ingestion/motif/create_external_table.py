@@ -7,10 +7,9 @@ from debussy_concert.core.phrase.protocols import PCreateExternalTableMotif
 class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
     def __init__(
         self,
-        config,
         name=None
     ) -> None:
-        super().__init__(name=name, config=config)
+        super().__init__(name=name)
 
     @property
     def table_resource(self):

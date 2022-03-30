@@ -1,9 +1,13 @@
+from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
+from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
 from debussy_concert.core.movement.protocols import PLandingStorageToDataWarehouseRawPhrase
-from debussy_concert.core.phrase.protocols import PMergeTableMotif, PCreateExternalTableMotif, PExecuteQueryMotif
+from debussy_concert.core.phrase.protocols import PMergeTableMotif, PCreateExternalTableMotif
 from debussy_concert.core.phrase.phrase_base import PhraseBase
 
 
 class LandingStorageExternalTableToDataWarehouseRawPhrase(PhraseBase, PLandingStorageToDataWarehouseRawPhrase):
+    config: ConfigDataIngestion
+
     def __init__(
         self,
         create_external_table_motif: PCreateExternalTableMotif,
@@ -21,8 +25,9 @@ class LandingStorageExternalTableToDataWarehouseRawPhrase(PhraseBase, PLandingSt
                 f"{self.config.environment.landing_dataset}."
                 f"{self.config.table_prefix}_{self.movement_parameters.name}")
 
-    def setup(self, config, movement_parameters, source_storage_uri_prefix, datawarehouse_raw_uri):
-        self.config = config
+    def setup(self, movement_parameters: DataIngestionMovementParameters,
+              source_storage_uri_prefix,
+              datawarehouse_raw_uri):
         self.movement_parameters = movement_parameters
         self.create_external_table_motif.setup(
             source_bucket_uri_prefix=source_storage_uri_prefix,

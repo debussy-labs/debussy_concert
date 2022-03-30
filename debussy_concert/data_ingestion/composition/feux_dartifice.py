@@ -20,8 +20,10 @@ from debussy_concert.data_ingestion.motif.merge_table import MergeBigQueryTableM
 
 
 class FeuxDArtifice(CompositionBase):
-    def __init__(self, config: ConfigDataIngestion):
-        super().__init__(config=config)
+    config: ConfigDataIngestion
+
+    def __init__(self,):
+        super().__init__()
 
     def mysql_full_load_movement_builder(
             self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
@@ -30,7 +32,7 @@ class FeuxDArtifice(CompositionBase):
 
     def mysql_ingestion_to_landing_phrase(self, movement_parameters):
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
-            config=self.config, movement_parameters=movement_parameters)
+            movement_parameters=movement_parameters)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
@@ -55,10 +57,10 @@ class FeuxDArtifice(CompositionBase):
     def rdbms_ingestion_movement_builder(
             self, ingestion_to_landing_phrase,
             movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
-        start_phrase = StartPhrase(config=self.config)
+        start_phrase = StartPhrase()
         gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
         data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
-        end_phrase = EndPhrase(config=self.config)
+        end_phrase = EndPhrase()
 
         name = f'DataIngestionMovement_{movement_parameters.name}'
         movement = DataIngestionMovement(
@@ -69,7 +71,7 @@ class FeuxDArtifice(CompositionBase):
             data_warehouse_raw_to_trusted_phrase=data_warehouse_raw_to_trusted_phrase,
             end_phrase=end_phrase
         )
-        movement.setup(self.config, movement_parameters)
+        movement.setup(movement_parameters)
         return movement
 
     def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
@@ -95,16 +97,13 @@ class FeuxDArtifice(CompositionBase):
     def merge_bigquery_table_motif(
             self, movement_parameters: DataIngestionMovementParameters) -> MergeBigQueryTableMotif:
         merge_bigquery_table_motif = MergeBigQueryTableMotif(
-            config=self.config,
             movement_parameters=movement_parameters
         )
         return merge_bigquery_table_motif
 
     def create_external_bigquery_table_motif(
             self) -> CreateExternalBigQueryTableMotif:
-        create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif(
-            config=self.config
-        )
+        create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif()
         return create_external_bigquery_table_motif
 
     @classmethod
@@ -113,4 +112,4 @@ class FeuxDArtifice(CompositionBase):
             composition_config_file_path=composition_config_yaml_filepath,
             env_file_path=environment_config_yaml_filepath
         )
-        return cls(config)
+        return cls(config=config)

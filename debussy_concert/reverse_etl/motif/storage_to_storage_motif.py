@@ -6,11 +6,11 @@ from debussy_concert.core.motif.motif_base import MotifBase
 
 
 class StorageToStorageMotif(MotifBase):
-    def __init__(self, *, config,
+    def __init__(self, *,
                  origin_storage_hook: StorageHookInterface,
                  destiny_storage_hook: StorageHookInterface, destiny_file_uri,
                  name=None) -> None:
-        super().__init__(config=config, name=name)
+        super().__init__(name=name)
         self.origin_storage_hook = origin_storage_hook
         self.destiny_storage_hook = destiny_storage_hook
         self.destiny_file_uri = destiny_file_uri

@@ -8,8 +8,8 @@ class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):
                  field_delimiter: Optional[str] = ',',
                  destination_format: Optional[str] = 'CSV',
                  gcp_conn_id='google_cloud_default',
-                 config=None, name=None):
-        super().__init__(name=name, config=config)
+                 name=None):
+        super().__init__(name=name)
         self.field_delimiter = field_delimiter
         self.destination_format = destination_format
         self.gcp_conn_id = gcp_conn_id
