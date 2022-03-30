@@ -2,6 +2,9 @@ import datetime as dt
 
 
 class ConfigDagParameters:
+    dag_id: str
+    start_date: dt.datetime
+
     def __init__(
             self,
             **kwargs
