@@ -1,6 +1,6 @@
 .PHONY: clean-pyc clean-build docs clean install mypy
 
-clean: clean-build clean-pyc clean-test
+clean: clean-build clean-pyc clean-test clean-mypy
 
 clean-build:
 	rm -fr build/
@@ -19,6 +19,9 @@ clean-test:
 	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
+
+clean-mypy:
+	find . -name '.mypy_cache' -exec rm -fr {} +
 
 mypy:
 	mypy --namespace-packages --explicit-package-bases debussy_concert
