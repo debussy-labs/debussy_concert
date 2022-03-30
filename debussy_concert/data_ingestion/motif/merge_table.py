@@ -4,7 +4,7 @@ from airflow.operators.python import PythonOperator
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin
 from debussy_concert.core.phrase.protocols import PMergeTableMotif
-from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
 
 
 def build_bigquery_merge_query(
@@ -91,7 +91,7 @@ MERGE = """
 class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
     def __init__(
         self,
-        movement_parameters: DataIngestionMovementParameters,
+        movement_parameters: RdbmsDataIngestionMovementParameters,
         name=None
     ) -> None:
         self.movement_parameters = movement_parameters

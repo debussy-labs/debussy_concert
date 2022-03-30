@@ -10,12 +10,12 @@ from debussy_framework.v2.operators.datastore import DatastoreGetEntityOperator
 from debussy_concert.core.motif.motif_base import MotifBase, PClusterMotifMixin
 from debussy_concert.core.motif.mixins.dataproc import DataprocClusterHandlerMixin
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
-from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
-from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
+from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 
 
 class ExportBigQueryTableMotif(MotifBase, PExportDataToStorageMotif):
-    config: ConfigDataIngestion
+    config: ConfigRdbmsDataIngestion
 
     def __init__(self, name=None) -> None:
         super().__init__(name=name)
@@ -69,18 +69,18 @@ def build_query_from_datastore_entity_json(entity_json_str):
 
 class ExportFullMySqlTableToGcsMotif(
         MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
-    config: ConfigDataIngestion
+    config: ConfigRdbmsDataIngestion
 
     def __init__(
             self,
-            movement_parameters: DataIngestionMovementParameters,
+            movement_parameters: RdbmsDataIngestionMovementParameters,
             name=None
     ) -> None:
         self.movement_parameters = movement_parameters
         super().__init__(name=name)
 
     @property
-    def config(self) -> ConfigDataIngestion:
+    def config(self) -> ConfigRdbmsDataIngestion:
         return super().config
 
     @property
@@ -265,7 +265,7 @@ class ExportFullMySqlTableToGcsMotif(
 
         return check_mysql_table
 
-    def get_datastore_entity(self, dag, movement_parameters: DataIngestionMovementParameters, task_group):
+    def get_datastore_entity(self, dag, movement_parameters: RdbmsDataIngestionMovementParameters, task_group):
         db_kind = self.config.database[0].upper() + self.config.database[1:]
         kind = f"MySql{db_kind}Tables"
         get_datastore_entity = DatastoreGetEntityOperator(

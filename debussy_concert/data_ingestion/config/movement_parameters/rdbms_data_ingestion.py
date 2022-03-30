@@ -25,7 +25,7 @@ class TableField:
 
 
 @dataclass(frozen=True)
-class DataIngestionMovementParameters(MovementParametersBase):
+class RdbmsDataIngestionMovementParameters(MovementParametersBase):
     fields: List[TableField]
     primary_key: Optional[TableField] = None
     pii_columns: Optional[List[TableField]] = None

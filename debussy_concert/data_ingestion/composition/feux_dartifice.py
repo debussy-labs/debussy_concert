@@ -1,7 +1,7 @@
 from typing import Callable
 
-from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
-from debussy_concert.data_ingestion.config.movement_parameters.data_ingestion import DataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
+from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
 
 from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement
@@ -20,13 +20,13 @@ from debussy_concert.data_ingestion.motif.merge_table import MergeBigQueryTableM
 
 
 class FeuxDArtifice(CompositionBase):
-    config: ConfigDataIngestion
+    config: ConfigRdbmsDataIngestion
 
     def __init__(self,):
         super().__init__()
 
     def mysql_full_load_movement_builder(
-            self, movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
+            self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
         ingestion_to_landing_phrase = self.mysql_ingestion_to_landing_phrase(movement_parameters)
         return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters)
 
@@ -44,7 +44,7 @@ class FeuxDArtifice(CompositionBase):
         dag = self.play(rdbms_builder_fn)
         return dag
 
-    def rdbms_builder_fn(self) -> Callable[[DataIngestionMovementParameters], PMovement]:
+    def rdbms_builder_fn(self) -> Callable[[RdbmsDataIngestionMovementParameters], PMovement]:
         map_ = {
             'mysql': self.mysql_full_load_movement_builder
         }
@@ -56,7 +56,7 @@ class FeuxDArtifice(CompositionBase):
 
     def rdbms_ingestion_movement_builder(
             self, ingestion_to_landing_phrase,
-            movement_parameters: DataIngestionMovementParameters) -> DataIngestionMovement:
+            movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
         start_phrase = StartPhrase()
         gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
         data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
@@ -83,7 +83,7 @@ class FeuxDArtifice(CompositionBase):
         return data_warehouse_raw_to_trusted_phrase
 
     def gcs_landing_to_bigquery_raw_phrase(
-            self, movement_parameters: DataIngestionMovementParameters
+            self, movement_parameters: RdbmsDataIngestionMovementParameters
     ) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
         create_external_bigquery_table_motif = self.create_external_bigquery_table_motif()
         merge_bigquery_table_motif = self.merge_bigquery_table_motif(movement_parameters)
@@ -95,7 +95,7 @@ class FeuxDArtifice(CompositionBase):
         return gcs_landing_to_bigquery_raw_phrase
 
     def merge_bigquery_table_motif(
-            self, movement_parameters: DataIngestionMovementParameters) -> MergeBigQueryTableMotif:
+            self, movement_parameters: RdbmsDataIngestionMovementParameters) -> MergeBigQueryTableMotif:
         merge_bigquery_table_motif = MergeBigQueryTableMotif(
             movement_parameters=movement_parameters
         )
@@ -108,7 +108,7 @@ class FeuxDArtifice(CompositionBase):
 
     @classmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath) -> 'FeuxDArtifice':
-        config = ConfigDataIngestion.load_from_file(
+        config = ConfigRdbmsDataIngestion.load_from_file(
             composition_config_file_path=composition_config_yaml_filepath,
             env_file_path=environment_config_yaml_filepath
         )
