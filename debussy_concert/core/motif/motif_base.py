@@ -3,7 +3,7 @@ from typing import Callable, Protocol, TypeVar
 import inject
 
 from debussy_concert.core.entities.protocols import PWorkflowDag, PMotifGroup
-from debussy_concert.config.config_composition import ConfigComposition
+from debussy_concert.core.config.config_composition import ConfigComposition
 from debussy_concert.core.service.workflow.protocol import PWorkflowService
 
 ConfigCompositionType = TypeVar('ConfigCompositionType', bound=ConfigComposition)

@@ -1,7 +1,7 @@
 from typing import List, Optional
 from dataclasses import dataclass
 import warnings
-from debussy_concert.config.movement_parameters.base import MovementParametersBase
+from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
 
 
 class TableField:

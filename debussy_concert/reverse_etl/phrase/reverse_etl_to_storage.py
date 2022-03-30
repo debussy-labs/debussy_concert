@@ -1,6 +1,6 @@
 from debussy_concert.core.phrase.phrase_base import PhraseBase
 from debussy_concert.reverse_etl.config.reverse_etl import ConfigReverseEtl
-from debussy_concert.config.movement_parameters.base import MovementParametersType
+from debussy_concert.core.config.movement_parameters.base import MovementParametersType
 
 
 class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):

@@ -7,7 +7,7 @@ from debussy_concert.core.movement.protocols import (
     PEndPhrase
 )
 from debussy_concert.data_ingestion.config.data_ingestion import ConfigDataIngestion
-from debussy_concert.config.movement_parameters.base import MovementParametersType
+from debussy_concert.core.config.movement_parameters.base import MovementParametersType
 
 
 class DataIngestionMovement(MovementBase):

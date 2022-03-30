@@ -2,9 +2,9 @@ from abc import abstractclassmethod
 from dataclasses import dataclass
 from typing import List
 
-from debussy_concert.config.config_environment import ConfigEnvironment
-from debussy_concert.config.config_dag_parameters import ConfigDagParameters
-from debussy_concert.config.movement_parameters.base import MovementParametersBase
+from debussy_concert.core.config.config_environment import ConfigEnvironment
+from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
+from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
 
 
 @dataclass(frozen=True)

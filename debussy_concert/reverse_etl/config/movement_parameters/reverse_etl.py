@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from debussy_concert.config.movement_parameters.base import MovementParametersBase
+from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
 
 
 @dataclass(frozen=True)
