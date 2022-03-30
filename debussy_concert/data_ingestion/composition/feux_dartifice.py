@@ -92,10 +92,6 @@ class FeuxDArtifice(CompositionBase):
         )
         return gcs_landing_to_bigquery_raw_phrase
 
-    def execute_query_motif(self, sql_query):
-        execute_query_motif = BigQueryQueryJobMotif().setup(sql_query=sql_query)
-        return execute_query_motif
-
     def merge_bigquery_table_motif(
             self, movement_parameters: DataIngestionMovementParameters) -> MergeBigQueryTableMotif:
         merge_bigquery_table_motif = MergeBigQueryTableMotif(
