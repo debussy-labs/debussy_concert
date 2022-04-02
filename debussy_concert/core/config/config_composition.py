@@ -1,4 +1,4 @@
-from abc import abstractclassmethod
+from abc import ABC, abstractclassmethod
 from dataclasses import dataclass
 from typing import List
 
@@ -8,7 +8,7 @@ from debussy_concert.core.config.movement_parameters.base import MovementParamet
 
 
 @dataclass(frozen=True)
-class ConfigComposition:
+class ConfigComposition(ABC):
     name: str
     description: str
     movements_parameters: List[MovementParametersBase]
