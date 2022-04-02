@@ -17,5 +17,10 @@ class PMotifGroup(PGroup):
     pass
 
 
-class PWorkflowDag:
+class PWorkflowDag(Protocol):
     pass
+
+
+class PConfigComposition(Protocol):
+    def load_from_file(cls, composition_config_file_path, env_file_path):
+        pass
