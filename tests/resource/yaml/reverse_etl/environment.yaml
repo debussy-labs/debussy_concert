@@ -1,0 +1,12 @@
+project: project_test
+region: region_test
+zone: zone_test
+reverse_etl_bucket: reverse_etl_bucket_test
+landing_bucket: landing_bucket_test
+artifact_bucket: artifact_bucket_test
+staging_bucket: staging_bucket_test
+landing_dataset: landing_dataset_test
+raw_dataset: raw_dataset_test
+trusted_dataset: trusted_dataset_test
+reverse_etl_dataset: reverse_etl_dataset_test
+temp_dataset: temp_dataset_test
