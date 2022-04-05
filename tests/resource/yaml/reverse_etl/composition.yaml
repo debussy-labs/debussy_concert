@@ -18,8 +18,10 @@ extraction_movements:
     reverse_etl_dataset_partition_type: reverse_etl_dataset_partition_type_test
     reverse_etl_dataset_partition_field: reverse_etl_dataset_partition_field_Test
     extract_query_from_temp: extract_query_from_temp_test
-    file_format: file_format_test
-    field_delimiter: field_delimiter_test
+    output_config:
+      format: CSV
+      file_name: file_name_test.format
+      field_delimiter: field_delimiter_test
     destination_type: destination_type_test
     destination_object_path: destination_object_path_test
     gcp_connection_id: gcp_connection_id_test

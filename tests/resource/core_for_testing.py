@@ -59,3 +59,8 @@ class DummyDag(PWorkflowDag):
     def __init__(self, dag_id, **kwargs):
         self.dag_id = dag_id
         self.kwargs = kwargs
+
+
+def create_empty_phrase(name):
+    motif = DummyMotif(name=f'{name}_motif')
+    return DummyPhrase(name=name, motifs=[motif])
