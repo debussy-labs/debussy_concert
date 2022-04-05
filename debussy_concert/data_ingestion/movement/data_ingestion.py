@@ -18,20 +18,17 @@ class DataIngestionMovement(MovementBase):
         start_phrase: PStartPhrase,
         ingestion_source_to_landing_storage_phrase: PIngestionSourceToLandingStoragePhrase,
         landing_storage_to_data_warehouse_raw_phrase: PLandingStorageToDataWarehouseRawPhrase,
-        data_warehouse_raw_to_trusted_phrase: PDataWarehouseRawToTrustedPhrase,
         end_phrase: PEndPhrase
     ) -> None:
 
         self.start_phrase = start_phrase
         self.ingestion_source_to_landing_storage_phrase = ingestion_source_to_landing_storage_phrase
         self.landing_storage_to_data_warehouse_raw_phrase = landing_storage_to_data_warehouse_raw_phrase
-        self.data_warehouse_raw_to_trusted_phrase = data_warehouse_raw_to_trusted_phrase
         self.end_phrase = end_phrase
         phrases = [
             self.start_phrase,
             self.ingestion_source_to_landing_storage_phrase,
             self.landing_storage_to_data_warehouse_raw_phrase,
-            self.data_warehouse_raw_to_trusted_phrase,
             self.end_phrase
         ]
         super().__init__(name=name, phrases=phrases)

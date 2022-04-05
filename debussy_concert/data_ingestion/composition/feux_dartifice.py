@@ -59,7 +59,6 @@ class FeuxDArtifice(CompositionBase):
             movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
         start_phrase = StartPhrase()
         gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
-        data_warehouse_raw_to_trusted_phrase = self.data_warehouse_raw_to_trusted_phrase()
         end_phrase = EndPhrase()
 
         name = f'DataIngestionMovement_{movement_parameters.name}'
@@ -68,19 +67,10 @@ class FeuxDArtifice(CompositionBase):
             start_phrase=start_phrase,
             ingestion_source_to_landing_storage_phrase=ingestion_to_landing_phrase,
             landing_storage_to_data_warehouse_raw_phrase=gcs_landing_to_bigquery_raw_phrase,
-            data_warehouse_raw_to_trusted_phrase=data_warehouse_raw_to_trusted_phrase,
             end_phrase=end_phrase
         )
         movement.setup(movement_parameters)
         return movement
-
-    def data_warehouse_raw_to_trusted_phrase(self) -> DataWarehouseRawToTrustedPhrase:
-        bigquery_to_bigquery_motif = BigQueryQueryJobMotif().setup(sql_query='select 1')
-        data_warehouse_raw_to_trusted_phrase = DataWarehouseRawToTrustedPhrase(
-            name='Raw_to_Trusted_Phrase',
-            raw_to_trusted_motif=bigquery_to_bigquery_motif
-        )
-        return data_warehouse_raw_to_trusted_phrase
 
     def gcs_landing_to_bigquery_raw_phrase(
             self, movement_parameters: RdbmsDataIngestionMovementParameters
