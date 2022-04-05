@@ -146,3 +146,57 @@ class MergeBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
         )
 
         return build_merge_query
+
+
+def build_bigquery_append_merge_query(main_table, delta_table, execution_date):
+    query = f"""MERGE
+        `{main_table}`
+    USING
+        (SELECT * FROM `{delta_table}` WHERE execution_date = '{execution_date}')
+    ON False
+    WHEN NOT MATCHED BY TARGET THEN
+    INSERT ROW;
+    """
+    return query
+
+
+class MergeAppendBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMotif):
+    def __init__(
+        self,
+        movement_parameters: RdbmsDataIngestionMovementParameters,
+        name=None
+    ) -> None:
+        self.movement_parameters = movement_parameters
+        super().__init__(name=name)
+
+    def setup(
+        self,
+        main_table_uri: str,
+        delta_table_uri: str,
+    ):
+        self.main_table_uri = main_table_uri
+        self.delta_table_uri = delta_table_uri
+        return self
+
+    def build(self, dag, task_group):
+        task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=task_group)
+        build_merge_query = self.build_merge_query(dag, task_group)
+        query_macro = f"{{{{ task_instance.xcom_pull('{build_merge_query.task_id}') }}}}"
+        execute_query = self.insert_job_operator(dag, task_group, self.query_configuration(sql_query=query_macro))
+        build_merge_query >> execute_query
+        return task_group
+
+    def build_merge_query(self, dag, task_group) -> PythonOperator:
+        build_merge_query = PythonOperator(
+            task_id="build_merge_append_query",
+            python_callable=build_bigquery_append_merge_query,
+            op_kwargs={
+                "main_table": self.main_table_uri,
+                "delta_table": self.delta_table_uri,
+                "execution_date": '{{ execution_date }}'
+            },
+            dag=dag,
+            task_group=task_group
+        )
+
+        return build_merge_query
