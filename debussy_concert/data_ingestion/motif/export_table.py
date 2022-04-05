@@ -1,7 +1,7 @@
+from typing import List
 from google.protobuf.duration_pb2 import Duration
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
-from airflow.operators.dummy import DummyOperator
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
 from debussy_framework.v3.operators.mysql_check import MySQLCheckOperator
 from debussy_framework.v2.operators.basic import StartOperator
@@ -9,20 +9,38 @@ from debussy_framework.v2.operators.datastore import DatastoreGetEntityOperator
 
 from debussy_concert.core.motif.motif_base import MotifBase, PClusterMotifMixin
 from debussy_concert.core.motif.mixins.dataproc import DataprocClusterHandlerMixin
+from debussy_concert.core.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
 from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 
 
-class ExportBigQueryTableMotif(MotifBase, PExportDataToStorageMotif):
-    config: ConfigRdbmsDataIngestion
+class ExportBigQueryQueryMotif(BigQueryQueryJobMotif):
+    extract_query_template = """
+    EXPORT DATA OPTIONS(
+    overwrite=true,{extract_data_kwargs})
+    AS {extract_query}
+    """
 
-    def __init__(self, name=None) -> None:
-        super().__init__(name=name)
+    def __init__(self, extract_query, partition: str,
+                 extract_data_kwargs: dict, name=None, gcp_conn_id='google_cloud_default', **op_kw_args):
+        super().__init__(name, gcp_conn_id=gcp_conn_id, **op_kw_args)
+        if 'uri' in extract_data_kwargs.keys():
+            raise ValueError("Dont set 'uri' parameter at extract_data_kwargs. this parameter is set by the framework")
+        self.extract_data_kwargs = extract_data_kwargs
+        self.extract_query = extract_query
+        self.partition = partition
 
-    def build(self, dag, task_group):
-        operator = DummyOperator(task_id=self.name, dag=dag, task_group=task_group)
-        return operator
+    def setup(self, destination_storage_uri):
+        self.destination_storage_uri = destination_storage_uri
+        self.extract_data_kwargs['uri'] = (f'{destination_storage_uri}/'
+                                           f'{self.partition}/'
+                                           f'*.{self.extract_data_kwargs["format"].lower()}')
+        extract_args = ','.join([f"{key}='{value}'" for key, value in self.extract_data_kwargs.items()])
+        self.sql_query = self.extract_query_template.format(
+            extract_data_kwargs=extract_args, extract_query=self.extract_query)
+
+        return self
 
 
 def build_query_from_datastore_entity_json(entity_json_str):
