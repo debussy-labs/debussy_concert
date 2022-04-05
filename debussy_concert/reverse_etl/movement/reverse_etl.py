@@ -43,8 +43,8 @@ class ReverseEtlMovement(MovementBase):
     @property
     def reverse_etl_bucket_uri_prefix(self):
         return (f"gs://{self.config.environment.reverse_etl_bucket}/"
-                f"{self.config.name}/{self.movement_parameters.name}/{self.movement_parameters.name}_"
-                "{{ execution_date }}.csv")
+                f"{self.config.name}/{self.movement_parameters.name}/"
+                f"{self.movement_parameters.output_config.file_name}")
 
     @property
     def datawarehouse_to_reverse_etl_query(self):

@@ -24,5 +24,5 @@ if __name__ == '__main__':
 
 
 composition: ChildrensCorner = ChildrensCorner()
-reverse_etl_movement_fn = composition.gcs_reverse_etl_movement_builder
+reverse_etl_movement_fn = composition.csv_to_gcs_reverse_etl_movement_builder
 dag = composition.play(reverse_etl_movement_fn)
