@@ -30,7 +30,7 @@ class PClusterMotifMixin(PMotif, Protocol):
 
 
 class MotifBase(PMotif, ABC):
-    @inject.autoparams()
+    @inject.params(config=ConfigComposition, workflow_service=PWorkflowService)
     def __init__(self, *,
                  workflow_service: PWorkflowService,
                  config: ConfigComposition,

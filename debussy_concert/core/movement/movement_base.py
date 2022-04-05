@@ -19,7 +19,7 @@ class PMovement(Protocol):
 
 
 class MovementBase(PMovement):
-    @inject.autoparams()
+    @inject.params(config=ConfigComposition, workflow_service=PWorkflowService)
     def __init__(
         self, *,
         config: ConfigComposition,

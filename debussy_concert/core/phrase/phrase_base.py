@@ -14,7 +14,7 @@ class PPhrase(Protocol):
 
 
 class PhraseBase(PPhrase):
-    @inject.autoparams()
+    @inject.params(config=ConfigComposition, workflow_service=PWorkflowService)
     def __init__(
             self, *,
             config: ConfigComposition,
