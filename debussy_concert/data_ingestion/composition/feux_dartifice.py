@@ -2,6 +2,7 @@ from typing import Callable
 
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.movement_parameters.bigquery import BigQueryDataIngestionMovementParameters
 
 from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement
@@ -9,12 +10,10 @@ from debussy_concert.core.movement.movement_base import PMovement
 
 from debussy_concert.data_ingestion.phrase.ingestion_to_landing import IngestionSourceToLandingStoragePhrase
 from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageExternalTableToDataWarehouseRawPhrase
-from debussy_concert.data_ingestion.phrase.raw_to_trusted import DataWarehouseRawToTrustedPhrase
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
 
-from debussy_concert.data_ingestion.motif.export_table import ExportFullMySqlTableToGcsMotif
-from debussy_concert.data_ingestion.motif.bigquery_query_job import BigQueryQueryJobMotif
+from debussy_concert.data_ingestion.motif.export_table import ExportFullMySqlTableToGcsMotif, ExportBigQueryQueryMotif
 from debussy_concert.data_ingestion.motif.create_external_table import CreateExternalBigQueryTableMotif
 from debussy_concert.data_ingestion.motif.merge_table import MergeBigQueryTableMotif
 
@@ -48,7 +47,7 @@ class FeuxDArtifice(CompositionBase):
         map_ = {
             'mysql': self.mysql_full_load_movement_builder
         }
-        rdbms_name = self.config.rdbms_name
+        rdbms_name = self.config.rdbms_name.lower()
         builder = map_.get(rdbms_name)
         if not builder:
             raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
