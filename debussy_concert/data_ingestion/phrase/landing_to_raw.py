@@ -20,6 +20,7 @@ class LandingStorageExternalTableToDataWarehouseRawPhrase(PhraseBase, PLandingSt
         super().__init__(name=name,
                          motifs=motifs)
 
+    @property
     def landing_external_table_uri(self):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.landing_dataset}."
