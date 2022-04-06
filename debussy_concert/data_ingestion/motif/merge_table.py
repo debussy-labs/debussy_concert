@@ -164,9 +164,11 @@ class MergeAppendBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMoti
     def __init__(
         self,
         movement_parameters: RdbmsDataIngestionMovementParameters,
+        gcp_conn_id='google_cloud_default',
         name=None
     ) -> None:
         self.movement_parameters = movement_parameters
+        self.gcp_conn_id = gcp_conn_id
         super().__init__(name=name)
 
     def setup(
@@ -182,7 +184,9 @@ class MergeAppendBigQueryTableMotif(MotifBase, BigQueryJobMixin, PMergeTableMoti
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=task_group)
         build_merge_query = self.build_merge_query(dag, task_group)
         query_macro = f"{{{{ task_instance.xcom_pull('{build_merge_query.task_id}') }}}}"
-        execute_query = self.insert_job_operator(dag, task_group, self.query_configuration(sql_query=query_macro))
+        execute_query = self.insert_job_operator(dag, task_group,
+                                                 self.query_configuration(sql_query=query_macro),
+                                                 gcp_conn_id=self.gcp_conn_id)
         build_merge_query >> execute_query
         return task_group
 

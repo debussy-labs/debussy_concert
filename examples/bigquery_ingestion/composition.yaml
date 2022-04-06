@@ -2,6 +2,7 @@ name: bigquery_ingestion
 database: example
 rdbms_name: bigquery
 description: BigQuery ingestion
+gcp_connection_id: google_cloud_debussy
 dag_parameters:
     dag_id: bigquery_ingestion
     description: BigQuery ingestion
@@ -17,5 +18,4 @@ dag_parameters:
 ingestion_parameters:
   - name: sintetico
     extract_sql_query: SELECT 'dado' as data
-    output_config:
-      format: PARQUET
+    extract_connection_id: google_cloud_debussy

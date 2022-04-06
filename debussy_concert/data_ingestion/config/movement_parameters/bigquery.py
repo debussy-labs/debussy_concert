@@ -5,4 +5,4 @@ from debussy_concert.core.config.movement_parameters.base import MovementParamet
 @dataclass(frozen=True)
 class BigQueryDataIngestionMovementParameters(MovementParametersBase):
     extract_sql_query: str
-    output_config: dict
+    extract_connection_id: str

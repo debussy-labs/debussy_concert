@@ -33,7 +33,7 @@ class BigQueryIngestionComposition(CompositionBase):
         export_motif = ExportBigQueryQueryMotif(
             partition='execution_date={{ execution_date }}',
             extract_query=movement_parameters.extract_sql_query,
-            extract_data_kwargs=movement_parameters.output_config)
+            gcp_conn_id=movement_parameters.extract_connection_id)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(export_data_to_storage_motif=export_motif)
         gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
         end_phrase = EndPhrase()
@@ -64,11 +64,12 @@ class BigQueryIngestionComposition(CompositionBase):
     def merge_bigquery_table_motif(
             self, movement_parameters: BigQueryDataIngestionMovementParameters) -> MergeAppendBigQueryTableMotif:
         merge_bigquery_table_motif = MergeAppendBigQueryTableMotif(
-            movement_parameters=movement_parameters
+            movement_parameters=movement_parameters, gcp_conn_id=self.config.gcp_connection_id
         )
         return merge_bigquery_table_motif
 
     def create_external_bigquery_table_motif(
             self) -> CreateExternalBigQueryTableMotif:
-        create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif()
+        create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif(
+            gcp_conn_id=self.config.gcp_connection_id)
         return create_external_bigquery_table_motif

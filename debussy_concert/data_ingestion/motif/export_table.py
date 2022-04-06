@@ -17,28 +17,23 @@ from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdb
 
 class ExportBigQueryQueryMotif(BigQueryQueryJobMotif):
     extract_query_template = """
-    EXPORT DATA OPTIONS(
-    overwrite=true,{extract_data_kwargs})
+    EXPORT DATA OPTIONS(overwrite=true,format='PARQUET',uri='{uri}')
     AS {extract_query}
     """
 
     def __init__(self, extract_query, partition: str,
-                 extract_data_kwargs: dict, name=None, gcp_conn_id='google_cloud_default', **op_kw_args):
+                 name=None, gcp_conn_id='google_cloud_default', **op_kw_args):
         super().__init__(name, gcp_conn_id=gcp_conn_id, **op_kw_args)
-        if 'uri' in extract_data_kwargs.keys():
-            raise ValueError("Dont set 'uri' parameter at extract_data_kwargs. this parameter is set by the framework")
-        self.extract_data_kwargs = extract_data_kwargs
         self.extract_query = extract_query
         self.partition = partition
 
     def setup(self, destination_storage_uri):
         self.destination_storage_uri = destination_storage_uri
-        self.extract_data_kwargs['uri'] = (f'{destination_storage_uri}/'
-                                           f'{self.partition}/'
-                                           f'*.{self.extract_data_kwargs["format"].lower()}')
-        extract_args = ','.join([f"{key}='{value}'" for key, value in self.extract_data_kwargs.items()])
+        uri = (f'{destination_storage_uri}/'
+               f'{self.partition}/'
+               f'*.parquet')
         self.sql_query = self.extract_query_template.format(
-            extract_data_kwargs=extract_args, extract_query=self.extract_query)
+            uri=uri, extract_query=self.extract_query)
 
         return self
 

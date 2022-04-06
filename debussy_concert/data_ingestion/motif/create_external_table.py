@@ -7,9 +7,11 @@ from debussy_concert.core.phrase.protocols import PCreateExternalTableMotif
 class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
     def __init__(
         self,
+        gcp_conn_id='google_cloud_default',
         name=None
     ) -> None:
         super().__init__(name=name)
+        self.gcp_conn_id = gcp_conn_id
 
     @property
     def table_resource(self):
@@ -41,7 +43,8 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
             destination_project_dataset_table=self.destination_table_uri,
             table_resource=self.table_resource,
             dag=dag,
-            task_group=task_group
+            task_group=task_group,
+            bigquery_conn_id=self.gcp_conn_id
         )
         return create_landing_external_table
 

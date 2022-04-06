@@ -11,6 +11,7 @@ from debussy_concert.data_ingestion.config.movement_parameters.bigquery import B
 class ConfigBigQueryDataIngestion(ConfigComposition):
     database: str
     rdbms_name: str
+    gcp_connection_id: str
 
     @property
     def table_prefix(self):
