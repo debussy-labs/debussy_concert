@@ -15,22 +15,22 @@ from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingest
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 
 
-class ExportBigQueryQueryMotif(BigQueryQueryJobMotif):
+class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
     extract_query_template = """
     EXPORT DATA OPTIONS(overwrite=true,format='PARQUET',uri='{uri}')
     AS {extract_query}
     """
 
-    def __init__(self, extract_query, partition: str,
+    def __init__(self, extract_query, gcs_partition: str,
                  name=None, gcp_conn_id='google_cloud_default', **op_kw_args):
         super().__init__(name, gcp_conn_id=gcp_conn_id, **op_kw_args)
         self.extract_query = extract_query
-        self.partition = partition
+        self.gcs_partition = gcs_partition
 
     def setup(self, destination_storage_uri):
         self.destination_storage_uri = destination_storage_uri
         uri = (f'{destination_storage_uri}/'
-               f'{self.partition}/'
+               f'{self.gcs_partition}/'
                f'*.parquet')
         self.sql_query = self.extract_query_template.format(
             uri=uri, extract_query=self.extract_query)
