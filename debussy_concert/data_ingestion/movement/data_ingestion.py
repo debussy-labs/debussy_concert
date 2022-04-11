@@ -3,7 +3,6 @@ from debussy_concert.core.movement.protocols import (
     PStartPhrase,
     PIngestionSourceToLandingStoragePhrase,
     PLandingStorageToDataWarehouseRawPhrase,
-    PDataWarehouseRawToTrustedPhrase,
     PEndPhrase
 )
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion

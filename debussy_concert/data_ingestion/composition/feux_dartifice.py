@@ -13,7 +13,7 @@ from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageE
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
 
-from debussy_concert.data_ingestion.motif.export_table import ExportFullMySqlTableToGcsMotif, ExportBigQueryQueryMotif
+from debussy_concert.data_ingestion.motif.export_table import ExportFullMySqlTableToGcsMotif, ExportBigQueryQueryToGcsMotif
 from debussy_concert.data_ingestion.motif.create_external_table import CreateExternalBigQueryTableMotif
 from debussy_concert.data_ingestion.motif.merge_table import MergeBigQueryTableMotif
 
