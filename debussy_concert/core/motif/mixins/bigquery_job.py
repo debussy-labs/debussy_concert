@@ -1,6 +1,8 @@
 import re
 from typing import Optional, List, Union
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
+from google.cloud.bigquery.external_config import HivePartitioningOptions
+
 from debussy_concert.core.motif.motif_base import PMotif
 
 
@@ -16,7 +18,7 @@ class TableReference:
     """
 
     def __init__(self, table_uri):
-        regexp_str = r'^(?P<project_id>[^.]*)\.(?P<dataset_id>[^.]*)\.(?P<table_id>[^.]*)$'
+        regexp_str = r'^(?P<project_id>[^.]*)\.(?P<dataset_id>[^.]*)\.(?P<table_id>.*)$'
         reference_regexp = re.compile(regexp_str)
         match = re.match(reference_regexp, table_uri)
         self.table_uri = table_uri
@@ -123,6 +125,36 @@ class BigQueryJobMixin:
                 "printHeader": True,
                 "fieldDelimiter": field_delimiter,
                 "destinationFormat": destination_format
+            }
+        }
+
+    def load_configuration(self,
+                           destination_table: str,
+                           source_uris: Union[List[str], str],
+                           source_format: str,
+                           write_disposition: Optional[str] = None,
+                           create_disposition: Optional[str] = None,
+                           schema_update_options: Optional[List[str]] = None,
+                           time_partitioning: Optional[BigQueryTimePartitioning] = None,
+                           hive_partitioning_options: Optional[HivePartitioningOptions] = None):
+        """
+            https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
+        """
+        destination_table_ref = TableReference(table_uri=destination_table).to_dict()
+        if isinstance(source_uris, str):
+            source_uris = [source_uris]
+        time_partitioning_ref = time_partitioning.to_dict() if time_partitioning else None
+        hive_partitioning_options_ref = hive_partitioning_options.to_api_repr() if hive_partitioning_options else None
+        return {
+            "load": {
+                "destinationTable": destination_table_ref,
+                "sourceUris": source_uris,
+                "sourceFormat": source_format,
+                "createDisposition": create_disposition,
+                "writeDisposition": write_disposition,
+                "schemaUpdateOptions": schema_update_options,
+                "timePartitioning": time_partitioning_ref,
+                "hivePartitioningOptions": hive_partitioning_options_ref
             }
         }
 
