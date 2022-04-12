@@ -11,6 +11,7 @@ dag_parameters:
     default_args:
       owner: astro
     tags:
+      - debussy_concert
       - example
       - reverse_etl
 extraction_movements:

@@ -16,6 +16,10 @@ dag_parameters:
       year: 2022
       month: 1
       day: 1
+    tags:
+      - debussy_concert
+      - example
+      - data_ingestion
     default_args:
       owner: astro
 ingestion_parameters:
