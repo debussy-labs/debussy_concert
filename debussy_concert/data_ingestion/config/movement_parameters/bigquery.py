@@ -5,8 +5,8 @@ from debussy_concert.core.config.movement_parameters.base import MovementParamet
 @dataclass(frozen=True)
 class BigQueryDataPartitioning:
     partitioning_type: str
-    field: str
-    value: str
+    gcs_partition_schema: str
+    partition_field: str
     destination_partition: str
 
 

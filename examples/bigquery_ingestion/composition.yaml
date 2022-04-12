@@ -26,6 +26,6 @@ ingestion_parameters:
     data_partitioning:
       partitioning_type: time
       partition_granularity: HOUR
-      field: _logical_ts
-      value: "{{ dag_run.logical_date }}"
+      partition_field: _logical_ts
+      gcs_partition_schema: _logical_ts={{ dag_run.logical_date }}/_ingestion_ts={{ dag_run.start_date }}
       destination_partition: "{{ macros.ds_format(dag_run.logical_date, '%Y-%m-%d %H:%M:%S+00:00', '%Y%m%d%H') }}"

@@ -28,7 +28,7 @@ class BigQueryIngestionComposition(CompositionBase):
     def bigquery_ingestion_movement_builder(
             self, movement_parameters: BigQueryDataIngestionMovementParameters) -> DataIngestionMovement:
         start_phrase = StartPhrase()
-        gcs_partition = f'{movement_parameters.data_partitioning.field}={movement_parameters.data_partitioning.value}'
+        gcs_partition = movement_parameters.data_partitioning.gcs_partition_schema
         export_motif = ExportBigQueryQueryToGcsMotif(
             gcs_partition=gcs_partition,
             extract_query=movement_parameters.extract_sql_query,
@@ -59,7 +59,7 @@ class BigQueryIngestionComposition(CompositionBase):
             source_uri_prefix=source_uri_prefix,
             gcs_partition=gcs_partition,
             partition_granularity=movement_parameters.data_partitioning.partition_granularity,
-            partition_field=movement_parameters.data_partitioning.field,
+            partition_field=movement_parameters.data_partitioning.partition_field,
             destination_partition=movement_parameters.data_partitioning.destination_partition
         )
         gcs_landing_to_bigquery_raw_phrase = LandingStorageLoadToDataWarehouseRawPhrase(
