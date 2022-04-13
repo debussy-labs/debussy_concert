@@ -1,11 +1,11 @@
-name: bigquery_ingestion
+name: bigquery_ingestion_inc
 database: example
 rdbms_name: bigquery
 description: BigQuery ingestion
 gcp_connection_id: google_cloud_debussy
 dag_parameters:
-    dag_id: bigquery_ingestion
-    description: BigQuery ingestion
+    dag_id: bigquery_ingestion_inc
+    description: BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage
     catchup: false
     schedule_interval: '*/1 * * * *' # At every minute.
     start_date:
@@ -13,19 +13,22 @@ dag_parameters:
       month: 1
       day: 1
     tags:
-      - debussy_concert
-      - example
-      - data_ingestion
+      - framework:debussy_concert
+      - project:example
+      - source:bigquery
+      - type:ingestion
+      - load:incremental
+      - tier:1
     default_args:
-      owner: astro
+      owner: debussy
 
 ingestion_parameters:
-  - name: sintetico
-    extract_sql_query: SELECT 'dado' as data
+  - name: sintetico_inc
+    extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ dag_run.logical_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       partitioning_type: time
       partition_granularity: HOUR
       partition_field: _logical_ts
-      gcs_partition_schema: _logical_ts={{ dag_run.logical_date }}/_ingestion_ts={{ dag_run.start_date }}
+      gcs_partition_schema: _load_flag=inc/_logical_ts={{ dag_run.logical_date }}/_ingestion_ts={{ dag_run.start_date }}
       destination_partition: "{{ macros.ds_format(dag_run.logical_date, '%Y-%m-%d %H:%M:%S+00:00', '%Y%m%d%H') }}"
