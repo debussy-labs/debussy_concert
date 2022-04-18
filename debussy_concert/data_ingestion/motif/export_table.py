@@ -17,7 +17,7 @@ from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdb
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
     extract_query_template = """
-    EXPORT DATA OPTIONS(overwrite=true,format='PARQUET',uri='{uri}')
+    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='{uri}')
     AS {extract_query}
     """
 
