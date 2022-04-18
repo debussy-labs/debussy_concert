@@ -16,8 +16,15 @@ dag_parameters:
       year: 2022
       month: 1
       day: 1
+    tags:
+      - framework:debussy_concert
+      - project:example
+      - source:mysql
+      - type:ingestion
+      - load:N/A
+      - tier:5
     default_args:
-      owner: astro
+      owner: debussy
 ingestion_parameters:
   - name: key_history
     primary_key: id

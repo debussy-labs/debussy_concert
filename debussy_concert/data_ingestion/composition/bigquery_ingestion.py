@@ -1,4 +1,3 @@
-
 from debussy_concert.data_ingestion.config.bigquery_data_ingestion import ConfigBigQueryDataIngestion
 from debussy_concert.data_ingestion.config.movement_parameters.bigquery import BigQueryDataIngestionMovementParameters
 
@@ -7,13 +6,12 @@ from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestion
 
 
 from debussy_concert.data_ingestion.phrase.ingestion_to_landing import IngestionSourceToLandingStoragePhrase
-from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageExternalTableToDataWarehouseRawPhrase
+from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageLoadToDataWarehouseRawPhrase
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
-
-from debussy_concert.data_ingestion.motif.export_table import ExportBigQueryQueryMotif
-from debussy_concert.data_ingestion.motif.create_external_table import CreateExternalBigQueryTableMotif
-from debussy_concert.data_ingestion.motif.merge_table import MergeAppendBigQueryTableMotif
+from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning, HivePartitioningOptions
+from debussy_concert.data_ingestion.motif.export_table import ExportBigQueryQueryToGcsMotif
+from debussy_concert.data_ingestion.motif.load_table_motif import LoadGcsToBigQueryHivePartitionMotif
 
 
 class BigQueryIngestionComposition(CompositionBase):
@@ -30,12 +28,13 @@ class BigQueryIngestionComposition(CompositionBase):
     def bigquery_ingestion_movement_builder(
             self, movement_parameters: BigQueryDataIngestionMovementParameters) -> DataIngestionMovement:
         start_phrase = StartPhrase()
-        export_motif = ExportBigQueryQueryMotif(
-            partition='execution_date={{ execution_date }}',
+        gcs_partition = movement_parameters.data_partitioning.gcs_partition_schema
+        export_motif = ExportBigQueryQueryToGcsMotif(
+            gcs_partition=gcs_partition,
             extract_query=movement_parameters.extract_sql_query,
             gcp_conn_id=movement_parameters.extract_connection_id)
         ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(export_data_to_storage_motif=export_motif)
-        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
+        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters, gcs_partition)
         end_phrase = EndPhrase()
 
         name = f'DataIngestionMovement_{movement_parameters.name}'
@@ -50,26 +49,42 @@ class BigQueryIngestionComposition(CompositionBase):
         return movement
 
     def gcs_landing_to_bigquery_raw_phrase(
-            self, movement_parameters: BigQueryDataIngestionMovementParameters
-    ) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
-        create_external_bigquery_table_motif = self.create_external_bigquery_table_motif()
-        merge_bigquery_table_motif = self.merge_bigquery_table_motif(movement_parameters)
-        gcs_landing_to_bigquery_raw_phrase = LandingStorageExternalTableToDataWarehouseRawPhrase(
-            name='Landing_to_Raw_Phrase',
-            create_external_table_motif=create_external_bigquery_table_motif,
-            merge_table_motif=merge_bigquery_table_motif
+        self, movement_parameters: BigQueryDataIngestionMovementParameters,
+        gcs_partition
+    ):
+        source_uri_prefix = (f"gs://{self.config.environment.landing_bucket}/"
+                             f"{self.config.rdbms_name}/{self.config.database}/{movement_parameters.name}")
+        load_bigquery_from_gcs = self.load_bigquery_from_gcs_hive_partition_motif(
+            gcp_conn_id=movement_parameters.extract_connection_id,
+            source_uri_prefix=source_uri_prefix,
+            gcs_partition=gcs_partition,
+            partition_granularity=movement_parameters.data_partitioning.partition_granularity,
+            partition_field=movement_parameters.data_partitioning.partition_field,
+            destination_partition=movement_parameters.data_partitioning.destination_partition
+        )
+        gcs_landing_to_bigquery_raw_phrase = LandingStorageLoadToDataWarehouseRawPhrase(
+            load_table_from_storage_motif=load_bigquery_from_gcs
         )
         return gcs_landing_to_bigquery_raw_phrase
 
-    def merge_bigquery_table_motif(
-            self, movement_parameters: BigQueryDataIngestionMovementParameters) -> MergeAppendBigQueryTableMotif:
-        merge_bigquery_table_motif = MergeAppendBigQueryTableMotif(
-            movement_parameters=movement_parameters, gcp_conn_id=self.config.gcp_connection_id
+    def load_bigquery_from_gcs_hive_partition_motif(
+            self, gcp_conn_id, source_uri_prefix,
+            gcs_partition, partition_granularity,
+            partition_field, destination_partition):
+        hive_options = HivePartitioningOptions()
+        hive_options.mode = "AUTO"
+        hive_options.source_uri_prefix = source_uri_prefix
+        time_partitioning = BigQueryTimePartitioning(type=partition_granularity, field=partition_field)
+        motif = LoadGcsToBigQueryHivePartitionMotif(
+            name='load_bigquery_from_gcs_hive_partition_motif',
+            gcs_partition=gcs_partition,
+            destination_partition=destination_partition,
+            source_format='PARQUET',
+            write_disposition='WRITE_TRUNCATE',
+            create_disposition='CREATE_IF_NEEDED',
+            hive_partitioning_options=hive_options,
+            time_partitioning=time_partitioning,
+            schema_update_options=None,
+            gcp_conn_id=gcp_conn_id
         )
-        return merge_bigquery_table_motif
-
-    def create_external_bigquery_table_motif(
-            self) -> CreateExternalBigQueryTableMotif:
-        create_external_bigquery_table_motif = CreateExternalBigQueryTableMotif(
-            gcp_conn_id=self.config.gcp_connection_id)
-        return create_external_bigquery_table_motif
+        return motif

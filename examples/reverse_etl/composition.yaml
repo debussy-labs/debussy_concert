@@ -9,10 +9,13 @@ dag_parameters:
       day: 1
     description: Example of a reverse ETL from data warehouse to sftp using dummy operators
     default_args:
-      owner: astro
+      owner: debussy
     tags:
-      - example
-      - reverse_etl
+      - framework:debussy_concert
+      - project:example
+      - destiny:gcs
+      - type:reverse_etl
+      - tier:5
 extraction_movements:
   - name: retl_data
     reverse_etl_query: >
