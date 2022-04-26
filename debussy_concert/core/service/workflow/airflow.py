@@ -1,6 +1,7 @@
 from enum import Enum
 
 from airflow.models.dag import DAG
+from airflow.models.baseoperator import chain
 from airflow.utils.task_group import TaskGroup
 
 from debussy_concert.core.service.workflow.protocol import PWorkflowService
@@ -41,3 +42,6 @@ class AirflowService(PWorkflowService):
 
     def workflow_dag(self, dag_id, **kwargs):
         return DAG(dag_id=dag_id, **kwargs)
+
+    def chain_tasks(self, *tasks):
+        return chain(tasks)

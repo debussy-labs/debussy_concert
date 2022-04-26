@@ -16,3 +16,6 @@ class PWorkflowService(Protocol):
 
     def workflow_dag(self, dag_id, **kwargs) -> PWorkflowDag:
         pass
+
+    def chain_tasks(self, *tasks):
+        pass
