@@ -35,7 +35,7 @@ class DataIngestionMovement(MovementBase):
     @property
     def landing_bucket_uri_prefix(self):
         return (f"gs://{self.config.environment.landing_bucket}/"
-                f"{self.config.rdbms_name}/{self.config.database}/{self.movement_parameters.name}")
+                f"{self.config.source_type}/{self.config.source_name}/{self.movement_parameters.name}")
 
     @property
     def raw_table_uri(self):

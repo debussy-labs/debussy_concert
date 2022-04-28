@@ -47,7 +47,7 @@ class FeuxDArtifice(CompositionBase):
         map_ = {
             'mysql': self.mysql_full_load_movement_builder
         }
-        rdbms_name = self.config.rdbms_name.lower()
+        rdbms_name = self.config.source_type.lower()
         builder = map_.get(rdbms_name)
         if not builder:
             raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")

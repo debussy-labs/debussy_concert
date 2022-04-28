@@ -1,6 +1,6 @@
 name: bigquery_ingestion_full
-database: example
-rdbms_name: bigquery
+source_name: example
+source_type: bigquery
 description: BigQuery ingestion
 gcp_connection_id: google_cloud_debussy
 dag_parameters:

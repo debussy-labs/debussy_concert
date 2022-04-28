@@ -189,7 +189,7 @@ class ExportFullMySqlTableToGcsMotif(
         response = client.access_secret_version(name=name)
         secret = response.payload.data.decode("UTF-8")
         db_conn_data = json.loads(secret)
-        db_conn_data.update({"database": self.config.database})
+        db_conn_data.update({"database": self.config.source_name})
         return db_conn_data
 
     def build(self, dag, parent_task_group: TaskGroup):
@@ -226,7 +226,7 @@ class ExportFullMySqlTableToGcsMotif(
         pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
 
         driver = "com.mysql.cj.jdbc.Driver"
-        jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.database
+        jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.source_name
 
         jdbc_to_landing = DataprocSubmitJobOperator(
             task_id="jdbc_to_landing",
@@ -239,7 +239,7 @@ class ExportFullMySqlTableToGcsMotif(
                             driver,
                             jdbc_url,
                             secret_uri,
-                            self.config.database,
+                            self.config.source_name,
                             f"{{{{ task_instance.xcom_pull('{build_extract_query_id}') }}}}",
                             run_ts,
                             (f"{self.destination_storage_uri}/{load_date_partition}={run_date}/"
@@ -279,7 +279,7 @@ class ExportFullMySqlTableToGcsMotif(
         return check_mysql_table
 
     def get_datastore_entity(self, dag, movement_parameters: RdbmsDataIngestionMovementParameters, task_group):
-        db_kind = self.config.database[0].upper() + self.config.database[1:]
+        db_kind = self.config.source_name[0].upper() + self.config.source_name[1:]
         kind = f"MySql{db_kind}Tables"
         get_datastore_entity = DatastoreGetEntityOperator(
             task_id="get_datastore_entity",
