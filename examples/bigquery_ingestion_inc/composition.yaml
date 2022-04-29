@@ -7,7 +7,7 @@ dag_parameters:
     dag_id: bigquery_ingestion_incr
     description: BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage
     catchup: false
-    schedule_interval: '*/1 * * * *' # At every minute.
+    schedule_interval: '*/30 * * * *' # At every minute.
     start_date:
       year: 2022
       month: 1
