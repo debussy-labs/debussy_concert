@@ -1,8 +1,8 @@
 from debussy_concert.core.movement.movement_base import MovementBase
 from debussy_concert.core.movement.protocols import (
     PStartPhrase,
-    PIngestionSourceToLandingStoragePhrase,
-    PLandingStorageToDataWarehouseRawPhrase,
+    PIngestionSourceToRawVaultStoragePhrase,
+    PRawVaultStorageToDataWarehouseRawPhrase,
     PEndPhrase
 )
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
@@ -15,26 +15,26 @@ class DataIngestionMovement(MovementBase):
     def __init__(
         self, name,
         start_phrase: PStartPhrase,
-        ingestion_source_to_landing_storage_phrase: PIngestionSourceToLandingStoragePhrase,
-        landing_storage_to_data_warehouse_raw_phrase: PLandingStorageToDataWarehouseRawPhrase,
+        ingestion_source_to_raw_vault_storage_phrase: PIngestionSourceToRawVaultStoragePhrase,
+        raw_vault_storage_to_data_warehouse_raw_phrase: PRawVaultStorageToDataWarehouseRawPhrase,
         end_phrase: PEndPhrase
     ) -> None:
 
         self.start_phrase = start_phrase
-        self.ingestion_source_to_landing_storage_phrase = ingestion_source_to_landing_storage_phrase
-        self.landing_storage_to_data_warehouse_raw_phrase = landing_storage_to_data_warehouse_raw_phrase
+        self.ingestion_source_to_raw_vault_storage_phrase = ingestion_source_to_raw_vault_storage_phrase
+        self.raw_vault_storage_to_data_warehouse_raw_phrase = raw_vault_storage_to_data_warehouse_raw_phrase
         self.end_phrase = end_phrase
         phrases = [
             self.start_phrase,
-            self.ingestion_source_to_landing_storage_phrase,
-            self.landing_storage_to_data_warehouse_raw_phrase,
+            self.ingestion_source_to_raw_vault_storage_phrase,
+            self.raw_vault_storage_to_data_warehouse_raw_phrase,
             self.end_phrase
         ]
         super().__init__(name=name, phrases=phrases)
 
     @property
-    def landing_bucket_uri_prefix(self):
-        return (f"gs://{self.config.environment.landing_bucket}/"
+    def raw_vault_bucket_uri_prefix(self):
+        return (f"gs://{self.config.environment.raw_vault_bucket}/"
                 f"{self.config.source_type}/{self.config.source_name}/{self.movement_parameters.name}")
 
     @property
@@ -48,10 +48,10 @@ class DataIngestionMovement(MovementBase):
         movement_parameters: MovementParametersType
     ):
         self.movement_parameters = movement_parameters
-        self.ingestion_source_to_landing_storage_phrase.setup(
-            destination_storage_uri=self.landing_bucket_uri_prefix)
-        self.landing_storage_to_data_warehouse_raw_phrase.setup(
+        self.ingestion_source_to_raw_vault_storage_phrase.setup(
+            destination_storage_uri=self.raw_vault_bucket_uri_prefix)
+        self.raw_vault_storage_to_data_warehouse_raw_phrase.setup(
             movement_parameters=movement_parameters,
-            source_storage_uri_prefix=self.landing_bucket_uri_prefix,
+            source_storage_uri_prefix=self.raw_vault_bucket_uri_prefix,
             datawarehouse_raw_uri=self.raw_table_uri)
         return self

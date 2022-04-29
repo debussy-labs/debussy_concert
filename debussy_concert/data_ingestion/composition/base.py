@@ -5,7 +5,7 @@ from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement
 
 
-from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageLoadToDataWarehouseRawPhrase
+from debussy_concert.data_ingestion.phrase.raw_vault_to_raw import RawVaultStorageLoadToDataWarehouseRawPhrase
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning, HivePartitioningOptions
@@ -17,29 +17,30 @@ class DataIngestionBase(CompositionBase):
 
     def ingestion_movement_builder(
             self, movement_parameters: TimePartitionedDataIngestionMovementParameters,
-            ingestion_to_landing_phrase
+            ingestion_to_raw_vault_phrase
     ) -> DataIngestionMovement:
         start_phrase = StartPhrase()
         gcs_partition = movement_parameters.data_partitioning.gcs_partition_schema
-        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters, gcs_partition)
+        gcs_raw_vault_to_bigquery_raw_phrase = self.gcs_raw_vault_to_bigquery_raw_phrase(
+            movement_parameters, gcs_partition)
         end_phrase = EndPhrase()
 
         name = f'DataIngestionMovement_{movement_parameters.name}'
         movement = DataIngestionMovement(
             name=name,
             start_phrase=start_phrase,
-            ingestion_source_to_landing_storage_phrase=ingestion_to_landing_phrase,
-            landing_storage_to_data_warehouse_raw_phrase=gcs_landing_to_bigquery_raw_phrase,
+            ingestion_source_to_raw_vault_storage_phrase=ingestion_to_raw_vault_phrase,
+            raw_vault_storage_to_data_warehouse_raw_phrase=gcs_raw_vault_to_bigquery_raw_phrase,
             end_phrase=end_phrase
         )
         movement.setup(movement_parameters)
         return movement
 
-    def gcs_landing_to_bigquery_raw_phrase(
+    def gcs_raw_vault_to_bigquery_raw_phrase(
         self, movement_parameters: TimePartitionedDataIngestionMovementParameters,
         gcs_partition
     ):
-        source_uri_prefix = (f"gs://{self.config.environment.landing_bucket}/"
+        source_uri_prefix = (f"gs://{self.config.environment.raw_vault_bucket}/"
                              f"{self.config.source_type}/{self.config.source_name}/{movement_parameters.name}")
         load_bigquery_from_gcs = self.load_bigquery_from_gcs_hive_partition_motif(
             gcp_conn_id=movement_parameters.extract_connection_id,
@@ -49,10 +50,10 @@ class DataIngestionBase(CompositionBase):
             partition_field=movement_parameters.data_partitioning.partition_field,
             destination_partition=movement_parameters.data_partitioning.destination_partition
         )
-        gcs_landing_to_bigquery_raw_phrase = LandingStorageLoadToDataWarehouseRawPhrase(
+        gcs_raw_vault_to_bigquery_raw_phrase = RawVaultStorageLoadToDataWarehouseRawPhrase(
             load_table_from_storage_motif=load_bigquery_from_gcs
         )
-        return gcs_landing_to_bigquery_raw_phrase
+        return gcs_raw_vault_to_bigquery_raw_phrase
 
     def load_bigquery_from_gcs_hive_partition_motif(
             self, gcp_conn_id, source_uri_prefix,

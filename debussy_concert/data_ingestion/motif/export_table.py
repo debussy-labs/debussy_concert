@@ -201,7 +201,7 @@ class ExportFullMySqlTableToGcsMotif(
         check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
         build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
-        jdbc_to_landing = self.jdbc_to_landing(dag, task_group, build_extract_query.task_id)
+        jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, build_extract_query.task_id)
         delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
         (
             start >>
@@ -209,12 +209,12 @@ class ExportFullMySqlTableToGcsMotif(
             check_mysql_table >>
             build_extract_query >>
             create_dataproc_cluster >>
-            jdbc_to_landing >>
+            jdbc_to_raw_vault >>
             delete_dataproc_cluster
         )
         return task_group
 
-    def jdbc_to_landing(self, dag, task_group, build_extract_query_id):
+    def jdbc_to_raw_vault(self, dag, task_group, build_extract_query_id):
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
@@ -228,8 +228,8 @@ class ExportFullMySqlTableToGcsMotif(
         driver = "com.mysql.cj.jdbc.Driver"
         jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.source_name
 
-        jdbc_to_landing = DataprocSubmitJobOperator(
-            task_id="jdbc_to_landing",
+        jdbc_to_raw_vault = DataprocSubmitJobOperator(
+            task_id="jdbc_to_raw_vault",
             job={
                     "reference": {"project_id": self.config.environment.project},
                     "placement": {"cluster_name": self.cluster_name},
@@ -253,7 +253,7 @@ class ExportFullMySqlTableToGcsMotif(
             task_group=task_group
         )
 
-        return jdbc_to_landing
+        return jdbc_to_raw_vault
 
     def build_extract_query(self, dag, task_group, get_datastore_entity_task_id):
         build_extract_query = PythonOperator(

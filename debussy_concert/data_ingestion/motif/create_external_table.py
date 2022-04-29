@@ -36,8 +36,8 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
         self.destination_table_uri = destination_project_dataset_table
         return self
 
-    def create_landing_external_table(self, dag, task_group) -> BigQueryCreateExternalTableOperator:
-        create_landing_external_table = BigQueryCreateExternalTableOperator(
+    def create_raw_vault_external_table(self, dag, task_group) -> BigQueryCreateExternalTableOperator:
+        create_raw_vault_external_table = BigQueryCreateExternalTableOperator(
             task_id=self.name,
             bucket=self.source_storage_uri_prefix,
             destination_project_dataset_table=self.destination_table_uri,
@@ -46,7 +46,7 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
             task_group=task_group,
             bigquery_conn_id=self.gcp_conn_id
         )
-        return create_landing_external_table
+        return create_raw_vault_external_table
 
     def build(self, dag, phrase_group):
-        return self.create_landing_external_table(dag, phrase_group)
+        return self.create_raw_vault_external_table(dag, phrase_group)
