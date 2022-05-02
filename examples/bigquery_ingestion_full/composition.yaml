@@ -24,7 +24,7 @@ dag_parameters:
 
 ingestion_parameters:
   - name: sintetico_full
-    extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ dag_run.logical_date }}' as airflow_logical_date
+    extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       partitioning_type: time
