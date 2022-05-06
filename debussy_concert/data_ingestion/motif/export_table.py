@@ -109,7 +109,7 @@ class ExportFullMySqlTableToGcsMotif(
         self.pip_packages = self.config.dataproc_config.get(
             "pip_packages", [])
         self.spark_jars_packages = self.config.dataproc_config.get(
-            "spark_jars_packages", None)
+            "spark_jars_packages", "")
         self.service_account_scopes = self.config.dataproc_config.get(
             "service_account_scopes", self.service_account_scopes)
         self.cluster_tags = self.config.dataproc_config.get(
@@ -250,7 +250,7 @@ class ExportFullMySqlTableToGcsMotif(
     def build_cluster_name(self, dag: DAG, cluster_name_task):
         # max number of characters for dataproc cluster names is 34
         # for usage in cluster_name property
-        return (f"dby{{{{ ti.xcom_pull(dag_id={dag.dag_id}, task_ids='cluster_name_id') }}}}"
+        return (f"dby{{{{ ti.xcom_pull(dag_id='{dag.dag_id}', task_ids='{cluster_name_task.task_id}') }}}}"
                 f"{self.config.database.replace('_', '').lower()[:22]}")
 
     def cluster_name_id(self, dag, task_group):
