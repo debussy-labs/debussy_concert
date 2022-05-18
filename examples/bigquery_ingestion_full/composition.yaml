@@ -1,13 +1,13 @@
 name: bigquery_ingestion_full
-database: example
-rdbms_name: bigquery
+source_name: example
+source_type: bigquery
 description: BigQuery ingestion
 gcp_connection_id: google_cloud_debussy
 dag_parameters:
     dag_id: bigquery_ingestion_full
     description: BigQuery full ingestion example. Fixing a partition and always overwriting it. Versioning on storage
     catchup: false
-    schedule_interval: '*/1 * * * *' # At every minute.
+    schedule_interval: '*/30 * * * *' # At every minute.
     start_date:
       year: 2022
       month: 1
@@ -24,7 +24,7 @@ dag_parameters:
 
 ingestion_parameters:
   - name: sintetico_full
-    extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ dag_run.logical_date }}' as airflow_logical_date
+    extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       partitioning_type: time

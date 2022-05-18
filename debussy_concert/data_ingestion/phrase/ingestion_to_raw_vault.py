@@ -1,9 +1,9 @@
-from debussy_concert.core.movement.protocols import PIngestionSourceToLandingStoragePhrase
+from debussy_concert.core.movement.protocols import PIngestionSourceToRawVaultStoragePhrase
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
 from debussy_concert.core.phrase.phrase_base import PhraseBase
 
 
-class IngestionSourceToLandingStoragePhrase(PhraseBase, PIngestionSourceToLandingStoragePhrase):
+class IngestionSourceToRawVaultStoragePhrase(PhraseBase, PIngestionSourceToRawVaultStoragePhrase):
     def __init__(
         self,
         export_data_to_storage_motif: PExportDataToStorageMotif,
