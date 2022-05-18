@@ -15,6 +15,5 @@ class ConfigComposition(ABC):
     environment: ConfigEnvironment
     dag_parameters: ConfigDagParameters
 
-    @abstractclassmethod
     def load_from_file(cls, composition_config_file_path, env_file_path):
-        pass
+        raise NotImplementedError()
