@@ -1,19 +1,22 @@
+from cgitb import reset
 from typing import List
+from json import dumps, loads
+from uuid import uuid4
 from google.protobuf.duration_pb2 import Duration
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
 from debussy_framework.v3.operators.mysql_check import MySQLCheckOperator
-from debussy_framework.v2.operators.basic import StartOperator
-from debussy_framework.v2.operators.datastore import DatastoreGetEntityOperator
+from debussy_framework.v3.operators.basic import StartOperator
 
 from debussy_concert.core.motif.motif_base import MotifBase, PClusterMotifMixin
 from debussy_concert.core.motif.mixins.dataproc import DataprocClusterHandlerMixin
 from debussy_concert.core.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
-from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
+from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters, TableField
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 
+from airflow.operators.bash_operator import BashOperator
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
     extract_query_template = """
@@ -54,6 +57,8 @@ def build_query_from_datastore_entity_json(entity_json_str):
     fields = ", ".join(fields)
     offset_type = entity.get("OffsetType")
     offset_value = entity.get("OffsetValue")
+    execution_date = entity.get("ExecutionDate")
+    yesterday_date = entity.get("YesterdayDate")
     offset_field = entity.get("OffsetField")
     source_timezone = entity.get("SourceTimezone")
     if offset_value == "NONE":
@@ -72,7 +77,7 @@ def build_query_from_datastore_entity_json(entity_json_str):
     if offset_value:
         query = (
             f"SELECT {fields} FROM {source_table}"
-            f" WHERE {offset_field} > {offset_value}"
+            f" WHERE {offset_field} > {yesterday_date} AND {offset_field} < {execution_date}"
         )
     else:
         query = f"SELECT {fields} FROM {source_table}"
@@ -193,19 +198,19 @@ class ExportFullMySqlTableToGcsMotif(
         return db_conn_data
 
     def build(self, dag, parent_task_group: TaskGroup):
-        task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
+        task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=parent_task_group)
 
         start = StartOperator(phase=self.movement_parameters.name, dag=dag, task_group=task_group)
 
-        get_datastore_entity = self.get_datastore_entity(dag, self.movement_parameters, task_group)
-        check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
-        build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)
+        get_data_source_table = self.get_data_source_table(dag, task_group, self.movement_parameters)
+        check_mysql_table = self.check_mysql_table(dag, task_group, get_data_source_table.task_id)
+        build_extract_query = self.build_extract_query(dag, task_group, get_data_source_table.task_id)
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
         jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, build_extract_query.task_id)
         delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
         (
             start >>
-            get_datastore_entity >>
+            get_data_source_table >>
             check_mysql_table >>
             build_extract_query >>
             create_dataproc_cluster >>
@@ -276,19 +281,45 @@ class ExportFullMySqlTableToGcsMotif(
             task_group=task_group
         )
 
-        return check_mysql_table
-
-    def get_datastore_entity(self, dag, movement_parameters: RdbmsDataIngestionMovementParameters, task_group):
+        return check_mysql_table   
+    
+    def get_data_source_table(self, dag, task_group, movement_parameters: RdbmsDataIngestionMovementParameters):
         db_kind = self.config.source_name[0].upper() + self.config.source_name[1:]
-        kind = f"MySql{db_kind}Tables"
-        get_datastore_entity = DatastoreGetEntityOperator(
-            task_id="get_datastore_entity",
-            project=self.config.environment.project,
-            namespace="TABLE",
-            kind=kind,
-            filters=("SourceTable", "=", movement_parameters.name),
+        table_fields = movement_parameters.fields
+        fields_names = set(tf.name for tf in table_fields)
+
+        def build_data_source_table_json(yest_date, execution_date):
+            db_table_json = {                
+                    "BusinessPartitionColumn": movement_parameters.business_partition_column,
+                    "Fields": ",".join(fields_names),
+                    "Active": True,
+                    "SinkTable": movement_parameters.name,
+                    "PrimaryKey": movement_parameters.primary_key,
+                    "PIIColumns": movement_parameters.pii_columns,
+                    "YesterdayDate": yest_date,
+                    "ExecutionDate": execution_date,
+                    "OffsetValue": execution_date,
+                    "SourceTable": movement_parameters.name,
+                    "SinkDataset": self.config.environment.raw_dataset,
+                    "OffsetField": movement_parameters.offset_field,
+                    "OffsetType": movement_parameters.offset_type,
+                    "SourceTimezone": self.config.source_timezone                    
+            } 
+
+            db_table_dict = {}
+            db_table_dict["entity"] = dict(db_table_json)
+            db_table_dict["id"] = uuid4()
+            return dumps(db_table_dict, default=str)
+
+        get_data_source_table = PythonOperator(
+            task_id="get_data_source_table",
+            python_callable=build_data_source_table_json,
+            provide_context=True,
+            op_kwargs={"yest_date": "{{ yesterday_ds }}", "execution_date": "{{ ds }}"},
             dag=dag,
             task_group=task_group
-        )
+        )        
 
-        return get_datastore_entity
+        return get_data_source_table      
+
+    
