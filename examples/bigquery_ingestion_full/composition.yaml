@@ -2,7 +2,7 @@ name: bigquery_ingestion_full
 source_name: example
 source_type: bigquery
 description: BigQuery ingestion
-gcp_connection_id: google_cloud_debussy
+data_lake_connection_id: google_cloud_debussy
 dag_parameters:
     dag_id: bigquery_ingestion_full
     description: BigQuery full ingestion example. Fixing a partition and always overwriting it. Versioning on storage
