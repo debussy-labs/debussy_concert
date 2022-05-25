@@ -38,7 +38,6 @@ extraction_movements:
       field_delimiter: ','
     destination_type: gcs
     destination_object_path: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
-    gcp_connection_id: google_cloud_debussy
     destination_connection_id: google_cloud_debussy
   - name: synthetic_data_sftp
     reverse_etl_query: >
@@ -60,7 +59,6 @@ extraction_movements:
       field_delimiter: ','
     destination_type: sftp
     destination_object_path: "" #its empty due to a bug in sftp hook on debussy framework that will be fixed later
-    gcp_connection_id: google_cloud_debussy
     destination_connection_id: sftp_default
 
 

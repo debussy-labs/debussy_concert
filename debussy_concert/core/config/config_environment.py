@@ -16,6 +16,7 @@ class ConfigEnvironment:
     trusted_dataset: str
     reverse_etl_dataset: str
     temp_dataset: str
+    data_lake_connection_id: str
 
     @classmethod
     def load_from_file(cls, file_path):

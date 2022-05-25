@@ -32,11 +32,11 @@ class ChildrensCorner(CompositionBase):
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
             partition_type=movement_parameters.reverse_etl_dataset_partition_type,
             partition_field=movement_parameters.reverse_etl_dataset_partition_field,
-            gcp_conn_id=movement_parameters.gcp_connection_id
+            gcp_conn_id=self.config.environment.data_lake_connection_id
         )
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
             destination_config=csv_output_config,
-            gcp_conn_id=movement_parameters.gcp_connection_id
+            gcp_conn_id=self.config.environment.data_lake_connection_id
         )
 
         name = f'ReverseEtlMovement_{movement_parameters.name}'
@@ -87,7 +87,7 @@ class ChildrensCorner(CompositionBase):
             'sftp': SFTPHook,
         }
         HookCls = destination_type_motif_map[destination_type]
-        origin_gcs_hook = GCSHook(gcp_conn_id=movement_parameters.gcp_connection_id)
+        origin_gcs_hook = GCSHook(gcp_conn_id=self.config.environment.data_lake_connection_id)
         destiny_hook = HookCls(movement_parameters.destination_connection_id)
         storage_to_storage_motif = StorageToStorageMotif(
             name=f'gcs_to_{destination_type}_motif',

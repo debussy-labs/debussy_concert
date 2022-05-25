@@ -8,7 +8,6 @@ from debussy_concert.data_ingestion.config.movement_parameters.time_partitioned 
 
 @dataclass(frozen=True)
 class ConfigDataIngestionBase(ConfigComposition, ABC):
-    data_lake_connection_id: str
     # ingestion are time partitioned on bigquery based on ingestion logical date,
     # even if it is only one partition
     movements_parameters: List[TimePartitionedDataIngestionMovementParameters]
