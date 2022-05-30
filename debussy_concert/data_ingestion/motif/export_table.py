@@ -16,8 +16,6 @@ from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
 from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters, TableField
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 
-from airflow.operators.bash_operator import BashOperator
-
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
     extract_query_template = """
     EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='{uri}')
@@ -288,7 +286,7 @@ class ExportFullMySqlTableToGcsMotif(
         table_fields = movement_parameters.fields
         fields_names = set(tf.name for tf in table_fields)
 
-        def build_data_source_table_json(yest_date, execution_date):
+        def build_data_source_table_json(prev_execution_date, execution_date):
             db_table_json = {                
                     "BusinessPartitionColumn": movement_parameters.business_partition_column,
                     "Fields": ",".join(fields_names),
@@ -296,14 +294,14 @@ class ExportFullMySqlTableToGcsMotif(
                     "SinkTable": movement_parameters.name,
                     "PrimaryKey": movement_parameters.primary_key,
                     "PIIColumns": movement_parameters.pii_columns,
-                    "YesterdayDate": yest_date,
+                    "YesterdayDate": prev_execution_date,
                     "ExecutionDate": execution_date,
                     "OffsetValue": execution_date,
                     "SourceTable": movement_parameters.name,
                     "SinkDataset": self.config.environment.raw_dataset,
                     "OffsetField": movement_parameters.offset_field,
                     "OffsetType": movement_parameters.offset_type,
-                    "SourceTimezone": self.config.source_timezone                    
+                    "SourceTimezone": self.config.source_timezone                 
             } 
 
             db_table_dict = {}
@@ -315,7 +313,7 @@ class ExportFullMySqlTableToGcsMotif(
             task_id="get_data_source_table",
             python_callable=build_data_source_table_json,
             provide_context=True,
-            op_kwargs={"yest_date": "{{ yesterday_ds }}", "execution_date": "{{ ds }}"},
+            op_kwargs={"prev_execution_date": "{{ prev_ds }}", "execution_date": "{{ ds }}"},
             dag=dag,
             task_group=task_group
         )        
