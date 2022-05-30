@@ -11,7 +11,7 @@ from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning, HivePartitioningOptions
 from debussy_concert.data_ingestion.motif.export_table import ExportBigQueryQueryToGcsMotif
-from debussy_concert.data_ingestion.motif.load_table_motif import LoadGcsToBigQueryHivePartitionMotif
+from debussy_concert.data_ingestion.motif.load_table import LoadGcsToBigQueryHivePartitionMotif
 
 
 class BigQueryIngestionComposition(CompositionBase):
