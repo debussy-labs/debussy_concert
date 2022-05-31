@@ -1,3 +1,4 @@
+from typing import Optional
 from dataclasses import dataclass
 import yaml
 
@@ -9,13 +10,14 @@ class ConfigEnvironment:
     zone: str
     artifact_bucket: str
     reverse_etl_bucket: str
-    landing_bucket: str
+    raw_vault_bucket: str
     staging_bucket: str
-    landing_dataset: str
+    raw_vault_dataset: str
     raw_dataset: str
     trusted_dataset: str
     reverse_etl_dataset: str
     temp_dataset: str
+    landing_bucket: Optional[str] = None
 
     @classmethod
     def load_from_file(cls, file_path):

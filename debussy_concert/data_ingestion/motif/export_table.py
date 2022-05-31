@@ -219,7 +219,7 @@ class ExportFullMySqlTableToGcsMotif(
         response = client.access_secret_version(name=name)
         secret = response.payload.data.decode("UTF-8")
         db_conn_data = json.loads(secret)
-        db_conn_data.update({"database": self.config.database})
+        db_conn_data.update({"database": self.config.source_name})
         return db_conn_data
 
     def build(self, dag, parent_task_group: TaskGroup):
@@ -233,7 +233,7 @@ class ExportFullMySqlTableToGcsMotif(
         check_mysql_table = self.check_mysql_table(dag, task_group, get_datastore_entity.task_id)
         build_extract_query = self.build_extract_query(dag, task_group, get_datastore_entity.task_id)
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
-        jdbc_to_landing = self.jdbc_to_landing(dag, task_group, build_extract_query.task_id)
+        jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, build_extract_query.task_id)
         delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
         self.workflow_service.chain_tasks(
             start,
@@ -242,7 +242,7 @@ class ExportFullMySqlTableToGcsMotif(
             build_extract_query,
             cluster_name_id,
             create_dataproc_cluster,
-            jdbc_to_landing,
+            jdbc_to_raw_vault,
             delete_dataproc_cluster
         )
         return task_group
@@ -262,7 +262,7 @@ class ExportFullMySqlTableToGcsMotif(
             task_group=task_group)
         return cluster_name_id
 
-    def jdbc_to_landing(self, dag, task_group, build_extract_query_id):
+    def jdbc_to_raw_vault(self, dag, task_group, build_extract_query_id):
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
@@ -274,10 +274,10 @@ class ExportFullMySqlTableToGcsMotif(
         pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
 
         driver = "com.mysql.cj.jdbc.Driver"
-        jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.database
+        jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.source_name
 
-        jdbc_to_landing = DataprocSubmitJobOperator(
-            task_id="jdbc_to_landing",
+        jdbc_to_raw_vault = DataprocSubmitJobOperator(
+            task_id="jdbc_to_raw_vault",
             job={
                     "reference": {"project_id": self.config.environment.project},
                     "placement": {"cluster_name": self.cluster_name},
@@ -287,7 +287,7 @@ class ExportFullMySqlTableToGcsMotif(
                             driver,
                             jdbc_url,
                             secret_uri,
-                            self.config.database,
+                            self.config.source_name,
                             f"{{{{ task_instance.xcom_pull('{build_extract_query_id}') }}}}",
                             run_ts,
                             (f"{self.destination_storage_uri}/{load_date_partition}={run_date}/"
@@ -301,7 +301,7 @@ class ExportFullMySqlTableToGcsMotif(
             task_group=task_group
         )
 
-        return jdbc_to_landing
+        return jdbc_to_raw_vault
 
     def build_extract_query(self, dag, task_group, get_datastore_entity_task_id):
         build_extract_query = PythonOperator(
@@ -327,7 +327,7 @@ class ExportFullMySqlTableToGcsMotif(
         return check_mysql_table
 
     def get_datastore_entity(self, dag, movement_parameters: RdbmsDataIngestionMovementParameters, task_group):
-        db_kind = self.config.database[0].upper() + self.config.database[1:]
+        db_kind = self.config.source_name[0].upper() + self.config.source_name[1:]
         kind = f"MySql{db_kind}Tables"
         get_datastore_entity = DatastoreGetEntityOperator(
             task_id="get_datastore_entity",

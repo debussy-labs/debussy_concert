@@ -2,20 +2,14 @@ from dataclasses import dataclass
 import yaml
 
 from debussy_concert.core.config.config_environment import ConfigEnvironment
-from debussy_concert.core.config.config_composition import ConfigComposition
+from debussy_concert.data_ingestion.config.base import ConfigDataIngestionBase
 from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
 from debussy_concert.data_ingestion.config.movement_parameters.bigquery import BigQueryDataIngestionMovementParameters
 
 
 @dataclass(frozen=True)
-class ConfigBigQueryDataIngestion(ConfigComposition):
-    database: str
-    rdbms_name: str
+class ConfigBigQueryDataIngestion(ConfigDataIngestionBase):
     gcp_connection_id: str
-
-    @property
-    def table_prefix(self):
-        return self.database.lower()
 
     @classmethod
     def load_from_file(cls, composition_config_file_path, env_file_path):

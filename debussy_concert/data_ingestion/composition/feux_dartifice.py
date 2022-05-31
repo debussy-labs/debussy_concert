@@ -8,8 +8,8 @@ from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement
 from debussy_concert.core.movement.movement_base import PMovement
 
-from debussy_concert.data_ingestion.phrase.ingestion_to_landing import IngestionSourceToLandingStoragePhrase
-from debussy_concert.data_ingestion.phrase.landing_to_raw import LandingStorageExternalTableToDataWarehouseRawPhrase
+from debussy_concert.data_ingestion.phrase.ingestion_to_raw_vault import IngestionSourceToRawVaultStoragePhrase
+from debussy_concert.data_ingestion.phrase.raw_vault_to_raw import RawVaultStorageExternalTableToDataWarehouseRawPhrase
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
 
@@ -26,17 +26,17 @@ class FeuxDArtifice(CompositionBase):
 
     def mysql_full_load_movement_builder(
             self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
-        ingestion_to_landing_phrase = self.mysql_ingestion_to_landing_phrase(movement_parameters)
-        return self.rdbms_ingestion_movement_builder(ingestion_to_landing_phrase, movement_parameters)
+        ingestion_to_raw_vault_phrase = self.mysql_ingestion_to_raw_vault_phrase(movement_parameters)
+        return self.rdbms_ingestion_movement_builder(ingestion_to_raw_vault_phrase, movement_parameters)
 
-    def mysql_ingestion_to_landing_phrase(self, movement_parameters):
+    def mysql_ingestion_to_raw_vault_phrase(self, movement_parameters):
         export_mysql_to_gcs_motif = ExportFullMySqlTableToGcsMotif(
             movement_parameters=movement_parameters)
-        ingestion_to_landing_phrase = IngestionSourceToLandingStoragePhrase(
+        ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
         )
 
-        return ingestion_to_landing_phrase
+        return ingestion_to_raw_vault_phrase
 
     def auto_play(self):
         rdbms_builder_fn = self.rdbms_builder_fn()
@@ -47,41 +47,41 @@ class FeuxDArtifice(CompositionBase):
         map_ = {
             'mysql': self.mysql_full_load_movement_builder
         }
-        rdbms_name = self.config.rdbms_name.lower()
+        rdbms_name = self.config.source_type.lower()
         builder = map_.get(rdbms_name)
         if not builder:
             raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
         return builder
 
     def rdbms_ingestion_movement_builder(
-            self, ingestion_to_landing_phrase,
+            self, ingestion_to_raw_vault_phrase,
             movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
         start_phrase = StartPhrase()
-        gcs_landing_to_bigquery_raw_phrase = self.gcs_landing_to_bigquery_raw_phrase(movement_parameters)
+        gcs_raw_vault_to_bigquery_raw_phrase = self.gcs_raw_vault_to_bigquery_raw_phrase(movement_parameters)
         end_phrase = EndPhrase()
 
         name = f'DataIngestionMovement_{movement_parameters.name}'
         movement = DataIngestionMovement(
             name=name,
             start_phrase=start_phrase,
-            ingestion_source_to_landing_storage_phrase=ingestion_to_landing_phrase,
-            landing_storage_to_data_warehouse_raw_phrase=gcs_landing_to_bigquery_raw_phrase,
+            ingestion_source_to_raw_vault_storage_phrase=ingestion_to_raw_vault_phrase,
+            raw_vault_storage_to_data_warehouse_raw_phrase=gcs_raw_vault_to_bigquery_raw_phrase,
             end_phrase=end_phrase
         )
         movement.setup(movement_parameters)
         return movement
 
-    def gcs_landing_to_bigquery_raw_phrase(
+    def gcs_raw_vault_to_bigquery_raw_phrase(
             self, movement_parameters: RdbmsDataIngestionMovementParameters
-    ) -> LandingStorageExternalTableToDataWarehouseRawPhrase:
+    ) -> RawVaultStorageExternalTableToDataWarehouseRawPhrase:
         create_external_bigquery_table_motif = self.create_external_bigquery_table_motif()
         merge_bigquery_table_motif = self.merge_bigquery_table_motif(movement_parameters)
-        gcs_landing_to_bigquery_raw_phrase = LandingStorageExternalTableToDataWarehouseRawPhrase(
-            name='Landing_to_Raw_Phrase',
+        gcs_raw_vault_to_bigquery_raw_phrase = RawVaultStorageExternalTableToDataWarehouseRawPhrase(
+            name='RawVault_to_Raw_Phrase',
             create_external_table_motif=create_external_bigquery_table_motif,
             merge_table_motif=merge_bigquery_table_motif
         )
-        return gcs_landing_to_bigquery_raw_phrase
+        return gcs_raw_vault_to_bigquery_raw_phrase
 
     def merge_bigquery_table_motif(
             self, movement_parameters: RdbmsDataIngestionMovementParameters) -> MergeBigQueryTableMotif:
