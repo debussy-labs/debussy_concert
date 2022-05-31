@@ -251,7 +251,7 @@ class ExportFullMySqlTableToGcsMotif(
         # max number of characters for dataproc cluster names is 34
         # for usage in cluster_name property
         return (f"dby{{{{ ti.xcom_pull(dag_id='{dag.dag_id}', task_ids='{cluster_name_task.task_id}') }}}}"
-                f"{self.config.database.replace('_', '').lower()[:22]}")
+                f"{self.config.source_name.replace('_', '').lower()[:22]}")
 
     def cluster_name_id(self, dag, task_group):
         cluster_name_id = PythonOperator(
