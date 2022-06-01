@@ -39,9 +39,8 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
         return self
 
 
-def build_query_from_datastore_entity_json(entity_json_str):
+def build_query_data_source_table(entity_json_str):
     import json
-    import pendulum
 
     entity_dict = json.loads(entity_json_str)
     entity = entity_dict["entity"]
@@ -53,32 +52,14 @@ def build_query_from_datastore_entity_json(entity_json_str):
 
     fields = [f"`{field}`" for field in fields]
     fields = ", ".join(fields)
-    offset_type = entity.get("OffsetType")
-    offset_value = entity.get("OffsetValue")
     execution_date = entity.get("ExecutionDate")
-    yesterday_date = entity.get("YesterdayDate")
+    prev_execution_date = entity.get("PrevExecutionDate")
     offset_field = entity.get("OffsetField")
-    source_timezone = entity.get("SourceTimezone")
-    if offset_value == "NONE":
-        offset_value = None
-    if offset_type == "TIMESTAMP":
-        offset_value = "'{}'".format(
-            pendulum.parse(offset_value)
-            .in_timezone(source_timezone)
-            .strftime("%Y-%m-%dT%H:%M:%S")
-        )
-    elif offset_type == "ROWVERSION":
-        offset_value = f"0x{offset_value}"
-    elif offset_type == "STRING":
-        offset_value = f"'{offset_value}'"
-
-    if offset_value:
-        query = (
-            f"SELECT {fields} FROM {source_table}"
-            f" WHERE {offset_field} > {yesterday_date} AND {offset_field} < {execution_date}"
-        )
-    else:
-        query = f"SELECT {fields} FROM {source_table}"
+    
+    query = (
+        f"SELECT {fields} FROM {source_table}"
+        f" WHERE {offset_field} > {prev_execution_date} AND {offset_field} < {execution_date}"
+    )
 
     return query
 
@@ -258,22 +239,22 @@ class ExportFullMySqlTableToGcsMotif(
 
         return jdbc_to_raw_vault
 
-    def build_extract_query(self, dag, task_group, get_datastore_entity_task_id):
+    def build_extract_query(self, dag, task_group, get_data_source_table_task_id):
         build_extract_query = PythonOperator(
             task_id="build_extract_query",
-            python_callable=build_query_from_datastore_entity_json,
+            python_callable=build_query_data_source_table,
             op_args=[
-                    f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}"],
+                    f"{{{{ task_instance.xcom_pull('{get_data_source_table_task_id}') }}}}"],
             dag=dag,
             task_group=task_group
         )
 
         return build_extract_query
 
-    def check_mysql_table(self, dag, task_group, get_datastore_entity_task_id):
+    def check_mysql_table(self, dag, task_group, get_data_source_table_task_id):
         check_mysql_table = MySQLCheckOperator(
             task_id="check_mysql_table",
-            entity_json_str=f"{{{{ task_instance.xcom_pull('{get_datastore_entity_task_id}') }}}}",
+            entity_json_str=f"{{{{ task_instance.xcom_pull('{get_data_source_table_task_id}') }}}}",
             db_conn_data_callable=self.get_db_conn_data,
             dag=dag,
             task_group=task_group
@@ -282,7 +263,6 @@ class ExportFullMySqlTableToGcsMotif(
         return check_mysql_table   
     
     def get_data_source_table(self, dag, task_group, movement_parameters: RdbmsDataIngestionMovementParameters):
-        db_kind = self.config.source_name[0].upper() + self.config.source_name[1:]
         table_fields = movement_parameters.fields
         fields_names = set(tf.name for tf in table_fields)
 
@@ -294,14 +274,12 @@ class ExportFullMySqlTableToGcsMotif(
                     "SinkTable": movement_parameters.name,
                     "PrimaryKey": movement_parameters.primary_key,
                     "PIIColumns": movement_parameters.pii_columns,
-                    "YesterdayDate": prev_execution_date,
+                    "PrevExecutionDate": prev_execution_date,
                     "ExecutionDate": execution_date,
-                    "OffsetValue": execution_date,
                     "SourceTable": movement_parameters.name,
                     "SinkDataset": self.config.environment.raw_dataset,
                     "OffsetField": movement_parameters.offset_field,
-                    "OffsetType": movement_parameters.offset_type,
-                    "SourceTimezone": self.config.source_timezone                 
+                    "OffsetType": movement_parameters.offset_type                
             } 
 
             db_table_dict = {}
