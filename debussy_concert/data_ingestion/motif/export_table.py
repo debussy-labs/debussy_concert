@@ -39,26 +39,14 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
         return self
 
 
-def build_query_data_source_table(entity_json_str):
-    import json
-
-    entity_dict = json.loads(entity_json_str)
-    entity = entity_dict["entity"]
-    source_table = entity.get("SourceTable")
-    fields = entity.get("Fields")
-    fields = fields.split(",")
-    if "METADATA" in fields:
-        fields.remove("METADATA")
+def build_query_data_source_table(source_table, offset_field, fields:list):
 
     fields = [f"`{field}`" for field in fields]
     fields = ", ".join(fields)
-    execution_date = entity.get("ExecutionDate")
-    prev_execution_date = entity.get("PrevExecutionDate")
-    offset_field = entity.get("OffsetField")
     
     query = (
         f"SELECT {fields} FROM {source_table}"
-        f" WHERE {offset_field} > {prev_execution_date} AND {offset_field} <= {execution_date}"
+        f" WHERE {offset_field} > '{{{{ prev_execution_date }}}}' AND {offset_field} <= '{{{{ execution_date }}}}'"
     )
 
     return query
@@ -181,24 +169,25 @@ class ExportFullMySqlTableToGcsMotif(
 
         start = StartOperator(phase=self.movement_parameters.name, dag=dag, task_group=task_group)
 
-        get_data_source_table = self.get_data_source_table(dag, task_group, self.movement_parameters)
-        check_mysql_table = self.check_mysql_table(dag, task_group, get_data_source_table.task_id)
-        build_extract_query = self.build_extract_query(dag, task_group, get_data_source_table.task_id)
+        #get_data_source_table = self.get_data_source_table(dag, task_group, self.movement_parameters)
+        #check_mysql_table = self.check_mysql_table(dag, task_group, get_data_source_table.task_id)
+        #build_extract_query = self.build_extract_query(dag, task_group, get_data_source_table.task_id)
+        built_query = build_query_data_source_table(self.movement_parameters.name,self.movement_parameters.offset_field, self.movement_parameters.fields)
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
-        jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, build_extract_query.task_id)
+        jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, built_query)
         delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
         (
             start >>
-            get_data_source_table >>
-            check_mysql_table >>
-            build_extract_query >>
+            #get_data_source_table >>
+            #check_mysql_table >>
+            #build_extract_query >>
             create_dataproc_cluster >>
             jdbc_to_raw_vault >>
             delete_dataproc_cluster
         )
         return task_group
 
-    def jdbc_to_raw_vault(self, dag, task_group, build_extract_query_id):
+    def jdbc_to_raw_vault(self, dag, task_group, extract_query):
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
@@ -224,7 +213,7 @@ class ExportFullMySqlTableToGcsMotif(
                             jdbc_url,
                             secret_uri,
                             self.config.source_name,
-                            f"{{{{ task_instance.xcom_pull('{build_extract_query_id}') }}}}",
+                            extract_query,
                             run_ts,
                             (f"{self.destination_storage_uri}/{load_date_partition}={run_date}/"
                              f"{load_timestamp_partition}={run_ts}/"),
