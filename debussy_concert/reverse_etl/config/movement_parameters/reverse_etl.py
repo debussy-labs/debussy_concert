@@ -29,6 +29,9 @@ class JsonFile(OutputConfig):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError("JsonFile is not implemented yet")
 
+class SqlFile(OutputConfig):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 def output_factory(output_config):
     format: str = output_config['format']
@@ -36,7 +39,8 @@ def output_factory(output_config):
         'csv': CsvFile,
         'avro': AvroFile,
         'parquet': ParquetFile,
-        'json': JsonFile
+        'json': JsonFile,
+        'sql': SqlFile
     }
     output_cls = mapping.get(format.lower())
     if output_cls is None:
