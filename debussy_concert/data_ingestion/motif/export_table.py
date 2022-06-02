@@ -58,7 +58,7 @@ def build_query_data_source_table(entity_json_str):
     
     query = (
         f"SELECT {fields} FROM {source_table}"
-        f" WHERE {offset_field} > {prev_execution_date} AND {offset_field} < {execution_date}"
+        f" WHERE {offset_field} > {prev_execution_date} AND {offset_field} <= {execution_date}"
     )
 
     return query
