@@ -29,9 +29,10 @@ class JsonFile(OutputConfig):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError("JsonFile is not implemented yet")
 
+@dataclass(frozen=True)
 class SqlFile(OutputConfig):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    command_type: str
+    field_delimiter: str
 
 def output_factory(output_config):
     format: str = output_config['format']

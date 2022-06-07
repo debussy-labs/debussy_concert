@@ -1,5 +1,5 @@
+import logging
 from debussy_concert.core.phrase.phrase_base import PhraseBase
-
 
 class DataWarehouseToReverseEtlPhrase(PhraseBase):
     def __init__(
@@ -13,6 +13,7 @@ class DataWarehouseToReverseEtlPhrase(PhraseBase):
                          motifs=motifs)
 
     def setup(self, reverse_etl_query, reverse_etl_table_uri):
+        logging.info(f"REVERSE ETL MOTIF: {reverse_etl_query}")
         self.dw_to_reverse_etl_motif.setup(
             sql_query=reverse_etl_query,
             destination_table=reverse_etl_table_uri)

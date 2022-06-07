@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Optional, List, Union
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
@@ -113,7 +114,7 @@ class BigQueryJobMixin:
             // End of list of possible types for union field source.
             }
         """
-        if destination_format not in ('CSV', 'NEWLINE_DELIMITED_JSON', 'PARQUET', 'AVRO'):
+        if destination_format not in ('CSV', 'NEWLINE_DELIMITED_JSON', 'PARQUET', 'AVRO', 'SQL'):
             raise ValueError(f"Invalid destination_format: {destination_format}")
         source_table_ref = TableReference(source_table_uri).to_dict()
         if isinstance(destination_uris, str):
@@ -170,4 +171,5 @@ class BigQueryJobMixin:
             gcp_conn_id=gcp_conn_id,
             **op_kw_args
         )
+        #logging.info(f"CONFIGURATION BIQUERY OPERATOR: {configuration}")
         return bigquery_job_operator

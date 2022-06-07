@@ -1,3 +1,4 @@
+import logging
 from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 from debussy_concert.reverse_etl.config.reverse_etl import ConfigReverseEtl
@@ -15,7 +16,7 @@ from debussy_concert.reverse_etl.motif.storage_to_storage_motif import StorageTo
 from debussy_framework.v3.hooks.storage_hook import GCSHook
 
 
-class ClairDeLune(CompositionBase):
+class   ClairDeLune(CompositionBase):
     config: ConfigReverseEtl
 
     def sql_to_gcs_reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters):
@@ -28,14 +29,16 @@ class ClairDeLune(CompositionBase):
                                      movement_parameters: ReverseEtlMovementParameters) -> ReverseEtlMovement:
         start_phrase = StartPhrase()
         end_phrase = EndPhrase()
-        csv_output_config: SqlFile = movement_parameters.output_config
+        sql_output_config: SqlFile = movement_parameters.output_config
+        #logging.info(f"movement_parameters.reverse_etl_dataset_partition_type: {movement_parameters.reverse_etl_dataset_partition_type}")
+        #logging.info(f"movement_parameters.reverse_etl_dataset_partition_field: {movement_parameters.reverse_etl_dataset_partition_field}")
         data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
             partition_type=movement_parameters.reverse_etl_dataset_partition_type,
             partition_field=movement_parameters.reverse_etl_dataset_partition_field,
             gcp_conn_id=movement_parameters.gcp_connection_id
         )
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
-            destination_config=csv_output_config,
+            destination_config=sql_output_config,
             gcp_conn_id=movement_parameters.gcp_connection_id
         )
 
@@ -53,25 +56,33 @@ class ClairDeLune(CompositionBase):
 
     def data_warehouse_raw_to_reverse_etl_phrase(self, partition_type, partition_field, gcp_conn_id):
         time_partitioning = BigQueryTimePartitioning(type=partition_type, field=partition_field)
+        
+        
         bigquery_job = BigQueryQueryJobMotif(name='bq_to_reverse_etl_motif',
                                              write_disposition="WRITE_APPEND",
                                              create_disposition="CREATE_IF_NEEDED",
                                              time_partitioning=time_partitioning,
                                              gcp_conn_id=gcp_conn_id)
-        phrase = DataWarehouseToReverseEtlPhrase(
-            dw_to_reverse_etl_motif=bigquery_job
-        )
+
+        phrase = DataWarehouseToReverseEtlPhrase(dw_to_reverse_etl_motif=bigquery_job)
         return phrase
+        
 
     def data_warehouse_reverse_etl_to_storage_phrase(self, destination_config: SqlFile, gcp_conn_id):
         bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif',
                                              write_disposition="WRITE_TRUNCATE",
                                              create_disposition="CREATE_IF_NEEDED",
                                              gcp_conn_id=gcp_conn_id)
+
+
+
         export_bigquery = BigQueryExtractJobMotif(name='bq_export_temp_table_to_gcs_motif',
                                                   destination_format=destination_config.format,
                                                   field_delimiter=destination_config.field_delimiter,
                                                   gcp_conn_id=gcp_conn_id)
+
+
+
         phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
             name='DataWarehouseReverseEtlToStoragePhrase',
             datawarehouse_reverse_etl_to_temp_table_motif=bigquery_job,
