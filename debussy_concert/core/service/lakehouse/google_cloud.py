@@ -9,3 +9,11 @@ class GoogleCloudLakeHouseService:
         for field in table_fields:
             table_schema.append(field.get_field_schema())
         return table_schema
+
+    @staticmethod
+    def get_table_partitioning(table: BigQueryTable):
+        partitioning = table.partitioning
+        if partitioning is not None:
+            partitioning = partitioning.to_dict()
+        return partitioning
+
