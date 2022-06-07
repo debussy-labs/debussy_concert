@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import List, Optional
+from typing import Any, List, Optional
 import yaml
 
 
@@ -86,9 +86,52 @@ class BigQueryTableField:
         return asdict(self)
 
 
+class Partitioning:
+    granularity: str
+    field: str
+
+
+class BigQueryTimePartitioning:
+    """
+     NOTE: might exist an implementation for this in the google.cloud.bigquery sdk, i could not find it
+     https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#timepartitioning
+     {
+        "type": string,
+        "expirationMs": string,
+        "field": string,
+        "requirePartitionFilter": boolean # deprecated
+     }
+    """
+
+    def __init__(self, type: str, expiration_ms: Optional[str] = None, field: Optional[str] = None):
+        _type = type.upper()
+        if _type not in ('DAY', 'HOUR', 'MONTH', 'YEAR'):
+            raise ValueError(f"Invalid type: {type}")
+        self.type = _type
+        self.expiration_ms = expiration_ms
+        self.field = field
+
+    def to_dict(self) -> dict:
+        ret = {
+            "type": self.type,
+            "expirationMs": self.expiration_ms,
+            "field": self.field,
+        }
+        return ret
+
+    @classmethod
+    def load_from_internal_partitioning_interface_dict(cls, data_dict):
+        del data_dict['type']
+        return cls(
+            type=data_dict['granularity'],
+            field=data_dict['field']
+        )
+
+
 @dataclass
 class Table:
     fields: List[TableField]
+    partitioning: Any
 
     @classmethod
     def load_from_dict(cls, table_dict):
@@ -105,11 +148,27 @@ class Table:
         return cls.load_from_dict(table_dict)
 
 
+def data_partitioning_factory(data_partitioning):
+    partitioning_type = data_partitioning['type'].lower()
+    mapping = {
+        'time': BigQueryTimePartitioning
+    }
+    output_cls = mapping.get(partitioning_type)
+    if output_cls is None:
+        raise TypeError(f'Format `{partitioning_type}` is not supported')
+    return output_cls.load_from_internal_partitioning_interface_dict(data_partitioning)
+
+
 class BigQueryTable(Table):
+    partitioning: BigQueryTimePartitioning
+
     @classmethod
     def load_from_dict(cls, table_dict):
         fields = []
         for field_dict in table_dict['fields']:
             field = BigQueryTableField.load_from_internal_table_field_interface_dict(field_dict)
             fields.append(field)
-        return cls(fields=fields)
+        partitioning = None
+        if partitioning_dict := table_dict.get('partitioning'):
+            partitioning = data_partitioning_factory(partitioning_dict)
+        return cls(fields=fields, partitioning=partitioning)
