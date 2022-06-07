@@ -22,7 +22,7 @@ dag_parameters:
     end_date:
       year: 2022
       month: 6
-      day: 2 
+      day: 2
     tags:
       - framework:debussy_concert
       - project:modular-aileron-191222

@@ -1,20 +1,15 @@
-from cgitb import reset
-from typing import List
-from json import dumps, loads
-from uuid import uuid4
 from google.protobuf.duration_pb2 import Duration
 from airflow.utils.task_group import TaskGroup
-from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
-from debussy_framework.v3.operators.mysql_check import MySQLCheckOperator
 from debussy_framework.v3.operators.basic import StartOperator
 
 from debussy_concert.core.motif.motif_base import MotifBase, PClusterMotifMixin
 from debussy_concert.core.motif.mixins.dataproc import DataprocClusterHandlerMixin
 from debussy_concert.core.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
-from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters, TableField
+from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
+
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
     extract_query_template = """
@@ -37,19 +32,6 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
             uri=uri, extract_query=self.extract_query)
 
         return self
-
-
-def build_query_data_source_table(source_table, offset_field, fields:list):
-
-    fields = [f"`{field}`" for field in fields]
-    fields = ", ".join(fields)
-    
-    query = (
-        f"SELECT {fields} FROM {source_table}"
-        f" WHERE {offset_field} > '{{{{ prev_execution_date }}}}' AND {offset_field} <= '{{{{ execution_date }}}}'"
-    )
-
-    return query
 
 
 class ExportFullMySqlTableToGcsMotif(
@@ -169,20 +151,13 @@ class ExportFullMySqlTableToGcsMotif(
 
         start = StartOperator(phase=self.movement_parameters.name, dag=dag, task_group=task_group)
 
-        #get_data_source_table = self.get_data_source_table(dag, task_group, self.movement_parameters)
-        #check_mysql_table = self.check_mysql_table(dag, task_group, get_data_source_table.task_id)
-        #build_extract_query = self.build_extract_query(dag, task_group, get_data_source_table.task_id)
-        built_query = build_query_data_source_table(self.movement_parameters.name,self.movement_parameters.offset_field, self.movement_parameters.fields)
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
-        jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, built_query)
+        jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, self.movement_parameters.extraction_query)
         delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
-        (
-            start >>
-            #get_data_source_table >>
-            #check_mysql_table >>
-            #build_extract_query >>
-            create_dataproc_cluster >>
-            jdbc_to_raw_vault >>
+        self.workflow_service.chain_tasks(
+            start,
+            create_dataproc_cluster,
+            jdbc_to_raw_vault,
             delete_dataproc_cluster
         )
         return task_group
@@ -227,64 +202,3 @@ class ExportFullMySqlTableToGcsMotif(
         )
 
         return jdbc_to_raw_vault
-
-    def build_extract_query(self, dag, task_group, get_data_source_table_task_id):
-        build_extract_query = PythonOperator(
-            task_id="build_extract_query",
-            python_callable=build_query_data_source_table,
-            op_args=[
-                    f"{{{{ task_instance.xcom_pull('{get_data_source_table_task_id}') }}}}"],
-            dag=dag,
-            task_group=task_group
-        )
-
-        return build_extract_query
-
-    def check_mysql_table(self, dag, task_group, get_data_source_table_task_id):
-        check_mysql_table = MySQLCheckOperator(
-            task_id="check_mysql_table",
-            entity_json_str=f"{{{{ task_instance.xcom_pull('{get_data_source_table_task_id}') }}}}",
-            db_conn_data_callable=self.get_db_conn_data,
-            dag=dag,
-            task_group=task_group
-        )
-
-        return check_mysql_table   
-    
-    def get_data_source_table(self, dag, task_group, movement_parameters: RdbmsDataIngestionMovementParameters):
-        table_fields = movement_parameters.fields
-        fields_names = set(tf.name for tf in table_fields)
-
-        def build_data_source_table_json(prev_execution_date, execution_date):
-            db_table_json = {                
-                    "BusinessPartitionColumn": movement_parameters.business_partition_column,
-                    "Fields": ",".join(fields_names),
-                    "Active": True,
-                    "SinkTable": movement_parameters.name,
-                    "PrimaryKey": movement_parameters.primary_key,
-                    "PIIColumns": movement_parameters.pii_columns,
-                    "PrevExecutionDate": prev_execution_date,
-                    "ExecutionDate": execution_date,
-                    "SourceTable": movement_parameters.name,
-                    "SinkDataset": self.config.environment.raw_dataset,
-                    "OffsetField": movement_parameters.offset_field,
-                    "OffsetType": movement_parameters.offset_type                
-            } 
-
-            db_table_dict = {}
-            db_table_dict["entity"] = dict(db_table_json)
-            db_table_dict["id"] = uuid4()
-            return dumps(db_table_dict, default=str)
-
-        get_data_source_table = PythonOperator(
-            task_id="get_data_source_table",
-            python_callable=build_data_source_table_json,
-            provide_context=True,
-            op_kwargs={"prev_execution_date": "{{ prev_ds }}", "execution_date": "{{ ds }}"},
-            dag=dag,
-            task_group=task_group
-        )        
-
-        return get_data_source_table      
-
-    
