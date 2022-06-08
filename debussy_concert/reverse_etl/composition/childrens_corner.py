@@ -12,13 +12,13 @@ from debussy_concert.reverse_etl.motif.bigquery_query_job import BigQueryQueryJo
 from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning
 from debussy_concert.reverse_etl.motif.storage_to_storage_motif import StorageToStorageMotif
-from debussy_framework.v3.hooks.storage_hook import GCSHook, SFTPHook
+from debussy_framework.debussy_framework.v3.hooks.storage_hook import GCSHook, StorageHookInterface, SFTPHook
 
 
 class ChildrensCorner(CompositionBase):
     config: ConfigReverseEtl
 
-    def csv_to_gcs_reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters):
+    def bigquery_to_storage_reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters):
         storage_to_destination_phrase = self.storage_to_destination_phrase(movement_parameters)
         return self.reverse_etl_movement_builder(
             storage_to_destination_phrase=storage_to_destination_phrase,
@@ -80,7 +80,8 @@ class ChildrensCorner(CompositionBase):
         return phrase
 
     def storage_to_destination_phrase(self, movement_parameters: ReverseEtlMovementParameters):
-        destiny_file_uri = movement_parameters.destination_object_path
+
+        destination_file_uri = movement_parameters.destination_object_path
         destination_type = movement_parameters.destination_type.lower()
         destination_type_motif_map = {
             'gcs': GCSHook,
@@ -88,12 +89,12 @@ class ChildrensCorner(CompositionBase):
         }
         HookCls = destination_type_motif_map[destination_type]
         origin_gcs_hook = GCSHook(gcp_conn_id=movement_parameters.gcp_connection_id)
-        destiny_hook = HookCls(movement_parameters.destination_connection_id)
+        destination_hook = HookCls(movement_parameters.destination_connection_id)
         storage_to_storage_motif = StorageToStorageMotif(
             name=f'gcs_to_{destination_type}_motif',
             origin_storage_hook=origin_gcs_hook,
-            destiny_storage_hook=destiny_hook,
-            destiny_file_uri=destiny_file_uri
+            destiny_storage_hook=destination_hook,
+            destiny_file_uri=destination_file_uri
         )
         phrase = StorageToDestinationPhrase(
             storage_to_destination_motif=storage_to_storage_motif)
