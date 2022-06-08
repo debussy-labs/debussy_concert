@@ -26,13 +26,9 @@ class TableField:
 
 @dataclass(frozen=True)
 class RdbmsDataIngestionMovementParameters(MovementParametersBase):
-    fields: List[TableField]
-    primary_key: Optional[TableField] = None
-    pii_columns: Optional[List[TableField]] = None
+    
+    primary_key: Optional[TableField] = None    
     data_tracking_tag: Optional[str] = None
-    offset_type: Optional[str] = None
-    offset_field: Optional[TableField] = None
-    business_partition_column: Optional[TableField] = None
     extraction_query: Optional[str] = dataclass_field(default=None, init=False, repr=False)
 
     def __post_init__(self):
@@ -65,55 +61,4 @@ class RdbmsDataIngestionMovementParameters(MovementParametersBase):
             f"SELECT {fields} FROM {self.name} "
             f"WHERE {self.offset_field} > '{{{{ prev_execution_date }}}}' AND {self.offset_field} <= '{{{{ execution_date }}}}'"
         )
-        return query
-
-    # alias
-    pii_fields: List[TableField] = pii_columns
-    pii_fields_names = pii_columns_names
-
-    @classmethod
-    def load_from_dict(cls, table_data):
-        return cls._load_from_dict(**table_data)
-
-    @classmethod
-    def _load_from_dict(cls, name,
-                        fields,
-                        primary_key=None,
-                        pii_columns=None,
-                        data_tracking_tag=None,
-                        offset_type=None,
-                        offset_field=None,
-                        business_partition_column=None):
-        # fields = [TableField(name, **field_data) for name, field_data in fields.items()]
-        fields = [TableField(**field_data) for field_data in fields]
-
-        if primary_key is not None:
-            # primary_key = list(filter(is_field_name_equal(primary_key), fields))
-            primary_key = [field for field in fields if field.name == primary_key]
-            assert len(primary_key) == 1
-            primary_key = primary_key[0]
-        if pii_columns is not None:
-            pii_columns_names = pii_columns.split(",")
-            pii_columns = [field for field in fields if field.name in pii_columns_names]
-        if offset_field is not None:
-            offset_field = [field for field in fields if field.name == offset_field]
-            assert len(offset_field) == 1
-            offset_field = offset_field[0]
-        if business_partition_column is not None:
-            business_partition_column = [
-                field for field in fields if field.name == business_partition_column]
-            assert len(business_partition_column) == 1
-            business_partition_column = business_partition_column[0]
-        return cls(name, fields, primary_key, pii_columns, data_tracking_tag,
-                   offset_type, offset_field, business_partition_column)
-
-    def __getitem__(self, key):
-        """
-            Called to implement evaluation of self[key]
-            https://docs.python.org/3/reference/datamodel.html#object.__getitem__
-        """
-        warnings.warn("Getting property using dictionary access, please update to use class property",
-                      category=FutureWarning)
-        if not isinstance(key, str):
-            raise TypeError('key must be strings')
-        return getattr(self, key)
+        return self.extraction_query
