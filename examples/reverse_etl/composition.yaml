@@ -1,5 +1,5 @@
 name: dev_retl
-description: Example of a reverse ETL from data warehouse to sftp using dummy operators
+description: Example of a reverse ETL to sftp and gcs
 dag_parameters:
     dag_id: reverse_etl_example_dag
     schedule_interval: null
@@ -7,19 +7,21 @@ dag_parameters:
       year: 2022
       month: 1
       day: 1
-    description: Example of a reverse ETL from data warehouse to sftp using dummy operators
+    description: Example of a reverse ETL to sftp and gcs
     default_args:
       owner: debussy
     tags:
       - framework:debussy_concert
       - project:example
       - destiny:gcs
+      - destiny:sftp
       - type:reverse_etl
       - tier:5
 extraction_movements:
-  - name: retl_data
+  - name: synthetic_data_gcs
     reverse_etl_query: >
       SELECT
+      'gcs' as destiny,
       CURRENT_TIMESTAMP as load_ts,
       '{{ ts_nodash }}' as date, 
       TIMESTAMP('{{ execution_date }}') as execution_date, 
@@ -34,9 +36,31 @@ extraction_movements:
       format: CSV
       file_name: retl_data_{{ execution_date }}.csv
       field_delimiter: ','
-    destination_type: not_used_yet
+    destination_type: gcs
     destination_object_path: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
     gcp_connection_id: google_cloud_debussy
     destination_connection_id: google_cloud_debussy
+  - name: synthetic_data_sftp
+    reverse_etl_query: >
+      SELECT
+      'sftp' as destiny,
+      CURRENT_TIMESTAMP as load_ts,
+      '{{ ts_nodash }}' as date, 
+      TIMESTAMP('{{ execution_date }}') as execution_date, 
+    reverse_etl_dataset_partition_type: DAY
+    reverse_etl_dataset_partition_field: execution_date
+    extract_query_from_temp: >
+      SELECT * 
+      FROM `{reverse_etl_table_uri}`
+      WHERE execution_date=TIMESTAMP('{{{{ execution_date }}}}')
+      QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
+    output_config:
+      format: CSV
+      file_name: retl_data_{{ execution_date }}.csv
+      field_delimiter: ','
+    destination_type: sftp
+    destination_object_path: "" #its empty due to a bug in sftp hook on debussy framework that will be fixed later
+    gcp_connection_id: google_cloud_debussy
+    destination_connection_id: sftp_default
 
 
