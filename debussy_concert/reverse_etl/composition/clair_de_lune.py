@@ -41,13 +41,13 @@ class   ClairDeLune(CompositionBase):
             destination_config=sql_output_config,
             gcp_conn_id=movement_parameters.gcp_connection_id
         )
-
-        load_file_storage_to_rdbms_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
+#//////////////////////////////////////////////
+        load_file_storage_to_rdbms_phrase = self.load_file_storage_to_rdbms_phrase(
             destination_config=sql_output_config,
             gcp_conn_id=movement_parameters.gcp_connection_id,
             rdbms_conn_id = movement_parameters.destination_connection_id
         )
-
+#/////////////////////////////////////////////
         name = f'ReverseEtlMovement_{movement_parameters.name}'
         movement = ReverseEtlMovement(
             name=name,
@@ -95,6 +95,29 @@ class   ClairDeLune(CompositionBase):
             export_temp_table_to_storage_motif=export_bigquery
         )
         return phrase
+
+    def load_file_storage_to_rdbms_phrase(self, destination_config: SqlFile, gcp_conn_id, rdbms_conn_id):
+        bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif',
+                                             write_disposition="WRITE_TRUNCATE",
+                                             create_disposition="CREATE_IF_NEEDED",
+                                             gcp_conn_id=gcp_conn_id)
+
+
+
+        export_bigquery = BigQueryExtractJobMotif(name='bq_export_temp_table_to_gcs_motif',
+                                                  destination_format=destination_config.format,
+                                                  field_delimiter=destination_config.field_delimiter,
+                                                  gcp_conn_id=gcp_conn_id)
+
+
+
+        phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
+            name='DataWarehouseReverseEtlToStoragePhrase',
+            datawarehouse_reverse_etl_to_temp_table_motif=bigquery_job,
+            export_temp_table_to_storage_motif=export_bigquery
+        )
+        return phrase
+
 
     def storage_to_destination_phrase(self, movement_parameters: ReverseEtlMovementParameters):
         dest_conn_id = movement_parameters.destination_connection_id
