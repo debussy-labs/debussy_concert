@@ -32,33 +32,9 @@ class RdbmsDataIngestionMovementParameters(MovementParametersBase):
     extraction_query: Optional[str] = dataclass_field(default=None, init=False, repr=False)
 
     def __post_init__(self):
-        pii_columns_joined = self.pii_columns_join()
         # hack for frozen dataclass https://stackoverflow.com/a/54119384
         # overwriting pii_columns with pii_columns_joined
-        object.__setattr__(self, 'pii_columns', pii_columns_joined)
         object.__setattr__(self, 'extraction_query', self.get_extraction_query())
 
-    def pii_columns_join(self):
-        # pii column can be set both on pii_columns argument or on a flag in field
-        # this function join those two methods
-        pii_columns = self.pii_columns or []
-        for field in self.fields:
-            if field.is_pii:
-                pii_columns.append(field)
-        # cast to set to remove duplicates fields
-        print(pii_columns)
-        pii_columns = set(pii_columns)
-        return pii_columns
-
-    def pii_columns_names(self) -> List[str]:
-        return [column.name for column in self.pii_columns]
-
-    def get_extraction_query(self):
-        fields = [f"`{field}`" for field in self.fields]
-        fields = ", ".join(fields)
-
-        query = (
-            f"SELECT {fields} FROM {self.name} "
-            f"WHERE {self.offset_field} > '{{{{ prev_execution_date }}}}' AND {self.offset_field} <= '{{{{ execution_date }}}}'"
-        )
+    def get_extraction_query(self):       
         return self.extraction_query
