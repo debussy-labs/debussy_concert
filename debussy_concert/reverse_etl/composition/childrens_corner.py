@@ -12,7 +12,7 @@ from debussy_concert.reverse_etl.motif.bigquery_query_job import BigQueryQueryJo
 from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning
 from debussy_concert.reverse_etl.motif.storage_to_storage_motif import StorageToStorageMotif
-from debussy_framework.debussy_framework.v3.hooks.storage_hook import GCSHook, StorageHookInterface, SFTPHook
+from debussy_framework.v3.hooks.storage_hook import GCSHook, SFTPHook
 
 
 class ChildrensCorner(CompositionBase):
