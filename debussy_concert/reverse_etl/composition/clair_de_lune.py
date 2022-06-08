@@ -42,6 +42,12 @@ class   ClairDeLune(CompositionBase):
             gcp_conn_id=movement_parameters.gcp_connection_id
         )
 
+        load_file_storage_to_rdbms_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
+            destination_config=sql_output_config,
+            gcp_conn_id=movement_parameters.gcp_connection_id,
+            rdbms_conn_id = movement_parameters.destination_connection_id
+        )
+
         name = f'ReverseEtlMovement_{movement_parameters.name}'
         movement = ReverseEtlMovement(
             name=name,
