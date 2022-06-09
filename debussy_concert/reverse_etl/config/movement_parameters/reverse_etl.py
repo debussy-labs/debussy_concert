@@ -13,6 +13,7 @@ class OutputConfig:
 @dataclass(frozen=True)
 class CsvFile(OutputConfig):
     field_delimiter: str
+    print_header: bool = True
 
 
 class AvroFile(OutputConfig):
