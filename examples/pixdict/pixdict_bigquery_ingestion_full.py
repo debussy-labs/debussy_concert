@@ -7,8 +7,8 @@ from debussy_concert.core.service.workflow.airflow import AirflowService
 
 
 dags_folder = conf.get('core', 'dags_folder')
-env_file = f'{dags_folder}/pixdict/environment.yaml'
-composition_file = f'{dags_folder}/pixdict/composition.yaml'
+env_file = f'{dags_folder}/examples/pixdict/environment.yaml'
+composition_file = f'{dags_folder}/examples/pixdict/composition.yaml'
 workflow_service = AirflowService()
 config_composition = ConfigRdbmsDataIngestion.load_from_file(
     composition_config_file_path=composition_file,
