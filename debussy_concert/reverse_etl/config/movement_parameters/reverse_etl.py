@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 
 from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -29,19 +30,13 @@ class JsonFile(OutputConfig):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError("JsonFile is not implemented yet")
 
-@dataclass(frozen=True)
-class SqlFile(OutputConfig):
-    command_type: str
-    field_delimiter: str
-
 def output_factory(output_config):
     format: str = output_config['format']
     mapping = {
         'csv': CsvFile,
         'avro': AvroFile,
         'parquet': ParquetFile,
-        'json': JsonFile,
-        'sql': SqlFile
+        'json': JsonFile
     }
     output_cls = mapping.get(format.lower())
     if output_cls is None:
@@ -58,9 +53,10 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     extract_query_from_temp: str
     destination_type: str
     output_config: OutputConfig
-    destination_object_path: str
     gcp_connection_id: str
     destination_connection_id: str
+    destination_object_path: Optional[str] = None
+    destination_table: Optional[str] = None
 
     def __post_init__(self):
         output_config = output_factory(self.output_config)
