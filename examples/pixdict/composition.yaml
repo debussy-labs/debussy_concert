@@ -12,7 +12,7 @@ dataproc_config:
   parallelism: 60
 dag_parameters:
     dag_id: pixdict_bigquery_ingestion_full
-    description: BigQuery full ingestion for pixdict relacional database. Fixing a partition and always overwriting it. Versioning on storage
+    description: BigQuery full ingestion for pixdict relational database. Fixing a partition and always overwriting it. Versioning on storage
     catchup: false
     schedule_interval: '*/1 * * * *' # At every minute.
     start_date:
