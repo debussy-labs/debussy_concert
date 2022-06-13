@@ -6,7 +6,7 @@ from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import C
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
 from debussy_concert.reverse_etl.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
-from debussy_concert.reverse_etl.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
+from debussy_concert.reverse_etl.phrase.reverse_etl_temp_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
 from debussy_concert.reverse_etl.phrase.storage_to_destination import StorageToDestinationPhrase
 from debussy_concert.reverse_etl.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
