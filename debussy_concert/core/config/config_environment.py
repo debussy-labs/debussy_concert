@@ -1,3 +1,4 @@
+from typing import Optional
 from dataclasses import dataclass
 import yaml
 
@@ -16,7 +17,7 @@ class ConfigEnvironment:
     trusted_dataset: str
     reverse_etl_dataset: str
     temp_dataset: str
-    landing_bucket: str
+    landing_bucket: Optional[str] = None
 
     @classmethod
     def load_from_file(cls, file_path):
