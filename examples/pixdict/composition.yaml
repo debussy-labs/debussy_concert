@@ -2,27 +2,23 @@ name: pixdic_bigquery_ingestion_full
 source_name: pixDict
 source_type: mysql
 description: mysql ingestion
+source_timezone: America/Sao_Paulo
 secret_manager_uri: projects/modular-aileron-191222/secrets/dotz-mysql-prod 
 #gcp_connection_id: google_cloud_default
-#source_timezone: America/Sao_Paulo
 dataproc_config:
   machine_type: n1-standard-2
   num_workers: 0
   subnet: subnet-cluster-services
   parallelism: 60
 dag_parameters:
-    dag_id: pixdict_ingestion_full
+    dag_id: pixdict_bigquery_ingestion_full
     description: BigQuery full ingestion for pixdict relacional database. Fixing a partition and always overwriting it. Versioning on storage
-    catchup: true
-    schedule_interval: '0 0 * * *' # At every minute.
+    catchup: false
+    schedule_interval: '*/1 * * * *' # At every minute.
     start_date:
       year: 2022
-      month: 6
+      month: 1
       day: 1
-    end_date:
-      year: 2022
-      month: 6
-      day: 2
     tags:
       - framework:debussy_concert
       - project:modular-aileron-191222
@@ -37,6 +33,7 @@ ingestion_parameters:
     primary_key: id
     offset_type: TIMESTAMP
     offset_field: created
+    extraction_query: SELECT id, user_id, account_id, key_type, key, created, deleted, bonus_applied FROM pixdict_key_history WHERE created > '{{{{ prev_execution_date }}}}' AND created <= '{{{{ execution_date }}}}'
     fields:
       - name: id
         description: Primary Key
