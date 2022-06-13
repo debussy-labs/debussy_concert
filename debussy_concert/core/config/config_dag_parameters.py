@@ -17,7 +17,7 @@ class ConfigDagParameters:
         start_date = dt.datetime(**start_date)
         dag_parameters_dict['start_date'] = start_date
         end_date = dag_parameters_dict.get('end_date')
-        if end_date is not None:
+        if end_date:
             end_date = dt.datetime(**end_date)
             dag_parameters_dict['end_date'] = end_date
         return cls(**dag_parameters_dict)
