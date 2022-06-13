@@ -4,7 +4,6 @@ source_type: mysql
 description: mysql ingestion
 secret_manager_uri: projects/modular-aileron-191222/secrets/dotz-mysql-prod 
 #gcp_connection_id: google_cloud_default
-source_timezone: America/Sao_Paulo
 dataproc_config:
   machine_type: n1-standard-2
   num_workers: 0

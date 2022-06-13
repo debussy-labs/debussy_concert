@@ -1,5 +1,3 @@
-from asyncio.log import logger
-import logging
 from typing import Optional, Union, List
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin
@@ -28,9 +26,6 @@ class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):
             raise ValueError("source_table_uri cant be none. initialize on setup")
         if self.destination_uris is None:
             raise ValueError("destination_uris cant be none. initialize on setup")
-        #logging.info(f"SOURCE TABLE URI: {self.source_table_uri}")
-        #logging.info(f"self.destination_uris: {self.destination_uris}")
-        #logging.info(f"self.destination_format: {self.destination_format}")
         bigquery_job_operator = self.insert_job_operator(
             dag, phrase_group,
             self.extract_configuration(

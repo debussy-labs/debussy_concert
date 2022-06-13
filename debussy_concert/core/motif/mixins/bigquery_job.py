@@ -171,5 +171,4 @@ class BigQueryJobMixin:
             gcp_conn_id=gcp_conn_id,
             **op_kw_args
         )
-        #logging.info(f"CONFIGURATION BIQUERY OPERATOR: {configuration}")
         return bigquery_job_operator

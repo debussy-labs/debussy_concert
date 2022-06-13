@@ -15,8 +15,6 @@ class ConfigDataIngestionBase(ConfigComposition, ABC):
     source_name: str
     # source tech type like mysql, mssql, bigquery, api, gcs
     source_type: str
-    # source timezone like America/Sao_Paulo, UTC   
-    source_timezone: str
 
     @property
     def table_prefix(self):

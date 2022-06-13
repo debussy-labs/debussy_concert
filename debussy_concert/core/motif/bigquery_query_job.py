@@ -13,7 +13,6 @@ class BigQueryQueryJobMotif(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
                  time_partitioning: Optional[BigQueryTimePartitioning] = None,
                  gcp_conn_id='google_cloud_default',
                  **op_kw_args):
-        #raise Exception(f"time_partitioning: {time_partitioning}")
         super().__init__(name=name)
 
         self.write_disposition = write_disposition
