@@ -7,6 +7,10 @@ from google.cloud.bigquery.external_config import HivePartitioningOptions
 from debussy_concert.core.motif.motif_base import PMotif
 
 
+class BigQueryInsertJobOperator(BigQueryInsertJobOperator):
+    template_ext = (".json", ".sql")
+
+
 class TableReference:
     """
      NOTE: might exist an implementation for this in the google.cloud.bigquery sdk, i could not find it
@@ -89,7 +93,8 @@ class BigQueryJobMixin:
         source_table_uri: str,
         destination_uris: Union[List[str], str],
         field_delimiter: str = ',',
-        destination_format: str = 'CSV'
+        destination_format: str = 'CSV',
+        print_header: bool = True
     ):
         """
             https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobconfigurationextract
@@ -123,7 +128,7 @@ class BigQueryJobMixin:
             'extract': {
                 "sourceTable": source_table_ref,
                 "destinationUris": destination_uris,
-                "printHeader": True,
+                "printHeader": print_header,
                 "fieldDelimiter": field_delimiter,
                 "destinationFormat": destination_format
             }

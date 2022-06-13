@@ -8,6 +8,8 @@ dataproc_config:
   num_workers: 0
   subnet: subnet-cluster-services
   parallelism: 60
+  pip_packages:
+    - "google-cloud-secret-manager"
 dag_parameters:
     dag_id: lazy_pixdict
     description: PixDict ingestion
