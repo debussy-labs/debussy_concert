@@ -1,16 +1,16 @@
 name: reverse_etl_unbounce
 description: Reverse ETL ingestion from storage to rdbms
 dag_parameters:
-    dag_id: reverse_etl_unbouncee
+    dag_id: reverse_etl_unbouncie
     schedule_interval: 0 0 * * *
     start_date:
       year: 2022
-      month: 6
-      day: 4
+      month: 3
+      day: 10
     end_date:
       year: 2022
-      month: 6
-      day: 5
+      month: 3
+      day: 11
     description: Reverse ETL incremental ingestion from storage to rdbms base 
     default_args:
       owner: debussy
@@ -23,32 +23,22 @@ dag_parameters:
 extraction_movements:
   - name: extract_to_mysql
     reverse_etl_query: >
-      SELECT *     
-      FROM `dotzcloud-datalabs-analytics.UNBOUNCE.vw_unbounce_leads` WHERE name_campain = "Novo Varejo LP Cadastro" AND DATE(created_at_lead) = DATE('{{ execution_date }}') 
+      SELECT id_lead as participant_id, id_page as campaign_id, cpf as  document, '' as date_birth, nome as name, email, '' as gender, 'PF' as person_type, '00000000-0000-0000-0000-000000000000' as participant_parent_id, is_cpf_valid as active, '{{ execution_date }}' as created, '{{ execution_date }}' as updated, '' as migration_id, '' as identification, '' as nickname, created_at_lead FROM `dotzcloud-datalabs-analytics.UNBOUNCE.vw_unbounce_leads` WHERE name_campain = "Novo Varejo LP Cadastro" AND DATE(created_at_lead) = DATE('{{ execution_date }}') 
       #novaconversao
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: created_at_lead
     extract_query_from_temp: >
-      SELECT * 
-      FROM `{reverse_etl_table_uri}`
-      WHERE created_at_lead=TIMESTAMP('{{{{ execution_date }}}}')
+      SELECT participant_id, campaign_id, document, date_birth, name, email, gender, person_type, participant_parent_id, active, created, updated, migration_id, identification, nickname FROM `{reverse_etl_table_uri}`
+      WHERE DATE(created_at_lead)=DATE('{{{{ execution_date }}}}')
       QUALIFY ROW_NUMBER() OVER (PARTITION BY created_at_lead) = 1
-    #output_config:
-    #  format: SQL
-    #file_name: retl_data_{{ execution_date }}.sql
-    #command_type: DML
-      #adicionar secret para conexão com a base de destino
-      #adicionar queru de inclusao do registro na origem
     output_config:
-      format: SQL
-      file_name: retl_data_{{ execution_date }}.sql
-      command_type: DML
+      format: CSV
+      file_name: retl_unbounce_{{ execution_date }}.csv
       field_delimiter: ','
-    destination_type: not_used_yet
-    destination_object_path: gs://autodelete_dev_bucket/retl_unbounce/extract_to_mysql/retl_unbounce_{{ execution_date }}.sql
-    #destination_object_path: gs://autodelete_dev_bucket/retl_unbounce/unbounce_insert_{{ execution_date }}.sql
+    destination_type: rdbms
+    destination_object_path: gs://autodelete_dev_bucket/retl_unbounce_to_rdbms/extract_to_mysql/retl_unbounce_{{ execution_date }}.csv
+    destination_table: multiCampaign.participant
     gcp_connection_id: google_cloud_default
-    destination_connection_id: google_cloud_default
-    #destination_connection_id: unbounce_connection_id
+    destination_connection_id: unbounce_connection_id
 
 
