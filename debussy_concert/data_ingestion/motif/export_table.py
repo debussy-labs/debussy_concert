@@ -37,7 +37,7 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
         return self
 
 
-class ExportFullMySqlTableToGcsMotif(
+class DataprocExportRdbmsTableToGcsMotif(
         MotifBase, DataprocClusterHandlerMixin, PClusterMotifMixin, PExportDataToStorageMotif):
     config: ConfigRdbmsDataIngestion
     cluster_tags = ["dataproc"]
@@ -58,9 +58,15 @@ class ExportFullMySqlTableToGcsMotif(
     def __init__(
             self,
             movement_parameters: RdbmsDataIngestionMovementParameters,
+            gcs_partition: str,
+            jdbc_driver,
+            jdbc_url, 
             name=None
     ) -> None:
         super().__init__(name=name)
+        self.gcs_partition = gcs_partition
+        self.jdbc_driver = jdbc_driver
+        self.jdbc_url = jdbc_url
         self.movement_parameters = movement_parameters
         self.pip_packages = self.config.dataproc_config.get(
             "pip_packages", [])
@@ -164,20 +170,6 @@ class ExportFullMySqlTableToGcsMotif(
         self.destination_storage_uri = destination_storage_uri
         return self
 
-    def get_db_conn_data(self):
-        """Get database connection data from Secret Manager"""
-        from google.cloud import secretmanager
-        import json
-
-        client = secretmanager.SecretManagerServiceClient()
-
-        name = f"{self.config.secret_manager_uri}/versions/latest"
-        response = client.access_secret_version(name=name)
-        secret = response.payload.data.decode("UTF-8")
-        db_conn_data = json.loads(secret)
-        db_conn_data.update({"database": self.config.source_name})
-        return db_conn_data
-
     def build(self, dag, parent_task_group: TaskGroup):
         task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=parent_task_group)
 
@@ -218,15 +210,9 @@ class ExportFullMySqlTableToGcsMotif(
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
-        # path and naming parameters
-        load_timestamp_partition = "loadTimestamp"
-        run_ts = "{{ ts_nodash }}"
-        load_date_partition = "loadDate"
-        run_date = "{{ ds }}"
+        
         pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
 
-        driver = "com.mysql.cj.jdbc.Driver"
-        jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.source_name
 
         jdbc_to_raw_vault = DataprocSubmitJobOperator(
             task_id="jdbc_to_raw_vault",
@@ -236,14 +222,13 @@ class ExportFullMySqlTableToGcsMotif(
                     "pyspark_job": {
                         "main_python_file_uri": f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py",
                         "args": [
-                            driver,
-                            jdbc_url,
+                            self.jdbc_driver,
+                            self.jdbc_url,
                             secret_uri,
                             self.config.source_name,
                             extract_query,
                             run_ts,
-                            (f"{self.destination_storage_uri}/{load_date_partition}={run_date}/"
-                             f"{load_timestamp_partition}={run_ts}/"),
+                            f"{self.destination_storage_uri}/{self.gcs_partition}"
                         ],
                     },
             },
