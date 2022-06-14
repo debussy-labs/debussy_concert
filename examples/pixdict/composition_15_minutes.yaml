@@ -1,0 +1,44 @@
+name: mysql_pixdict_ingestion_minutes
+source_name: pixDict
+source_type: mysql
+description: mysql ingestion
+secret_manager_uri: projects/modular-aileron-191222/secrets/dotz-mysql-prod
+dataproc_config:
+  machine_type: n1-standard-2
+  num_workers: 0
+  subnet: subnet-cluster-services
+  parallelism: 60
+  pip_packages: 
+    - google-cloud-secret-manager
+dag_parameters:
+    dag_id: mysql_pixdict_ingestion_minutes
+    description: Mysql ingestion for pixdict relational database.
+    catchup: false
+    schedule_interval: '*/15 * * * *'
+    start_date:
+      year: 2022
+      month: 6
+      day: 1
+    tags:
+      - framework:debussy_concert
+      - project:modular-aileron-191222
+      - source:mysql
+      - type:ingestion
+      - load:incremental
+      - tier:2
+    default_args:
+      owner: debussy
+ingestion_parameters: 
+  - name: key_history_minutes
+    extraction_query: > 
+      SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied` 
+      FROM key_history 
+      WHERE (created > '{{ prev_execution_date.in_timezone("America/Sao_Paulo").strftime('%Y-%m-%d %H:00:00') }}' AND created <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}')
+      OR (deleted > '{{ prev_execution_date.in_timezone("America/Sao_Paulo") }}' AND deleted <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}')   
+    extract_connection_id: google_cloud_debussy
+    data_partitioning:
+      partitioning_type: time
+      partition_granularity: HOUR
+      partition_field: _logical_ts
+      gcs_partition_schema: _load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}
+      destination_partition: "{{ (execution_date + macros.timedelta(minutes=45)).strftime('%Y%m%d%H') }}"
