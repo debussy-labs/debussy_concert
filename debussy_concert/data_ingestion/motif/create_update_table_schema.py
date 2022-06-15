@@ -4,7 +4,7 @@ from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.service.lakehouse.google_cloud import GoogleCloudLakeHouseService, BigQueryTable
 
 
-class CreateOrUpdateBigQueryTableMotif(MotifBase):
+class CreateBigQueryTableMotif(MotifBase):
     def __init__(self, table: BigQueryTable, name=None):
         super().__init__(name=name)
         self.bq_schema = GoogleCloudLakeHouseService.get_table_schema(table)
