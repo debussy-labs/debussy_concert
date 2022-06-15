@@ -31,9 +31,9 @@ dag_parameters:
 ingestion_parameters:
   - name: key_history
     extraction_query: > 
-      SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied` 
-      FROM key_history 
-      WHERE DATE(created) = DATE('{{ execution_date }}')    
+      SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied`
+      FROM key_history
+      WHERE DATE(created) = DATE('{{ execution_date }}')
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       partitioning_type: time

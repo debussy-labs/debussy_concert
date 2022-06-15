@@ -44,15 +44,15 @@ ingestion_parameters:
       destination_partition: "{{ (execution_date + macros.timedelta(minutes=45)).strftime('%Y%m%d%H') }}"
   - name: key_history_minutes_v2
     extraction_query: > 
-      SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied` 
-      FROM key_history 
+      SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied`
+      FROM key_history
       WHERE (
-        created > '{{ prev_execution_date.in_timezone("America/Sao_Paulo").strftime('%Y-%m-%d %H:00:00') }}' 
+        created > '{{ prev_execution_date.in_timezone("America/Sao_Paulo").strftime('%Y-%m-%d %H:00:00') }}'
         AND created <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}'
       ) OR (
         deleted > '{{ prev_execution_date.in_timezone("America/Sao_Paulo").strftime('%Y-%m-%d %H:00:00') }}'
         AND deleted <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}'
-      )   
+      )
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       partitioning_type: time

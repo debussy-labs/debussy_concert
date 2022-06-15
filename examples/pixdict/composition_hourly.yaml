@@ -32,9 +32,14 @@ ingestion_parameters:
   - name: key_history_hourly
     extraction_query: > 
       SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied` 
-      FROM key_history 
-      WHERE (created > '{{ prev_execution_date.in_timezone("America/Sao_Paulo") }}' AND created <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}')
-      OR (deleted > '{{ prev_execution_date.in_timezone("America/Sao_Paulo") }}' AND deleted <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}')   
+      FROM key_history
+      WHERE (
+        created > '{{ prev_execution_date.in_timezone("America/Sao_Paulo") }}'
+        AND created <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}'
+      ) OR (
+        deleted > '{{ prev_execution_date.in_timezone("America/Sao_Paulo") }}' 
+        AND deleted <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}'
+      )
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       partitioning_type: time
