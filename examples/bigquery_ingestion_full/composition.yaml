@@ -21,10 +21,9 @@ dag_parameters:
       - tier:2
     default_args:
       owner: debussy
-
 ingestion_parameters:
   - name: sintetico_full
-    raw_table_definition: table_def_sintetico_full.yaml
+    raw_table_definition: /usr/local/airflow/dags/examples/bigquery_ingestion_full/table_def_sintetico_full.yaml
     extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:

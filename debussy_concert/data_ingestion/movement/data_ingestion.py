@@ -15,10 +15,10 @@ class DataIngestionMovement(MovementBase):
     def __init__(
         self, name,
         start_phrase: PStartPhrase,
+        create_or_update_table_phrase,
         ingestion_source_to_raw_vault_storage_phrase: PIngestionSourceToRawVaultStoragePhrase,
         raw_vault_storage_to_data_warehouse_raw_phrase: PRawVaultStorageToDataWarehouseRawPhrase,
         end_phrase: PEndPhrase,
-        create_or_update_table_phrase=None,
     ) -> None:
 
         self.start_phrase = start_phrase
@@ -28,10 +28,8 @@ class DataIngestionMovement(MovementBase):
         self.end_phrase = end_phrase
         phrases = [
             self.start_phrase,
-            self.ingestion_source_to_raw_vault_storage_phrase]
-        if create_or_update_table_phrase:
-            phrases.append(self.create_or_update_table_phrase)
-        phrases += [
+            self.create_or_update_table_phrase,
+            self.ingestion_source_to_raw_vault_storage_phrase,
             self.raw_vault_storage_to_data_warehouse_raw_phrase,
             self.end_phrase
         ]

@@ -10,9 +10,8 @@ class CreateBigQueryTableMotif(MotifBase):
         self.bq_schema = GoogleCloudLakeHouseService.get_table_schema(table)
         self.bq_partitioning = GoogleCloudLakeHouseService.get_table_partitioning(table)
 
-    def setup(self, destination_table_uri):
-        self.destination_table_uri = destination_table_uri
-        self.table_ref = TableReference(table_uri=destination_table_uri)
+    def setup(self, table_uri):
+        self.table_ref = TableReference(table_uri=table_uri)
 
     def build(self, workflow_dag, phrase_group):
         create_table = BigQueryCreateEmptyTableOperator(

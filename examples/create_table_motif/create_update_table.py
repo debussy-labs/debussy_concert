@@ -16,7 +16,7 @@ table = BigQueryTable.load_from_file(schema_file)
 
 inject_dependencies(workflow_service=None, config_composition=None)
 motif = CreateBigQueryTableMotif(table=table)
-motif.setup(destination_table_uri='modular-aileron-191222.temp.create_table_motif_test')
+motif.setup(table_uri='modular-aileron-191222.temp.create_table_motif_test')
 task = motif.build(
     workflow_dag=dag,
     phrase_group=phrase_group

@@ -25,9 +25,9 @@ class CreateOrUpdateRawTablePhrase(PhraseBase, PIngestionSourceToRawVaultStorage
         super().__init__(name=name,
                          motifs=motifs)
 
-    def setup(self, destination_table_uri):
+    def setup(self, table_uri):
         self.create_table_motif.setup(
-            destination_table_uri=destination_table_uri)
+            table_uri=table_uri)
         # self.check_table_exist_motif.setup(
         #     table_uri=destination_table_uri
         # )
