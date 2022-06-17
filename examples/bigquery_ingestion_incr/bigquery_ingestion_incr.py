@@ -7,8 +7,8 @@ from debussy_concert.core.service.workflow.airflow import AirflowService
 
 
 dags_folder = conf.get('core', 'dags_folder')
-env_file = f'{dags_folder}/examples/bigquery_ingestion_inc/environment.yaml'
-composition_file = f'{dags_folder}/examples/bigquery_ingestion_inc/composition.yaml'
+env_file = f'{dags_folder}/examples/bigquery_ingestion_incr/environment.yaml'
+composition_file = f'{dags_folder}/examples/bigquery_ingestion_incr/composition.yaml'
 workflow_service = AirflowService()
 config_composition = ConfigBigQueryDataIngestion.load_from_file(
     composition_config_file_path=composition_file,
