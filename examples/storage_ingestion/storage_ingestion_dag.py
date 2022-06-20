@@ -117,7 +117,7 @@ s3_source = SourceInfo(
 movements_parameters = []
 for source in (gcs_source, s3_source):
     movement_parameters = StorageParquetDataIngestionMovementParameters(
-            name=f'{source.storage_type}_parquet_ingestion_example',
+        name=f'{source.storage_type}_parquet_ingestion_example',
         source_file_uri=source.file_uri,
         source_storage_type=source.storage_type,
         extract_connection_id=source.extract_connection_id,
