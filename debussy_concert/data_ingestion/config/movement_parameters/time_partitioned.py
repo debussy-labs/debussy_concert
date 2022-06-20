@@ -6,39 +6,21 @@ from debussy_concert.core.entities.table import BigQueryTable
 
 @dataclass(frozen=True)
 class BigQueryDataPartitioning:
-    partitioning_type: str
     gcs_partition_schema: str
-    partition_field: str
     destination_partition: str
-
-
-@dataclass(frozen=True)
-class BigQueryTimeDataPartitioning(BigQueryDataPartitioning):
-    partition_granularity: str
-
-
-def data_partitioning_factory(data_partitioning):
-    partitioning_type = data_partitioning['partitioning_type'].lower()
-    mapping = {
-        'time': BigQueryTimeDataPartitioning
-    }
-    output_cls = mapping.get(partitioning_type)
-    if output_cls is None:
-        raise TypeError(f'Format `{partitioning_type}` is not supported')
-    return output_cls(**data_partitioning)
 
 
 @dataclass(frozen=True)
 class TimePartitionedDataIngestionMovementParameters(MovementParametersBase):
     extract_connection_id: str
-    data_partitioning: BigQueryTimeDataPartitioning
+    data_partitioning: BigQueryDataPartitioning
     raw_table_definition: str
 
     def __post_init__(self):
-        if not isinstance(self.data_partitioning, BigQueryTimeDataPartitioning):
-            data_partitioning = data_partitioning_factory(self.data_partitioning)
+        if not isinstance(self.data_partitioning, BigQueryDataPartitioning):
+            data_partitioning = BigQueryDataPartitioning(**self.data_partitioning)
             # hack for frozen dataclass https://stackoverflow.com/a/54119384
-            # overwriting data_partitioning with BigQueryTimeDataPartitioning instance
+            # overwriting data_partitioning with BigQueryDataPartitioning instance
             object.__setattr__(self, 'data_partitioning', data_partitioning)
         if self.raw_table_definition is not None:
             self.load_raw_table_definition_attr(self.raw_table_definition)

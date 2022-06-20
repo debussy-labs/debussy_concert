@@ -48,8 +48,6 @@ class DataIngestionBase(CompositionBase):
             gcp_conn_id=movement_parameters.extract_connection_id,
             source_uri_prefix=source_uri_prefix,
             gcs_partition=gcs_partition,
-            partition_granularity=movement_parameters.data_partitioning.partition_granularity,
-            partition_field=movement_parameters.data_partitioning.partition_field,
             destination_partition=movement_parameters.data_partitioning.destination_partition
         )
         gcs_raw_vault_to_bigquery_raw_phrase = RawVaultStorageLoadToDataWarehouseRawPhrase(
@@ -59,12 +57,10 @@ class DataIngestionBase(CompositionBase):
 
     def load_bigquery_from_gcs_hive_partition_motif(
             self, gcp_conn_id, source_uri_prefix,
-            gcs_partition, partition_granularity,
-            partition_field, destination_partition):
+            gcs_partition, destination_partition):
         hive_options = HivePartitioningOptions()
         hive_options.mode = "AUTO"
         hive_options.source_uri_prefix = source_uri_prefix
-        time_partitioning = BigQueryTimePartitioning(type=partition_granularity, field=partition_field)
         motif = LoadGcsToBigQueryHivePartitionMotif(
             name='load_bigquery_from_gcs_hive_partition_motif',
             gcs_partition=gcs_partition,
@@ -73,7 +69,6 @@ class DataIngestionBase(CompositionBase):
             write_disposition='WRITE_TRUNCATE',
             create_disposition='CREATE_IF_NEEDED',
             hive_partitioning_options=hive_options,
-            time_partitioning=time_partitioning,
             schema_update_options=None,
             gcp_conn_id=gcp_conn_id
         )
