@@ -25,29 +25,30 @@ class StorageParquetDataIngestionMovementParameters(TimePartitionedDataIngestion
 
 class SourceToGcsMotif(MotifBase, PExportDataToStorageMotif):
     def __init__(self, source_storage_hook,
-                 lake_gcp_conn_id,
+                 lakehouse_gcp_conn_id,
                  source_file_uri,
                  gcs_partition,
                  name=None):
         super().__init__(name=name)
         self.source_storage_hook = source_storage_hook
-        self.lake_gcs_hook = GCSHook(gcp_conn_id=lake_gcp_conn_id)
+        self.lakehouse_gcs_hook = GCSHook(gcp_conn_id=lakehouse_gcp_conn_id)
         self.source_file_uri = source_file_uri
         self.gcs_partition = gcs_partition
 
     def setup(self, destination_storage_uri: str):
         self.destination_storage_uri = destination_storage_uri
-        self.gcs_schema_uri = (f'{destination_storage_uri}/'
-                               f'{self.gcs_partition}/'
-                               )
+        self.gcs_schema_uri = (
+            f'{destination_storage_uri}/'
+            f'{self.gcs_partition}/'
+        )
 
     def build(self, dag, phrase_group):
         gcs_to_gcs_task = StorageToStorageOperator(
             task_id='source_to_raw_vault_gcs',
             origin_storage_hook=self.source_storage_hook,
             origin_file_uri=self.source_file_uri,
-            destiny_storage_hook=self.lake_gcs_hook,
-            destiny_file_uri=self.gcs_schema_uri + '0.parquet',
+            destination_storage_hook=self.lakehouse_gcs_hook,
+            destination_file_uri=self.gcs_schema_uri + '0.parquet',
             dag=dag,
             task_group=phrase_group
         )
@@ -59,7 +60,7 @@ class StorageParquetDataIngestionComposition(DataIngestionBase):
                                       movement_parameters: StorageParquetDataIngestionMovementParameters):
         return SourceToGcsMotif(
             source_storage_hook=source_storage_hook,
-            lake_gcp_conn_id=self.config.environment.data_lake_connection_id,
+            lakehouse_gcp_conn_id=self.config.environment.data_lake_connection_id,
             source_file_uri=movement_parameters.source_file_uri,
             gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema
         )
@@ -116,7 +117,7 @@ s3_source = SourceInfo(
 movements_parameters = []
 for source in (gcs_source, s3_source):
     movement_parameters = StorageParquetDataIngestionMovementParameters(
-        name=f'{source.storage_type}_parquet_ingestion_example',
+            name=f'{source.storage_type}_parquet_ingestion_example',
         source_file_uri=source.file_uri,
         source_storage_type=source.storage_type,
         extract_connection_id=source.extract_connection_id,
@@ -139,7 +140,7 @@ dag_parameters = ConfigDagParameters(
     start_date=dt.datetime(2022, 1, 1),
     schedule_interval=None,
     tags=['project:example', 'tier:5', 'source:gcs',
-          'framework:concert', 'load:full', 'type:ingestion'],
+          'framework:debussy_concert', 'load:full', 'type:ingestion'],
 
 )
 workflow_service = AirflowService()
