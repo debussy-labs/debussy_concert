@@ -1,7 +1,7 @@
 name: reverse_etl_unbounce
 description: Reverse ETL ingestion from storage to rdbms
 dag_parameters:
-    dag_id: reverse_etl_unbouncie
+    dag_id: reverse_etl_unbounce
     schedule_interval: 0 0 * * *
     start_date:
       year: 2022
@@ -16,7 +16,7 @@ dag_parameters:
       owner: debussy
     tags:
       - framework:debussy_concert
-      - project:modular-aileron-191222
+      - project:example
       - destiny:rdbms
       - type:reverse_etl
       - tier:5
