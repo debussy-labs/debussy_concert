@@ -171,7 +171,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         return self
 
     def build(self, dag, parent_task_group: TaskGroup):
-        task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
+        task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=parent_task_group)
 
         start = StartOperator(phase=self.movement_parameters.name, dag=dag, task_group=task_group)
 
