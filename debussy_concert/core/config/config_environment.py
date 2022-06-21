@@ -17,7 +17,7 @@ class ConfigEnvironment:
     trusted_dataset: str
     reverse_etl_dataset: str
     temp_dataset: str
-    data_lake_connection_id: str
+    data_lakehouse_connection_id: str
     landing_bucket: Optional[str] = None
 
     @classmethod

@@ -60,7 +60,7 @@ class StorageParquetDataIngestionComposition(DataIngestionBase):
                                       movement_parameters: StorageParquetDataIngestionMovementParameters):
         return SourceToGcsMotif(
             source_storage_hook=source_storage_hook,
-            lakehouse_gcp_conn_id=self.config.environment.data_lake_connection_id,
+            lakehouse_gcp_conn_id=self.config.environment.data_lakehouse_connection_id,
             source_file_uri=movement_parameters.source_file_uri,
             gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema
         )
