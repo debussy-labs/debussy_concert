@@ -75,5 +75,7 @@ class ReverseEtlRdbmsMovement(MovementBase):
             storage_uri_prefix=self.reverse_etl_bucket_uri_prefix)
         self.storage_to_destination_phrase.setup(
             storage_uri_prefix=self.reverse_etl_bucket_uri_prefix)
-        self.storage_to_rdbms_destination_phrase.setup(self.reverse_etl_bucket_uri_prefix, self.reverse_etl_destination_table)
+        self.storage_to_rdbms_destination_phrase.setup(
+            self.reverse_etl_bucket_uri_prefix,
+            self.reverse_etl_destination_table)
         return self

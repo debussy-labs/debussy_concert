@@ -20,16 +20,24 @@ from debussy_framework.v3.hooks.storage_hook import GCSHook
 from debussy_framework.v3.hooks.db_api_hook import MySqlConnectorHook
 
 
-class   ClairDeLune(CompositionBase):
+class ClairDeLune(CompositionBase):
     config: ConfigReverseEtl
 
-    def storage_to_rdbms_reverse_etl_movement_builder(self, movement_parameters: ReverseEtlMovementParameters):
+    def storage_to_rdbms_reverse_etl_movement_builder(
+        self,
+        movement_parameters: ReverseEtlMovementParameters
+    ):
         storage_to_destination_phrase = self.storage_to_destination_phrase(movement_parameters)
         return self.reverse_etl_movement_builder(
             storage_to_destination_phrase=storage_to_destination_phrase,
-            movement_parameters=movement_parameters)
+            movement_parameters=movement_parameters
+        )
 
-    def reverse_etl_movement_builder(self, storage_to_destination_phrase, movement_parameters: ReverseEtlMovementParameters) -> ReverseEtlRdbmsMovement:
+    def reverse_etl_movement_builder(
+        self,
+        storage_to_destination_phrase,
+        movement_parameters: ReverseEtlMovementParameters
+    ) -> ReverseEtlRdbmsMovement:
         start_phrase = StartPhrase()
         end_phrase = EndPhrase()
         csv_output_config: CsvFile = movement_parameters.output_config
@@ -64,8 +72,7 @@ class   ClairDeLune(CompositionBase):
 
     def data_warehouse_raw_to_reverse_etl_phrase(self, partition_type, partition_field, gcp_conn_id):
         time_partitioning = BigQueryTimePartitioning(type=partition_type, field=partition_field)
-        
-        
+
         bigquery_job = BigQueryQueryJobMotif(name='bq_to_reverse_etl_motif',
                                              write_disposition="WRITE_APPEND",
                                              create_disposition="CREATE_IF_NEEDED",
@@ -74,15 +81,12 @@ class   ClairDeLune(CompositionBase):
 
         phrase = DataWarehouseToReverseEtlPhrase(dw_to_reverse_etl_motif=bigquery_job)
         return phrase
-        
 
     def data_warehouse_reverse_etl_to_storage_phrase(self, destination_config: CsvFile, gcp_conn_id):
         bigquery_job = BigQueryQueryJobMotif(name='bq_reverse_etl_to_temp_table_motif',
                                              write_disposition="WRITE_TRUNCATE",
                                              create_disposition="CREATE_IF_NEEDED",
                                              gcp_conn_id=gcp_conn_id)
-
-
 
         export_bigquery = BigQueryExtractJobMotif(name='bq_export_temp_table_to_gcs_motif',
                                                   destination_format=destination_config.format,
@@ -98,17 +102,20 @@ class   ClairDeLune(CompositionBase):
 
     def data_storage_to_rdbms_phrase(self, movement_parameters: ReverseEtlMovementParameters):
         dest_conn_id = movement_parameters.destination_connection_id
-        cgp_conn_id = movement_parameters.gcp_connection_id
+        gcp_conn_id = movement_parameters.gcp_connection_id
 
         dbapi_hook = MySqlConnectorHook(rdbms_conn_id=dest_conn_id)
-        storage_hook = GCSHook(gcp_conn_id=cgp_conn_id)
-        rdbms_query_destination = RdbmsQueryMotif(name='file_storage_to_build_insert_query_to_rdbms_motif',dbapi_hook=dbapi_hook, storage_hook=storage_hook)
+        storage_hook = GCSHook(gcp_conn_id=gcp_conn_id)
+        rdbms_query_destination = RdbmsQueryMotif(
+            name='file_storage_to_build_insert_query_to_rdbms_motif',
+            dbapi_hook=dbapi_hook,
+            storage_hook=storage_hook
+        )
 
         phrase = StorageToRdbmsDestinationPhrase(name='StorageToRdbmsDestinationPhrase',
-            storage_to_rdbms_destination_motif=rdbms_query_destination)
+                                                 storage_to_rdbms_destination_motif=rdbms_query_destination)
         return phrase
 
-    
     def storage_to_destination_phrase(self, movement_parameters: ReverseEtlMovementParameters):
         gcp_connection_id = movement_parameters.gcp_connection_id
         destination_file_uri = movement_parameters.destination_object_path
@@ -123,7 +130,6 @@ class   ClairDeLune(CompositionBase):
         phrase = StorageToDestinationPhrase(
             storage_to_destination_motif=storage_to_sftp)
         return phrase
-    
 
     @classmethod
     def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath):
