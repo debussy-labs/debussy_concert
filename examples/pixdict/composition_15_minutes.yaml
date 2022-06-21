@@ -11,7 +11,25 @@ dataproc_config:
   pip_packages: 
     - google-cloud-secret-manager
 dag_parameters:
-  - name: key_history_minutes
+    dag_id: mysql_pixdict_ingestion_minutes
+    description: Mysql ingestion for pixdict relational database.
+    catchup: false
+    schedule_interval: '*/15 * * * *'
+    start_date:
+      year: 2022
+      month: 6
+      day: 1
+    tags:
+      - framework:debussy_concert
+      - project:modular-aileron-191222
+      - source:mysql
+      - type:ingestion
+      - load:incremental
+      - tier:2
+    default_args:
+      owner: debussy
+ingestion_parameters: 
+  - name: key_history_minutes_v2
     extraction_query: > 
       SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied`
       FROM key_history
