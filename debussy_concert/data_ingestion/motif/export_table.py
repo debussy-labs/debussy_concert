@@ -14,7 +14,6 @@ from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingest
 from debussy_framework.v3.operators.basic import StartOperator
 
 
-
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
     extract_query_template = """
     EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='{uri}')
@@ -61,7 +60,7 @@ class DataprocExportRdbmsTableToGcsMotif(
             movement_parameters: RdbmsDataIngestionMovementParameters,
             gcs_partition: str,
             jdbc_driver,
-            jdbc_url, 
+            jdbc_url,
             name=None
     ) -> None:
         super().__init__(name=name)
@@ -177,7 +176,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         start = StartOperator(phase=self.movement_parameters.name, dag=dag, task_group=task_group)
 
         cluster_name_id = self.cluster_name_id(dag, task_group)
-        self._cluster_name_task_id = self.build_cluster_name(dag, cluster_name_id)       
+        self._cluster_name_task_id = self.build_cluster_name(dag, cluster_name_id)
 
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
         jdbc_to_raw_vault = self.jdbc_to_raw_vault(dag, task_group, self.movement_parameters.extraction_query)
@@ -211,9 +210,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
-        
         pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
-
 
         jdbc_to_raw_vault = DataprocSubmitJobOperator(
             task_id="jdbc_to_raw_vault",
