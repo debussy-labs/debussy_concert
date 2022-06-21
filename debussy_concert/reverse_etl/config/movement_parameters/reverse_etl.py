@@ -55,7 +55,6 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     destination_type: str
     output_config: OutputConfig
     destination_object_path: str
-    gcp_connection_id: str
     destination_connection_id: str
 
     def __post_init__(self):

@@ -9,7 +9,6 @@ from debussy_concert.data_ingestion.config.movement_parameters.bigquery import B
 
 @dataclass(frozen=True)
 class ConfigBigQueryDataIngestion(ConfigDataIngestionBase):
-    gcp_connection_id: str
 
     @classmethod
     def load_from_file(cls, composition_config_file_path, env_file_path):
