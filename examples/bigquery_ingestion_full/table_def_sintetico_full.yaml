@@ -1,6 +1,6 @@
 partitioning:
     type: time
-    granularity: HOUR
+    granularity: YEAR
     field: _logical_ts
 fields:
   - name: data
@@ -12,7 +12,7 @@ fields:
     data_type: string
     description: incr = incremental data ingestion; full = full data ingestion
   - name: _logical_ts
-    data_type: timestamp
+    data_type: date
     description: Airflow logical date
   - name: _ingestion_ts
     data_type: timestamp
