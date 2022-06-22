@@ -21,7 +21,7 @@ dag_parameters:
       day: 1
     tags:
       - framework:debussy_concert
-      - project:modular-aileron-191222
+      - project:example
       - source:mysql
       - type:ingestion
       - load:incremental
@@ -29,15 +29,13 @@ dag_parameters:
     default_args:
       owner: debussy
 ingestion_parameters:
-  - name: key_history
+  - name: key_history_daily
     extraction_query: > 
       SELECT `id`, `user_id`, `account_id`, `key_type`, `key`, `created`, `deleted`, `bonus_applied`
       FROM key_history
       WHERE DATE(created) = DATE('{{ execution_date }}')
     extract_connection_id: google_cloud_debussy
+    raw_table_definition: /usr/local/airflow/dags/examples/pixdict/raw_table_def_pixdict_daily.yaml
     data_partitioning:
-      partitioning_type: time
-      partition_granularity: DAY
-      partition_field: _logical_ts
-      gcs_partition_schema: _load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}
+      gcs_partition_schema: _flag_load=incr/_ts_logical={{ execution_date }}/_ts_ingestion={{ dag_run.start_date }}
       destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
