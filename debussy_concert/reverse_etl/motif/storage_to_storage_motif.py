@@ -23,8 +23,8 @@ class StorageToStorageMotif(MotifBase):
             task_id=self.name,
             origin_storage_hook=self.origin_storage_hook,
             origin_file_uri=self.origin_file_uri,
-            destiny_storage_hook=self.destiny_storage_hook,
-            destiny_file_uri=self.destiny_file_uri,
+            destination_storage_hook=self.destiny_storage_hook,
+            destination_file_uri=self.destiny_file_uri,
             dag=dag,
             task_group=parent_task_group
         )

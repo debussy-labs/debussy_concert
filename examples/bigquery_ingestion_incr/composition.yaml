@@ -2,7 +2,6 @@ name: bigquery_ingestion_incr
 source_name: example
 source_type: bigquery
 description: BigQuery ingestion
-gcp_connection_id: google_cloud_debussy
 dag_parameters:
     dag_id: bigquery_ingestion_incr
     description: BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage

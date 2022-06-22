@@ -12,7 +12,7 @@ class StartMotif(MotifBase):
         super().__init__(name=name)
 
     def build(self, dag, parent_task_group):
-        task_group = TaskGroup(group_id=self.name, parent_group=parent_task_group)
+        task_group = TaskGroup(group_id=self.name, dag=dag, parent_group=parent_task_group)
         start_dag = StartOperator(phase="dag", dag=dag, task_group=task_group)
         log_input = PythonOperator(
             task_id='log_input',

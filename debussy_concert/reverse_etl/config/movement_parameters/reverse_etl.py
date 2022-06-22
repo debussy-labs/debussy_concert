@@ -13,6 +13,7 @@ class OutputConfig:
 @dataclass(frozen=True)
 class CsvFile(OutputConfig):
     field_delimiter: str
+    print_header: bool = True
 
 
 class AvroFile(OutputConfig):
@@ -54,7 +55,6 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     destination_type: str
     output_config: OutputConfig
     destination_object_path: str
-    gcp_connection_id: str
     destination_connection_id: str
 
     def __post_init__(self):

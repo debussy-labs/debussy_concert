@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import logging
 import yaml
 
 from debussy_concert.core.config.config_environment import ConfigEnvironment
@@ -20,6 +21,7 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
         with open(composition_config_file_path) as file:
             config = yaml.safe_load(file)
         config["environment"] = env_config
+
         extract_movements = [RdbmsDataIngestionMovementParameters.load_from_dict(parameters)
                              for parameters in config["ingestion_parameters"]]
         del config["ingestion_parameters"]

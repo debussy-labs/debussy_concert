@@ -44,4 +44,4 @@ class AirflowService(PWorkflowService):
         return DAG(dag_id=dag_id, **kwargs)
 
     def chain_tasks(self, *tasks):
-        return chain(tasks)
+        return chain(*tasks)

@@ -33,6 +33,7 @@ class DummyMotif(MotifBase, TaskMixin):
     def build(self, workflow_dag, phrase_group) -> PMotifGroup:
         self.build_args = {"workflow_dag": workflow_dag,
                            "phrase_group": phrase_group}
+        return self
 
 
 @dataclass

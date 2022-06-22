@@ -24,7 +24,6 @@ extraction_movements:
       field_delimiter: field_delimiter_test
     destination_type: destination_type_test
     destination_object_path: destination_object_path_test
-    gcp_connection_id: gcp_connection_id_test
     destination_connection_id: destination_connection_id_test
 
 
