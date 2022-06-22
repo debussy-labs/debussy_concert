@@ -35,16 +35,16 @@ class DataIngestionMovement(MovementBase):
         ]
         super().__init__(name=name, phrases=phrases)
 
-    @ property
+    @property
     def raw_vault_bucket_uri_prefix(self):
         return (f"gs://{self.config.environment.raw_vault_bucket}/"
                 f"{self.config.source_type}/{self.config.source_name}/{self.movement_parameters.name}")
 
-    @ property
+    @property
     def raw_table_uri(self):
         return (f"{self.config.environment.project}."
                 f"{self.config.environment.raw_dataset}."
-                f"{self.config.table_prefix}_{self.movement_parameters.name}")
+                f"{self.config.source_type}_{self.config.source_name}_{self.movement_parameters.name}")
 
     def setup(
         self,
