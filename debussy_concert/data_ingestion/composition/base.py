@@ -45,7 +45,7 @@ class DataIngestionBase(CompositionBase):
         source_uri_prefix = (f"gs://{self.config.environment.raw_vault_bucket}/"
                              f"{self.config.source_type}/{self.config.source_name}/{movement_parameters.name}")
         load_bigquery_from_gcs = self.load_bigquery_from_gcs_hive_partition_motif(
-            gcp_conn_id=movement_parameters.extract_connection_id,
+            gcp_conn_id=self.config.environment.data_lakehouse_connection_id,
             source_uri_prefix=source_uri_prefix,
             gcs_partition=gcs_partition,
             destination_partition=movement_parameters.data_partitioning.destination_partition
