@@ -23,7 +23,7 @@ dag_parameters:
 ingestion_parameters:
   - name: sintetico_incr
     raw_table_definition: /usr/local/airflow/dags/examples/bigquery_ingestion_incr/table_def_sintetico_incr.yaml
-    extract_sql_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
+    extraction_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       gcs_partition_schema: _load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}

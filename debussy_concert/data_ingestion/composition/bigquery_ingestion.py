@@ -22,7 +22,7 @@ class BigQueryIngestionComposition(DataIngestionBase):
         gcs_partition = movement_parameters.data_partitioning.gcs_partition_schema
         export_motif = ExportBigQueryQueryToGcsMotif(
             gcs_partition=gcs_partition,
-            extract_query=movement_parameters.extract_sql_query,
+            extraction_query=movement_parameters.extraction_query,
             gcp_conn_id=movement_parameters.extract_connection_id)
         ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
             export_data_to_storage_motif=export_motif)

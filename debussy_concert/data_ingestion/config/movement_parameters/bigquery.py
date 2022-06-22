@@ -4,4 +4,4 @@ from debussy_concert.data_ingestion.config.movement_parameters.time_partitioned 
 
 @dataclass(frozen=True)
 class BigQueryDataIngestionMovementParameters(TimePartitionedDataIngestionMovementParameters):
-    extract_sql_query: str
+    extraction_query: str
