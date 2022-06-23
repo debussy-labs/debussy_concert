@@ -1,5 +1,6 @@
 from dataclasses import dataclass, asdict
 from typing import Any, List, Optional
+import os
 import yaml
 
 
@@ -142,7 +143,10 @@ class Table:
         return cls(fields=fields)
 
     @classmethod
-    def load_from_file(cls, file_path):
+    def load_from_file(cls, file_path: str):
+        if not file_path.startswith('/'):
+            dags_folder = os.environ['DEBUSSY_CONCERT__DAGS_FOLDER']
+            file_path = f"{dags_folder}/{file_path}"
         with open(file_path) as file:
             table_dict = yaml.safe_load(file)
         return cls.load_from_dict(table_dict)
