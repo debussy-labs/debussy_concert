@@ -8,7 +8,7 @@ from debussy_concert.core.service.workflow.airflow import AirflowService
 
 
 dags_folder = conf.get('core', 'dags_folder')
-os.environ['DEBUSSY_CONCERT__DAGS_FOLDER'] = dags_folder
+os.environ['DEBUSSY_CONCERT__DAGS_FOLDER'] = dags_folder  # of course you can set this on your system env var
 env_file = f'{dags_folder}/examples/bigquery_ingestion_full/environment.yaml'
 composition_file = f'{dags_folder}/examples/bigquery_ingestion_full/composition.yaml'
 workflow_service = AirflowService()

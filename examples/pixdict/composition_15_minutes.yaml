@@ -41,7 +41,7 @@ ingestion_parameters:
         AND deleted <= '{{ execution_date.in_timezone("America/Sao_Paulo") }}'
       )
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: /usr/local/airflow/dags/examples/pixdict/raw_table_def_pixdict_minutes.yaml
+    raw_table_definition: examples/pixdict/raw_table_def_pixdict_minutes.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _flag_load=incr/_dtt_window_start={{ prev_execution_date.in_timezone('America/Sao_Paulo').strftime('%Y-%m-%d %H:00:00')
