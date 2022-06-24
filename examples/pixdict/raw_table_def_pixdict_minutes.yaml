@@ -1,7 +1,7 @@
 partitioning:
     type: time
     granularity: HOUR
-    field: _dtt_window_start
+    field: _ts_window_start
 fields:
   - name: id
     data_type: INTEGER
@@ -37,9 +37,9 @@ fields:
   - name: _ts_ingestion
     data_type: TIMESTAMP
     description: Clock time at Airflow when the ingestion was executed
-  - name: _dtt_window_start
+  - name: _ts_window_start
     data_type: TIMESTAMP
     description: Ingestion window start at source timezone
-  - name: _dtt_window_end
+  - name: _ts_window_end
     data_type: TIMESTAMP
     description: Ingestion window end at source timezone

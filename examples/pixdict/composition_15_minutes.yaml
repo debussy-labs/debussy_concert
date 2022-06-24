@@ -44,8 +44,8 @@ ingestion_parameters:
     raw_table_definition: examples/pixdict/raw_table_def_pixdict_minutes.yaml
     data_partitioning:
       gcs_partition_schema: >-
-        _flag_load=incr/_dtt_window_start={{ prev_execution_date.in_timezone('America/Sao_Paulo').strftime('%Y-%m-%d %H:00:00')
-        }}/_dtt_window_end={{ execution_date.in_timezone('America/Sao_Paulo').strftime('%Y-%m-%d %H:%M:%S')
+        _flag_load=incr/_ts_window_start={{ prev_execution_date.in_timezone('America/Sao_Paulo').strftime('%Y-%m-%d %H:00:00')
+        }}/_ts_window_end={{ execution_date.in_timezone('America/Sao_Paulo').strftime('%Y-%m-%d %H:%M:%S')
         }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
       destination_partition: "{{ prev_execution_date.in_timezone('America/Sao_Paulo').strftime('%Y%m%d%H') }}"
