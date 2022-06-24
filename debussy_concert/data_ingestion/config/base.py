@@ -18,4 +18,4 @@ class ConfigDataIngestionBase(ConfigComposition, ABC):
 
     @property
     def table_prefix(self):
-        return self.source_name.lower()
+        return f"{self.source_type}_{self.source_name}"
