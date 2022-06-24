@@ -17,3 +17,9 @@ fields:
   - name: _ingestion_ts
     data_type: timestamp
     description: Clock time at when the ingestion was executed
+  - name: _ts_window_start
+    data_type: TIMESTAMP
+    description: Ingestion window start at source timezone
+  - name: _ts_window_end
+    data_type: TIMESTAMP
+    description: Ingestion window end at source timezone

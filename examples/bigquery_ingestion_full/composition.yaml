@@ -26,5 +26,5 @@ ingestion_parameters:
     extraction_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:
-      gcs_partition_schema: _load_flag=full/_logical_ts=1970-01-01/_ingestion_ts={{ dag_run.start_date }}
+      gcs_partition_schema: _load_flag=full/_ts_window_start=0001-01-01 00:00:00/_ts_window_end=9999-01-01 00:00:00/_logical_ts=1970-01-01/_ingestion_ts={{ dag_run.start_date }}
       destination_partition: 1970
