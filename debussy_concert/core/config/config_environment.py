@@ -2,6 +2,8 @@ from typing import Optional
 from dataclasses import dataclass
 import yaml
 
+from debussy_concert.core.service.debussy_yaml_safe_loader import DebussyYamlSafeLoader
+
 
 @dataclass(frozen=True)
 class ConfigEnvironment:
@@ -23,5 +25,5 @@ class ConfigEnvironment:
     @classmethod
     def load_from_file(cls, file_path):
         with open(file_path, 'r') as file:
-            env_config = yaml.safe_load(file)
+            env_config = yaml.load(file, Loader=DebussyYamlSafeLoader)
         return cls(**env_config)

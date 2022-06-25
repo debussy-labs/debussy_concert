@@ -35,7 +35,7 @@ ingestion_parameters:
       FROM key_history
       WHERE DATE(created) = DATE('{{ execution_date }}')
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: examples/pixdict/raw_table_def_pixdict_daily.yaml
+    raw_table_definition:  ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/pixdict/raw_table_def_pixdict_daily.yaml
     data_partitioning:
       gcs_partition_schema: _flag_load=incr/_ts_logical={{ execution_date }}/_ts_ingestion={{ dag_run.start_date }}
       destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
