@@ -114,11 +114,3 @@ class ReverseEtlBigQueryToStorageComposition(CompositionBase):
         phrase = StorageToDestinationPhrase(
             storage_to_destination_motif=storage_to_storage_motif)
         return phrase
-
-    @classmethod
-    def create_from_yaml(cls, environment_config_yaml_filepath, composition_config_yaml_filepath):
-        config = ConfigReverseEtl.load_from_file(
-            composition_config_file_path=composition_config_yaml_filepath,
-            env_file_path=environment_config_yaml_filepath
-        )
-        return cls(config)

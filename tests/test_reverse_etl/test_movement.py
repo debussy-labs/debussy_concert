@@ -27,7 +27,7 @@ def test_data_warehouse_to_reverse_etl_phrase(inject_testing):
 def test_data_warehouse_reverse_etl_to_storage_phrase(inject_testing):
     movement = csv_reverse_etl_movement_dummy_phrases()
     phrase = movement.data_warehouse_reverse_etl_to_storage_phrase
-    assert phrase._setup['extract_query'] == 'extract_query_from_temp_test'
+    assert phrase._setup['extraction_query'] == 'extraction_query_from_temp_test'
     assert phrase._setup['storage_uri_prefix'] == (
         "gs://reverse_etl_bucket_test/"
         "composition_name_test/extraction_name_test/file_name_test.format")

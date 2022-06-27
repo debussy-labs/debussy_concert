@@ -51,7 +51,7 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     reverse_etl_query: str
     reverse_etl_dataset_partition_type: str
     reverse_etl_dataset_partition_field: str
-    extract_query_from_temp: str
+    extraction_query_from_temp: str
     destination_type: str
     output_config: OutputConfig
     destination_object_path: str

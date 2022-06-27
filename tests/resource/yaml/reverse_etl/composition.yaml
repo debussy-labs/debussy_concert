@@ -17,7 +17,7 @@ extraction_movements:
     reverse_etl_query:  reverse_etl_query_test
     reverse_etl_dataset_partition_type: reverse_etl_dataset_partition_type_test
     reverse_etl_dataset_partition_field: reverse_etl_dataset_partition_field_Test
-    extract_query_from_temp: extract_query_from_temp_test
+    extraction_query_from_temp: extraction_query_from_temp_test
     output_config:
       format: CSV
       file_name: file_name_test.format
