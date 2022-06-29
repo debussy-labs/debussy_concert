@@ -54,10 +54,9 @@ class DataIngestionMovement(MovementBase):
         self.ingestion_source_to_raw_vault_storage_phrase.setup(
             destination_storage_uri=self.raw_vault_bucket_uri_prefix
         )
-        if self.create_or_update_table_phrase:
-            self.create_or_update_table_phrase.setup(
-                table_uri=self.raw_table_uri
-            )
+        self.create_or_update_table_phrase.setup(
+            table_uri=self.raw_table_uri
+        )
         self.raw_vault_storage_to_data_warehouse_raw_phrase.setup(
             movement_parameters=movement_parameters,
             source_storage_uri_prefix=self.raw_vault_bucket_uri_prefix,
