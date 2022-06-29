@@ -1,9 +1,8 @@
 from dataclasses import dataclass, asdict
 from typing import Any, List, Optional
-import os
-import yaml
 
-from debussy_concert.core.service.debussy_yaml_safe_loader import DebussyYamlSafeLoader
+
+from yaml_env_var_parser import load as yaml_load
 
 
 class TableField:
@@ -147,7 +146,7 @@ class Table:
     @classmethod
     def load_from_file(cls, file_path: str):
         with open(file_path) as file:
-            table_dict = yaml.load(file, Loader=DebussyYamlSafeLoader)
+            table_dict = yaml_load(file)
         return cls.load_from_dict(table_dict)
 
 

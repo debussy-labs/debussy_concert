@@ -1,10 +1,9 @@
 from typing import List
-import yaml
+from yaml_env_var_parser import load as yaml_load
 
 from debussy_concert.core.config.config_environment import ConfigEnvironment
 from debussy_concert.core.config.config_composition import ConfigComposition
 from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
-from debussy_concert.core.service.debussy_yaml_safe_loader import DebussyYamlSafeLoader
 from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import ReverseEtlMovementParameters
 
 
@@ -26,7 +25,7 @@ class ConfigReverseEtl(ConfigComposition):
         env_config = ConfigEnvironment.load_from_file(env_file_path)
 
         with open(composition_config_file_path) as file:
-            config = yaml.load(file, Loader=DebussyYamlSafeLoader)
+            config = yaml_load(file)
         config["environment"] = env_config
         extract_movements = [ReverseEtlMovementParameters.load_from_dict(parameters)
                              for parameters in config["extraction_movements"]]
