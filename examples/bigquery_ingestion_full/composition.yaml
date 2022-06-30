@@ -7,10 +7,7 @@ dag_parameters:
     description: BigQuery full ingestion example. Fixing a partition and always overwriting it. Versioning on storage
     catchup: false
     schedule_interval: '*/30 * * * *' # At every minute.
-    start_date:
-      year: 2022
-      month: 1
-      day: 1
+    start_date: !!timestamp 2022-01-01 00:00:00
     tags:
       - framework:debussy_concert
       - project:example
@@ -22,7 +19,7 @@ dag_parameters:
       owner: debussy
 ingestion_parameters:
   - name: sintetico_full
-    raw_table_definition: examples/bigquery_ingestion_full/table_def_sintetico_full.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/bigquery_ingestion_full/table_def_sintetico_full.yaml
     extraction_query: SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date
     extract_connection_id: google_cloud_debussy
     data_partitioning:

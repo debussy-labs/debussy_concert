@@ -54,7 +54,7 @@ def csv_reverse_etl_movement():
     dag_params = movement.config.dag_parameters
     dag = DummyDag(**dag_params)
     data_warehouse_reverse_etl_to_storage_phrase.datawarehouse_reverse_etl_to_temp_table_motif.__dict__
-    print(data_warehouse_reverse_etl_to_storage_phrase.__dict__)
-    print(data_warehouse_reverse_etl_to_storage_phrase.datawarehouse_reverse_etl_to_temp_table_motif.__dict__)
+    # print(data_warehouse_reverse_etl_to_storage_phrase.__dict__)
+    # print(data_warehouse_reverse_etl_to_storage_phrase.datawarehouse_reverse_etl_to_temp_table_motif.__dict__)
     movement.build(dag)
     return movement

@@ -1,4 +1,4 @@
-from abc import ABC, abstractclassmethod
+from abc import ABC
 from dataclasses import dataclass
 from typing import List
 

@@ -8,6 +8,16 @@ fields:
   - name: airflow_logical_date
     description: Airflow logical date timestamp
     data_type: timestamp
+  - name: pwd_env_var
+    description: Airflow $PWD env variable value
+    data_type: string
+  - name: debussy_concert_env_project
+    description: Value of the variable set in environment.yaml
+    data_type: string
+    data_type: string
+  - name: env_default_value_example
+    description: Example of a default value if variable does not exist in env
+    data_type: string
   - name: _load_flag
     data_type: string
     description: incr = incremental data ingestion; full = full data ingestion

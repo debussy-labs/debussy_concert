@@ -79,5 +79,5 @@ def test_get_table_schema():
         }
     ]
     schema = GoogleCloudLakeHouseService.get_table_schema(table)
-    print(schema)
+    # print(schema)
     assert schema == expected_schema
