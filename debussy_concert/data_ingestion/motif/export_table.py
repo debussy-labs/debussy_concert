@@ -53,6 +53,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         "boot_disk_size_gb": 1000,
     }
     endpoint_enable_http_port_access = True
+    idle_seconds_delete_ttl = 300
     _cluster_name_task_id = None
 
     def __init__(
@@ -61,12 +62,14 @@ class DataprocExportRdbmsTableToGcsMotif(
             gcs_partition: str,
             jdbc_driver,
             jdbc_url,
+            main_python_file_uri,
             name=None
     ) -> None:
         super().__init__(name=name)
         self.gcs_partition = gcs_partition
         self.jdbc_driver = jdbc_driver
         self.jdbc_url = jdbc_url
+        self.main_python_file_uri = main_python_file_uri
         self.movement_parameters = movement_parameters
         self.pip_packages = self.config.dataproc_config.get(
             "pip_packages", [])
@@ -163,6 +166,7 @@ class DataprocExportRdbmsTableToGcsMotif(
                 },
             ],
             "endpoint_config": {"enable_http_port_access": self.endpoint_enable_http_port_access},
+            "lifecycle_config": {"idle_delete_ttl": {"seconds": self.idle_seconds_delete_ttl}}
         }
         return cluster_config
 
@@ -210,15 +214,13 @@ class DataprocExportRdbmsTableToGcsMotif(
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
 
-        pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
-
         jdbc_to_raw_vault = DataprocSubmitJobOperator(
             task_id="jdbc_to_raw_vault",
             job={
                     "reference": {"project_id": self.config.environment.project},
                     "placement": {"cluster_name": self.cluster_name},
                     "pyspark_job": {
-                        "main_python_file_uri": f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py",
+                        "main_python_file_uri": self.main_python_file_uri,
                         "args": [
                             self.jdbc_driver,
                             self.jdbc_url,

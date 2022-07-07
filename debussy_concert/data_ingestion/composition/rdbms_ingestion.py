@@ -16,6 +16,8 @@ class RdbmsIngestionComposition(DataIngestionBase):
 
     def __init__(self):
         super().__init__()
+        pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
+        self.dataproc_main_python_file_uri = f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py"
 
     def auto_play(self):
         rdbms_builder_fn = self.rdbms_builder_fn()
@@ -36,7 +38,12 @@ class RdbmsIngestionComposition(DataIngestionBase):
         jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.source_name
 
         export_mysql_to_gcs_motif = DataprocExportRdbmsTableToGcsMotif(
-            movement_parameters=movement_parameters, gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema, jdbc_driver=mysql_jdbc_driver, jdbc_url=jdbc_url)
+            movement_parameters=movement_parameters,
+            gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema,
+            jdbc_driver=mysql_jdbc_driver,
+            jdbc_url=jdbc_url,
+            main_python_file_uri=self.dataproc_main_python_file_uri
+        )
 
         ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
             export_data_to_storage_motif=export_mysql_to_gcs_motif
