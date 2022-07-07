@@ -53,6 +53,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         "boot_disk_size_gb": 1000,
     }
     endpoint_enable_http_port_access = True
+    idle_seconds_delete_ttl = 300
     _cluster_name_task_id = None
 
     def __init__(
@@ -165,6 +166,7 @@ class DataprocExportRdbmsTableToGcsMotif(
                 },
             ],
             "endpoint_config": {"enable_http_port_access": self.endpoint_enable_http_port_access},
+            "lifecycle_config": {"idle_delete_ttl": {"seconds": self.idle_seconds_delete_ttl}}
         }
         return cluster_config
 
