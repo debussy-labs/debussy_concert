@@ -3,6 +3,7 @@ description: Reverse ETL ingestion from storage to rdbms
 dag_parameters:
     dag_id: reverse_etl_unbounce
     schedule_interval: 0 0 * * *
+    dag_concurrency: 10
     start_date:
       year: 2022
       month: 3
@@ -36,7 +37,7 @@ extraction_movements:
       file_name: retl_unbounce_{{ execution_date }}.csv
       field_delimiter: ','
     destination_type: rdbms
-    destination_object_path: gs://autodelete_dev_bucket/retl_unbounce_to_rdbms/extract_to_mysql/retl_unbounce_{{ execution_date }}.csv
+    #destination_object_path: gs://autodelete_dev_bucket/retl_unbounce_to_rdbms/extract_to_mysql/retl_unbounce_{{ execution_date }}.csv
     destination_table: multiCampaign.participant
     gcp_connection_id: google_cloud_default
     destination_connection_id: unbounce_connection_id

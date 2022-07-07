@@ -56,6 +56,8 @@ class BigQueryIngestionComposition(CompositionBase):
     ):
         source_uri_prefix = (f"gs://{self.config.environment.raw_vault_bucket}/"
                              f"{self.config.source_type}/{self.config.source_name}/{movement_parameters.name}")
+
+
         load_bigquery_from_gcs = self.load_bigquery_from_gcs_hive_partition_motif(
             gcp_conn_id=movement_parameters.extract_connection_id,
             source_uri_prefix=source_uri_prefix,
@@ -64,6 +66,8 @@ class BigQueryIngestionComposition(CompositionBase):
             partition_field=movement_parameters.data_partitioning.partition_field,
             destination_partition=movement_parameters.data_partitioning.destination_partition
         )
+
+        
         gcs_raw_vault_to_bigquery_raw_phrase = RawVaultStorageLoadToDataWarehouseRawPhrase(
             load_table_from_storage_motif=load_bigquery_from_gcs
         )

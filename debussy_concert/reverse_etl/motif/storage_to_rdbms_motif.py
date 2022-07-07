@@ -1,13 +1,13 @@
 from debussy_concert.core.motif.motif_base import MotifBase
-from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin
-from debussy_concert.core.phrase.protocols import PExecuteQueryMotif
+#from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin
+#from debussy_concert.core.phrase.protocols import PExecuteQueryMotif
 
 from debussy_framework.v3.hooks.db_api_hook import DbApiInterface
 from debussy_framework.v3.hooks.storage_hook import StorageHookInterface
 from debussy_framework.v3.operators.storage_to_rdbms import StorageToRdbmsOperator
 
 
-class RdbmsQueryMotif2(MotifBase, BigQueryJobMixin, PExecuteQueryMotif):
+class StorageToRdbmsQueryMotif(MotifBase):
     destination_table = None
 
     def __init__(self, 
