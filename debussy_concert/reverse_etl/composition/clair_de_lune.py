@@ -28,15 +28,15 @@ class ClairDeLune(CompositionBase):
         self,
         movement_parameters: ReverseEtlMovementParameters
     ):
-        storage_to_destination_phrase = self.storage_to_destination_phrase(movement_parameters)
+        #storage_to_destination_phrase = self.storage_to_destination_phrase(movement_parameters)
         return self.reverse_etl_movement_builder(
-            storage_to_destination_phrase=storage_to_destination_phrase,
+            #storage_to_destination_phrase=storage_to_destination_phrase,
             movement_parameters=movement_parameters
         )
 
     def reverse_etl_movement_builder(
         self,
-        storage_to_destination_phrase,
+        #storage_to_destination_phrase,
         movement_parameters: ReverseEtlMovementParameters
     ) -> ReverseEtlRdbmsMovement:
         start_phrase = StartPhrase()
@@ -51,7 +51,7 @@ class ClairDeLune(CompositionBase):
 
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
             destination_config=csv_output_config,
-            gcp_conn_id=movement_parameters.data_lakehouse_connection_id
+            gcp_conn_id=self.config.environment.data_lakehouse_connection_id
         )
 
         data_storage_to_rdbms_phrase = self.data_storage_to_rdbms_phrase(
@@ -64,7 +64,7 @@ class ClairDeLune(CompositionBase):
             start_phrase=start_phrase,
             #data_warehouse_to_reverse_etl_phrase=data_warehouse_raw_to_reverse_etl_phrase,
             data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
-            storage_to_destination_phrase=storage_to_destination_phrase,
+            #storage_to_destination_phrase=storage_to_destination_phrase,
             storage_to_rdbms_destination_phrase=data_storage_to_rdbms_phrase,
             end_phrase=end_phrase
         )
@@ -103,10 +103,10 @@ class ClairDeLune(CompositionBase):
 
     def data_storage_to_rdbms_phrase(self, movement_parameters: ReverseEtlMovementParameters):
         dest_conn_id = movement_parameters.destination_connection_id
-        gcp_conn_id = movement_parameters.gcp_connection_id
+        data_lakehouse_connection_id = self.config.environment.data_lakehouse_connection_id
 
         dbapi_hook = MySqlConnectorHook(rdbms_conn_id=dest_conn_id)
-        storage_hook = GCSHook(gcp_conn_id=gcp_conn_id)
+        storage_hook = GCSHook(gcp_conn_id=data_lakehouse_connection_id)
         rdbms_query_destination = StorageToRdbmsQueryMotif(
             name='file_storage_to_build_insert_query_to_rdbms_motif',
             dbapi_hook=dbapi_hook,
@@ -115,21 +115,6 @@ class ClairDeLune(CompositionBase):
 
         phrase = StorageToRdbmsDestinationPhrase(name='StorageToRdbmsDestinationPhrase',
                                                  storage_to_rdbms_destination_motif=rdbms_query_destination)
-        return phrase
-
-    def storage_to_destination_phrase(self, movement_parameters: ReverseEtlMovementParameters):
-        gcp_connection_id = movement_parameters.gcp_connection_id
-        destination_file_uri = movement_parameters.destination_object_path
-        origin_gcs_hook = GCSHook(gcp_conn_id=gcp_connection_id)
-        destiny_gcs_hook = GCSHook(gcp_conn_id=gcp_connection_id)
-        storage_to_sftp = StorageToStorageMotif(
-            name='gcs_to_gcs_motif',
-            origin_storage_hook=origin_gcs_hook,
-            destiny_storage_hook=destiny_gcs_hook,
-            destiny_file_uri=destination_file_uri
-        )
-        phrase = StorageToDestinationPhrase(
-            storage_to_destination_motif=storage_to_sftp)
         return phrase
 
     @classmethod

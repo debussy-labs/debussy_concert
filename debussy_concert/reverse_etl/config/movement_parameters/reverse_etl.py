@@ -52,7 +52,6 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     extract_query_from_temp: str
     destination_type: str
     output_config: OutputConfig
-    gcp_connection_id: str
     destination_connection_id: str
     destination_object_path: Optional[str] = None
     destination_table: Optional[str] = None

@@ -11,4 +11,5 @@ raw_dataset: raw
 trusted_dataset: trusted
 reverse_etl_dataset: reverse_etl
 temp_dataset: temp
+data_lakehouse_connection_id: google_cloud_debussy
  

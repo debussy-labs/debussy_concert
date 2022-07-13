@@ -32,7 +32,7 @@ class StorageToRdbmsQueryMotif(MotifBase):
             task_id=self.name,
             dbapi_hook=self.dbapi_hook,
             storage_hook=self.storage_hook,
-            bucket_file_path=self.bucket_file_path,
+            storage_file_uri=self.bucket_file_path,
             table_name = self.destination_table,
             dag=dag, task_group=task_group,
             **self.op_kw_args
