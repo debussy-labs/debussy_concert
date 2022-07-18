@@ -1,18 +1,18 @@
-name: reverse_etl_unbounce
+name: reverse_etl
 description: Reverse ETL ingestion from storage to rdbms
 dag_parameters:
-    dag_id: reverse_etl_unbounce_valid_local
+    dag_id: reverse_etl_participant
     catchup: true
-    schedule_interval: '0 4 * * *'
+    schedule_interval: '30 1 * * *'
     max_active_runs: 1
     start_date:
       year: 2022
-      month: 3
-      day: 9
+      month: 7
+      day: 13
     end_date:
       year: 2022
-      month: 3
-      day: 11
+      month: 7
+      day: 14
     description: Reverse ETL incremental ingestion from storage to rdbms base 
     default_args:
       owner: debussy
@@ -23,15 +23,16 @@ dag_parameters:
       - type:reverse_etl
       - tier:5
 extraction_movements:
-  - name: extract_to_mysql2
+  - name: participant
     reverse_etl_query: >
-      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM modular-aileron-191222.temp.participant
+      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM modular-aileron-191222.reverse_etl.reverse_etl_participant 
+      WHERE DATE(created_at_lead)=DATE('{{ execution_date }}')
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: created_at_lead
-#WHERE DATE(created_at_lead)=DATE('{{{{ execution_date }}}}')
-    extract_query_from_temp: >
-      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, CAST(celular AS INTEGER) as celular FROM `{reverse_etl_table_uri}`
-      QUALIFY ROW_NUMBER() OVER (PARTITION BY created_at_lead ORDER BY created_at_lead DESC) = 1
+    #extract_query_from_temp: >
+    #  SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM `{reverse_etl_table_uri}`
+    #  WHERE created_at_lead = DATE('{{ execution_date }}') 
+    #  QUALIFY RANK() OVER (PARTITION BY created_at_lead ORDER BY _ts_load DESC) = 1
     output_config:
       format: CSV
       file_name: participant_{{ execution_date }}.csv
