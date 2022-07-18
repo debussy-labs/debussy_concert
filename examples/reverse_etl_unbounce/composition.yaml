@@ -18,7 +18,7 @@ dag_parameters:
       owner: debussy
     tags:
       - framework:debussy_concert
-      - project:example
+      - project:multCampain
       - destiny:rdbms
       - type:reverse_etl
       - tier:5
@@ -29,21 +29,12 @@ extraction_movements:
       WHERE DATE(created_at_lead)=DATE('{{ execution_date }}')
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: created_at_lead
-    #extract_query_from_temp: >
-    #  SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM `{reverse_etl_table_uri}`
-    #  WHERE created_at_lead = DATE('{{ execution_date }}') 
-    #  QUALIFY RANK() OVER (PARTITION BY created_at_lead ORDER BY _ts_load DESC) = 1
     output_config:
       format: CSV
       file_name: participant_{{ execution_date }}.csv
-    #  file_name: retl_unbounce_{{ execution_date }}.csv
       field_delimiter: ','
     destination_type: rdbms
-    #destination_object_path: gs://autodelete_dev_bucket/retl_unbounce_to_rdbms/extract_to_mysql/retl_unbounce_{{ execution_date }}.csv
     destination_table: teste.participant
-    #destination_table: multiCampaign.participant
-    #gcp_connection_id: google_cloud_default
     destination_connection_id: db_teste_connection_id
-    #destination_connection_id: unbounce_connection_id
 
 
