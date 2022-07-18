@@ -56,7 +56,8 @@ class ReverseEtlRdbmsMovement(MovementBase):
 
     @property
     def datawarehouse_reverse_etl_extract_query(self):
-        return self.movement_parameters.extract_query_from_temp.format(reverse_etl_table_uri=self.reverse_etl_table_uri)
+        return self.movement_parameters.reverse_etl_query
+        #return self.movement_parameters.extract_query_from_temp.format(reverse_etl_table_uri=self.reverse_etl_table_uri)
 
     def setup(
         self,

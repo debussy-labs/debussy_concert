@@ -49,8 +49,7 @@ class DataWarehouseReverseEtlToStoragePhrase(PhraseBase):
     ) -> None:
         self.datawarehouse_reverse_etl_to_table_motif = datawarehouse_reverse_etl_to_table_motif
         self.export_table_to_storage_motif = export_table_to_storage_motif
-        motifs = [self.datawarehouse_reverse_etl_to_table_motif,
-                  self.export_table_to_storage_motif]
+        motifs = [self.datawarehouse_reverse_etl_to_table_motif,self.export_table_to_storage_motif]
         super().__init__(name=name,
                          motifs=motifs)
 
