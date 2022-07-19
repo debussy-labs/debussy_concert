@@ -15,15 +15,15 @@ from debussy_framework.v3.operators.basic import StartOperator
 
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
-    extract_query_template = """
+    extraction_query_template = """
     EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='{uri}')
-    AS {extract_query}
+    AS {extraction_query}
     """
 
-    def __init__(self, extract_query, gcs_partition: str,
+    def __init__(self, extraction_query, gcs_partition: str,
                  name=None, gcp_conn_id='google_cloud_default', **op_kw_args):
         super().__init__(name, gcp_conn_id=gcp_conn_id, **op_kw_args)
-        self.extract_query = extract_query
+        self.extraction_query = extraction_query
         self.gcs_partition = gcs_partition
 
     def setup(self, destination_storage_uri):
@@ -31,8 +31,8 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
         uri = (f'{destination_storage_uri}/'
                f'{self.gcs_partition}/'
                f'*.parquet')
-        self.sql_query = self.extract_query_template.format(
-            uri=uri, extract_query=self.extract_query)
+        self.sql_query = self.extraction_query_template.format(
+            uri=uri, extraction_query=self.extraction_query)
 
         return self
 
@@ -53,6 +53,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         "boot_disk_size_gb": 1000,
     }
     endpoint_enable_http_port_access = True
+    idle_seconds_delete_ttl = 300
     _cluster_name_task_id = None
 
     def __init__(
@@ -61,12 +62,14 @@ class DataprocExportRdbmsTableToGcsMotif(
             gcs_partition: str,
             jdbc_driver,
             jdbc_url,
+            main_python_file_uri,
             name=None
     ) -> None:
         super().__init__(name=name)
         self.gcs_partition = gcs_partition
         self.jdbc_driver = jdbc_driver
         self.jdbc_url = jdbc_url
+        self.main_python_file_uri = main_python_file_uri
         self.movement_parameters = movement_parameters
         self.pip_packages = self.config.dataproc_config.get(
             "pip_packages", [])
@@ -163,6 +166,7 @@ class DataprocExportRdbmsTableToGcsMotif(
                 },
             ],
             "endpoint_config": {"enable_http_port_access": self.endpoint_enable_http_port_access},
+            "lifecycle_config": {"idle_delete_ttl": {"seconds": self.idle_seconds_delete_ttl}}
         }
         return cluster_config
 
@@ -205,12 +209,10 @@ class DataprocExportRdbmsTableToGcsMotif(
             task_group=task_group)
         return cluster_name_id
 
-    def jdbc_to_raw_vault(self, dag, task_group, extract_query):
+    def jdbc_to_raw_vault(self, dag, task_group, extraction_query):
 
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
         run_ts = "{{ ts_nodash }}"
-
-        pyspark_scripts_uri = f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
 
         jdbc_to_raw_vault = DataprocSubmitJobOperator(
             task_id="jdbc_to_raw_vault",
@@ -218,13 +220,13 @@ class DataprocExportRdbmsTableToGcsMotif(
                     "reference": {"project_id": self.config.environment.project},
                     "placement": {"cluster_name": self.cluster_name},
                     "pyspark_job": {
-                        "main_python_file_uri": f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py",
+                        "main_python_file_uri": self.main_python_file_uri,
                         "args": [
                             self.jdbc_driver,
                             self.jdbc_url,
                             secret_uri,
                             self.config.source_name,
-                            extract_query,
+                            extraction_query,
                             run_ts,
                             f"{self.destination_storage_uri}/{self.gcs_partition}"
                         ],

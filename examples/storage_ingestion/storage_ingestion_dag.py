@@ -9,12 +9,14 @@ from debussy_concert.core.service.workflow.airflow import AirflowService
 from debussy_concert.data_ingestion.composition.base import DataIngestionBase
 from debussy_concert.data_ingestion.config.movement_parameters.time_partitioned import (
     TimePartitionedDataIngestionMovementParameters,
-    BigQueryTimeDataPartitioning)
+    BigQueryDataPartitioning)
 from debussy_concert.data_ingestion.phrase.ingestion_to_raw_vault import IngestionSourceToRawVaultStoragePhrase
 from debussy_concert.data_ingestion.config.base import ConfigDataIngestionBase
 from debussy_concert.core.service.injection import inject_dependencies
 from debussy_framework.v3.operators.storage_to_storage import StorageToStorageOperator
 from debussy_framework.v3.hooks.storage_hook import GCSHook, S3Hook
+
+dags_folder = conf.get('core', 'dags_folder')
 
 
 @dataclass(frozen=True)
@@ -98,6 +100,7 @@ class SourceInfo:
     storage_type: str
     extract_connection_id: str
     file_uri: str
+    raw_table_definition: str
 
 
 gcs_source = SourceInfo(
@@ -106,12 +109,14 @@ gcs_source = SourceInfo(
     file_uri=(
         'gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_full/'
         '_load_flag=full/_logical_ts=1970-01-01/_ingestion_ts=2022-04-29 16:33:00.218627+00:00/'
-        '000000000000.parquet')
+        '000000000000.parquet'),
+    raw_table_definition=f'{dags_folder}/examples/storage_ingestion/table_def_gcs.yaml'
 )
 s3_source = SourceInfo(
     storage_type='s3',
     extract_connection_id='aws_noverde',
-    file_uri='s3://dotz-integracao-stg/0.parquet'
+    file_uri='s3://dotz-integracao-stg/0.parquet',
+    raw_table_definition=f'{dags_folder}/examples/storage_ingestion/table_def_s3.yaml'
 )
 
 movements_parameters = []
@@ -121,10 +126,8 @@ for source in (gcs_source, s3_source):
         source_file_uri=source.file_uri,
         source_storage_type=source.storage_type,
         extract_connection_id=source.extract_connection_id,
-        data_partitioning=BigQueryTimeDataPartitioning(
-            partitioning_type='time',
-            partition_granularity='YEAR',
-            partition_field='_logical_ts',
+        raw_table_definition=source.raw_table_definition,
+        data_partitioning=BigQueryDataPartitioning(
             gcs_partition_schema='_load_flag=full/_logical_ts=1970-01-01/_ingestion_ts={{ dag_run.start_date }}',
             destination_partition=1970
         )
@@ -144,8 +147,7 @@ dag_parameters = ConfigDagParameters(
 
 )
 workflow_service = AirflowService()
-dags_folder = conf.get('core', 'dags_folder')
-env_file_path = f'{dags_folder}/examples/bigquery_ingestion_inc/environment.yaml'
+env_file_path = f'{dags_folder}/examples/storage_ingestion/environment.yaml'
 env_config = ConfigEnvironment.load_from_file(env_file_path)
 config_composition = ConfigDataIngestionBase(
     name='storage_data_ingestion_example',

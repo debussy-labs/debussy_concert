@@ -1,0 +1,25 @@
+partitioning:
+    type: time
+    granularity: YEAR
+    field: _logical_ts
+fields:
+  - name: data
+    data_type: string
+  - name: airflow_logical_date
+    description: Airflow logical date timestamp
+    data_type: timestamp
+  - name: _load_flag
+    data_type: string
+    description: incr = incremental data ingestion; full = full data ingestion
+  - name: _logical_ts
+    data_type: date
+    description: Airflow logical date
+  - name: _ingestion_ts
+    data_type: timestamp
+    description: Clock time at when the ingestion was executed
+  - name: _ts_window_start
+    data_type: TIMESTAMP
+    description: Ingestion window start at source timezone
+  - name: _ts_window_end
+    data_type: TIMESTAMP
+    description: Ingestion window end at source timezone

@@ -17,7 +17,7 @@ def test_DataWarehouseReverseEtlToTempToStoragePhrase(inject_testing):
     movement: ReverseEtlMovement = csv_reverse_etl_movement()
     motif = movement.data_warehouse_reverse_etl_to_storage_phrase.datawarehouse_reverse_etl_to_temp_table_motif
     temp_staging_table = 'project_test.temp_dataset_test.composition_name_test_extraction_name_test'
-    assert motif._setup['sql_query'] == 'extract_query_from_temp_test'
+    assert motif._setup['sql_query'] == 'extraction_query_from_temp_test'
     assert motif._setup['destination_table'] == temp_staging_table
     motif = movement.data_warehouse_reverse_etl_to_storage_phrase.export_temp_table_to_storage_motif
     assert motif._setup['source_table_uri'] == temp_staging_table

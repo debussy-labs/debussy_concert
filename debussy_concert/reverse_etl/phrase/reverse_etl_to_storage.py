@@ -27,10 +27,10 @@ class DataWarehouseReverseEtlToTempToStoragePhrase(PhraseBase):
 
     def setup(self,
               movement_parameters: MovementParametersType,
-              extract_query, storage_uri_prefix):
+              extraction_query, storage_uri_prefix):
         self.movement_parameters = movement_parameters
         self.datawarehouse_reverse_etl_to_temp_table_motif.setup(
-            sql_query=extract_query,
+            sql_query=extraction_query,
             destination_table=self.temp_table_uri)
         self.export_temp_table_to_storage_motif.setup(
             source_table_uri=self.temp_table_uri,

@@ -22,7 +22,6 @@ def config_composition_for_testing():
 
 @fixture(scope='session')
 def inject_testing(workflow_service, config_composition_for_testing):
-    print("Injecting")
 
     def inject_fn(binder: inject.Binder):
         binder.bind(PWorkflowService, workflow_service)
