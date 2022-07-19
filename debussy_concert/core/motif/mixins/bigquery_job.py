@@ -119,7 +119,7 @@ class BigQueryJobMixin:
             // End of list of possible types for union field source.
             }
         """
-        if destination_format not in ('CSV', 'NEWLINE_DELIMITED_JSON', 'PARQUET', 'AVRO', 'SQL'):
+        if destination_format not in ('CSV', 'NEWLINE_DELIMITED_JSON', 'PARQUET', 'AVRO'):
             raise ValueError(f"Invalid destination_format: {destination_format}")
         source_table_ref = TableReference(source_table_uri).to_dict()
         if isinstance(destination_uris, str):
