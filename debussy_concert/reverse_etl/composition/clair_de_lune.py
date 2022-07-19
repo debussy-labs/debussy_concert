@@ -20,7 +20,7 @@ from debussy_framework.v3.hooks.db_api_hook import MySqlConnectorHook
 class ClairDeLune(CompositionBase):
     config: ConfigReverseEtl
 
-    def storage_to_rdbms_reverse_etl_movement_builder(
+    def bigquery_to_storage_reverse_etl_to_rdbms_movement_builder(
         self,
         movement_parameters: ReverseEtlMovementParameters
     ):

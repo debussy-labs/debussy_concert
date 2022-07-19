@@ -14,7 +14,6 @@ class ReverseEtlRdbmsMovement(MovementBase):
         self,
         start_phrase: PStartPhrase,
         data_warehouse_reverse_etl_to_storage_phrase,
-        #storage_to_destination_phrase,
         storage_to_rdbms_destination_phrase,
         end_phrase: PEndPhrase,
         name=None
@@ -22,13 +21,11 @@ class ReverseEtlRdbmsMovement(MovementBase):
 
         self.start_phrase = start_phrase
         self.data_warehouse_reverse_etl_to_storage_phrase = data_warehouse_reverse_etl_to_storage_phrase
-        #self.storage_to_destination_phrase = storage_to_destination_phrase
         self.storage_to_rdbms_destination_phrase = storage_to_rdbms_destination_phrase
         self.end_phrase = end_phrase
         phrases = [
             self.start_phrase,
             self.data_warehouse_reverse_etl_to_storage_phrase,
-            #self.storage_to_destination_phrase,
             self.storage_to_rdbms_destination_phrase,
             self.end_phrase
         ]
@@ -55,9 +52,8 @@ class ReverseEtlRdbmsMovement(MovementBase):
         return self.movement_parameters.reverse_etl_query
 
     @property
-    def datawarehouse_reverse_etl_extract_query(self):
+    def datawarehouse_reverse_etl_extraction_query(self):
         return self.movement_parameters.reverse_etl_query
-        #return self.movement_parameters.extract_query_from_temp.format(reverse_etl_table_uri=self.reverse_etl_table_uri)
 
     def setup(
         self,
@@ -66,10 +62,8 @@ class ReverseEtlRdbmsMovement(MovementBase):
         self.movement_parameters = movement_parameters        
         self.data_warehouse_reverse_etl_to_storage_phrase.setup(
             movement_parameters=self.movement_parameters,
-            extract_query=self.datawarehouse_reverse_etl_extract_query,
+            extraction_query=self.datawarehouse_reverse_etl_extraction_query,
             storage_uri_prefix=self.reverse_etl_bucket_uri_prefix)
-        #self.storage_to_destination_phrase.setup(
-        #    storage_uri_prefix=self.reverse_etl_bucket_uri_prefix)
         self.storage_to_rdbms_destination_phrase.setup(
             self.reverse_etl_bucket_uri_prefix,
             self.reverse_etl_destination_table)

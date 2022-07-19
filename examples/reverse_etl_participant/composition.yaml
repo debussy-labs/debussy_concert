@@ -1,0 +1,40 @@
+name: reverse_etl
+description: Reverse ETL ingestion from storage to rdbms
+dag_parameters:
+    dag_id: reverse_etl_participant
+    catchup: true
+    schedule_interval: '30 1 * * *'
+    max_active_runs: 1
+    start_date:
+      year: 2022
+      month: 7
+      day: 13
+    end_date:
+      year: 2022
+      month: 7
+      day: 14
+    description: Reverse ETL incremental ingestion from storage to rdbms base 
+    default_args:
+      owner: debussy
+    tags:
+      - framework:debussy_concert
+      - project:test
+      - destiny:rdbms
+      - type:reverse_etl
+      - tier:5
+extraction_movements:
+  - name: participant
+    reverse_etl_query: >
+      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM modular-aileron-191222.reverse_etl.reverse_etl_participant 
+      WHERE DATE(created_at_lead)=DATE('{{ execution_date }}')
+    reverse_etl_dataset_partition_type: DAY
+    reverse_etl_dataset_partition_field: created_at_lead
+    output_config:
+      format: CSV
+      file_name: participant_{{ execution_date }}.csv
+      field_delimiter: ','
+    destination_type: rdbms
+    destination_table: teste.participant
+    destination_connection_id: db_teste_connection_id
+
+

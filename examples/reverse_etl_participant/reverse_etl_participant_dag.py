@@ -5,8 +5,8 @@ from debussy_concert.core.service.workflow.airflow import AirflowService
 from debussy_concert.core.service.injection import inject_dependencies
 
 dags_folder = conf.get('core', 'dags_folder')
-env_file = f'{dags_folder}/examples/reverse_etl_unbounce/environment.yaml'
-composition_file = f'{dags_folder}/examples/reverse_etl_unbounce/composition.yaml'
+env_file = f'{dags_folder}/examples/reverse_etl_participant/environment.yaml'
+composition_file = f'{dags_folder}/examples/reverse_etl_participant/composition.yaml'
 
 reverse_etl_config = ConfigReverseEtl.load_from_file(
     composition_config_file_path=composition_file,

@@ -1,9 +1,9 @@
 name: reverse_etl
 description: Reverse ETL ingestion from storage to rdbms
 dag_parameters:
-    dag_id: reverse_etl_participant
-    catchup: true
-    schedule_interval: '30 1 * * *'
+    dag_id: reverse_etl_to_rdbms_unbounce
+    catchup: false
+    schedule_interval: 30 1 * * *
     max_active_runs: 1
     start_date:
       year: 2022
@@ -18,23 +18,21 @@ dag_parameters:
       owner: debussy
     tags:
       - framework:debussy_concert
-      - project:multCampain
+      - project:multiCampaign
       - destiny:rdbms
       - type:reverse_etl
       - tier:5
 extraction_movements:
-  - name: participant
+  - name: unbounce
     reverse_etl_query: >
-      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM modular-aileron-191222.reverse_etl.reverse_etl_participant 
-      WHERE DATE(created_at_lead)=DATE('{{ execution_date }}')
+      SELECT id_lead as participant_id, id_page as campaign_id, cpf as  document, '' as date_birth, nome as name, email, '' as gender, 'PF' as person_type, '00000000-0000-0000-0000-000000000000' as participant_parent_id, is_cpf_valid as active, '{{ execution_date }}' as created, '{{ execution_date }}' as updated, '' as migration_id, '' as identification, '' as nickname, created_at_lead FROM `dotzcloud-datalabs-analytics.UNBOUNCE.vw_unbounce_leads` WHERE name_campain = "Novo Varejo LP Cadastro" AND DATE(created_at_lead) = DATE('{{ execution_date }}') 
+      #novaconversao
     reverse_etl_dataset_partition_type: DAY
-    reverse_etl_dataset_partition_field: created_at_lead
+    reverse_etl_dataset_partition_field: created_at_lead    
     output_config:
       format: CSV
-      file_name: participant_{{ execution_date }}.csv
+      file_name: retl_unbounce_{{ execution_date }}.csv
       field_delimiter: ','
     destination_type: rdbms
-    destination_table: teste.participant
-    destination_connection_id: db_teste_connection_id
-
-
+    destination_table: multiCampaign.participant   
+    destination_connection_id: unbounce_connection_id
