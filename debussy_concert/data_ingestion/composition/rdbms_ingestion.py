@@ -1,8 +1,6 @@
 from typing import Callable
 
 from debussy_concert.core.movement.movement_base import PMovement
-from debussy_concert.core.phrase.utils.start import StartPhrase
-from debussy_concert.core.phrase.utils.end import EndPhrase
 from debussy_concert.data_ingestion.config.rdbms_data_ingestion import ConfigRdbmsDataIngestion
 from debussy_concert.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
 from debussy_concert.data_ingestion.composition.base import DataIngestionBase
@@ -23,6 +21,18 @@ class RdbmsIngestionComposition(DataIngestionBase):
         rdbms_builder_fn = self.rdbms_builder_fn()
         dag = self.play(rdbms_builder_fn)
         return dag
+
+    def rdbms_builder_fn(self) -> Callable[[RdbmsDataIngestionMovementParameters], PMovement]:
+        map_ = {
+            'mysql': self.mysql_ingestion_movement_builder,
+            'mssql': self.mssql_ingestion_movement_builder,
+            'postgresql': self.postgresql_ingestion_movement_builder
+        }
+        rdbms_name = self.config.source_type.lower()
+        builder = map_.get(rdbms_name)
+        if not builder:
+            raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
+        return builder
 
     def mysql_ingestion_movement_builder(
             self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
@@ -53,20 +63,31 @@ class RdbmsIngestionComposition(DataIngestionBase):
 
     def mssql_ingestion_movement_builder(
             self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
-        raise NotImplementedError("MS SQL ingestion is not implemented yet")
+        ingestion_to_raw_vault_phrase = self.mssql_ingestion_to_raw_vault_phrase(movement_parameters)
+        return self.ingestion_movement_builder(
+            movement_parameters=movement_parameters,
+            ingestion_to_raw_vault_phrase=ingestion_to_raw_vault_phrase
+        )
+
+    def mssql_ingestion_to_raw_vault_phrase(self, movement_parameters: RdbmsDataIngestionMovementParameters):
+
+        mssql_jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+        jdbc_url = "jdbc:sqlserver://{host}:{port};databaseName=" + self.config.source_name
+
+        export_mssql_to_gcs_motif = DataprocExportRdbmsTableToGcsMotif(
+            movement_parameters=movement_parameters,
+            gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema,
+            jdbc_driver=mssql_jdbc_driver,
+            jdbc_url=jdbc_url,
+            main_python_file_uri=self.dataproc_main_python_file_uri
+        )
+
+        ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
+            export_data_to_storage_motif=export_mssql_to_gcs_motif
+        )
+
+        return ingestion_to_raw_vault_phrase
 
     def postgresql_ingestion_movement_builder(
             self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
         raise NotImplementedError("PostgreSQL ingestion is not implemented yet")
-
-    def rdbms_builder_fn(self) -> Callable[[RdbmsDataIngestionMovementParameters], PMovement]:
-        map_ = {
-            'mysql': self.mysql_ingestion_movement_builder,
-            'mssql': self.mssql_ingestion_movement_builder,
-            'postgresql': self.postgresql_ingestion_movement_builder
-        }
-        rdbms_name = self.config.source_type.lower()
-        builder = map_.get(rdbms_name)
-        if not builder:
-            raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
-        return builder
