@@ -1,0 +1,110 @@
+name: mssql_sakila_ingestion_daily
+source_name: sakila
+source_type: mssql
+description: mssql ingestion
+secret_manager_uri: projects/modular-aileron-191222/secrets/debussy_mssql_dev
+dataproc_config:
+  machine_type: n1-standard-2
+  num_workers: 0
+  subnet: subnet-cluster-services
+  parallelism: 60
+  pip_packages:
+    - google-cloud-secret-manager
+dag_parameters:
+  dag_id: mssql_sakila_ingestion_daily
+  description: Mssql ingestion for pixdict relational database.
+  catchup: true
+  schedule_interval: "0 5 * * *"
+  start_date:
+    year: 2006
+    month: 2
+    day: 15
+  end_date:
+    year: 2006
+    month: 2
+    day: 16
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - source:mssql
+    - type:ingestion
+    - load:incremental
+    - tier:5
+  default_args:
+    owner: debussy
+ingestion_parameters:
+  - name: country
+    extraction_query: >
+      SELECT country_id, country, last_update
+      FROM sakila.dbo.country
+      WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_country.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: city
+    extraction_query: >
+      SELECT city_id, city, country_id, last_update
+      FROM sakila.dbo.city
+      WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_city.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: store
+    extraction_query: >
+      SELECT store_id, manager_staff_id, address_id, last_update
+      FROM sakila.dbo.store
+      WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_store.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: inventory
+    extraction_query: >
+      SELECT inventory_id, film_id, store_id, last_update
+      FROM sakila.dbo.inventory
+      WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_inventory.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: staff
+    extraction_query: >
+      SELECT staff_id, first_name, last_name, address_id, picture, email, store_id, active, username, password, last_update
+      FROM sakila.dbo.staff
+      WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_staff.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"

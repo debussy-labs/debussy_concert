@@ -1,0 +1,35 @@
+fields:
+  - name: inventory_id
+    data_type: INTEGER
+    description: A surrogate primary key used to uniquely identify each item in inventory
+  - name: film_id
+    data_type: INTEGER
+    description: A foreign key pointing to the film this item represents
+  - name: store_id
+    data_type: INTEGER
+    description: A foreign key pointing to the store stocking this item
+  - name: last_update
+    data_type: TIMESTAMP
+    description: When the row was created or most recently updated
+  - name: _load_flag
+    data_type: STRING
+    description: incr = incremental data ingestion; full = full data ingestion
+  - name: _ts_window_start
+    data_type: TIMESTAMP
+    description: Ingestion window start at source timezone
+  - name: _ts_window_end
+    data_type: TIMESTAMP
+    description: Ingestion window end at source timezone
+  - name: _ts_logical
+    data_type: TIMESTAMP
+    description: Airflow logical date
+  - name: _ts_ingestion
+    data_type: TIMESTAMP
+    description: Clock time at Airflow when the ingestion was executed
+  - name: _hash_key
+    data_type: STRING
+    description: An MD5 surrogate hash key used to uniquely identify each record of the source
+partitioning:
+  field: _ts_window_start
+  type: time
+  granularity: DAY
