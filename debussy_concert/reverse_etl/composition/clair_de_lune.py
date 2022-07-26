@@ -5,11 +5,10 @@ from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartition
 
 from debussy_concert.reverse_etl.config.reverse_etl import ConfigReverseEtl
 from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import CsvFile, ReverseEtlMovementParameters
-from debussy_concert.reverse_etl.movement.reverse_etl_rdbms import ReverseEtlRdbmsMovement
+from debussy_concert.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 from debussy_concert.reverse_etl.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
 from debussy_concert.reverse_etl.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
-from debussy_concert.reverse_etl.phrase.storage_to_rdbms_destination import StorageToRdbmsDestinationPhrase
-
+from debussy_concert.reverse_etl.phrase.storage_to_destination import StorageToDestinationPhrase
 from debussy_concert.reverse_etl.motif.storage_to_rdbms_motif import StorageToRdbmsQueryMotif
 from debussy_concert.reverse_etl.motif.bigquery_query_job import BigQueryQueryJobMotif
 from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
@@ -31,10 +30,16 @@ class ClairDeLune(CompositionBase):
     def reverse_etl_movement_builder(
         self,
         movement_parameters: ReverseEtlMovementParameters
-    ) -> ReverseEtlRdbmsMovement:
+    ) -> ReverseEtlMovement:
         start_phrase = StartPhrase()
         end_phrase = EndPhrase()
         csv_output_config: CsvFile = movement_parameters.output_config
+
+        data_warehouse_raw_to_reverse_etl_phrase = self.data_warehouse_raw_to_reverse_etl_phrase(
+            partition_type=movement_parameters.reverse_etl_dataset_partition_type,
+            partition_field=movement_parameters.reverse_etl_dataset_partition_field,
+            gcp_conn_id=self.config.environment.data_lakehouse_connection_id
+        )
 
         data_warehouse_reverse_etl_to_storage_phrase = self.data_warehouse_reverse_etl_to_storage_phrase(
             destination_config=csv_output_config,
@@ -46,13 +51,15 @@ class ClairDeLune(CompositionBase):
         )
 
         name = f'ReverseEtlMovement_{movement_parameters.name}'
-        movement = ReverseEtlRdbmsMovement(
+        
+        movement = ReverseEtlMovement(
             name=name,
             start_phrase=start_phrase,
+            data_warehouse_to_reverse_etl_phrase=data_warehouse_raw_to_reverse_etl_phrase,
             data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
-            storage_to_rdbms_destination_phrase=data_storage_to_rdbms_phrase,
+            storage_to_destination_phrase=data_storage_to_rdbms_phrase,
             end_phrase=end_phrase
-        )
+        )    
         movement.setup(movement_parameters)
         return movement
 
@@ -92,14 +99,15 @@ class ClairDeLune(CompositionBase):
 
         dbapi_hook = MySqlConnectorHook(rdbms_conn_id=dest_conn_id)
         storage_hook = GCSHook(gcp_conn_id=data_lakehouse_connection_id)
-        rdbms_query_destination = StorageToRdbmsQueryMotif(
+        storage_to_rdbms_destination = StorageToRdbmsQueryMotif(
             name='file_storage_to_build_insert_query_to_rdbms_motif',
             dbapi_hook=dbapi_hook,
-            storage_hook=storage_hook
+            storage_hook=storage_hook,
+            destination_table=movement_parameters.destination_table
         )
 
-        phrase = StorageToRdbmsDestinationPhrase(name='StorageToRdbmsDestinationPhrase',
-                                                 storage_to_rdbms_destination_motif=rdbms_query_destination)
+        phrase = StorageToDestinationPhrase(name='StorageToRdbmsDestinationPhrase',
+                                                 storage_to_destination_motif=storage_to_rdbms_destination)
         return phrase
 
     @classmethod
