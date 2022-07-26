@@ -16,6 +16,7 @@ from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtra
 from debussy_framework.v3.hooks.storage_hook import GCSHook
 from debussy_framework.v3.hooks.db_api_hook import MySqlConnectorHook
 
+
 class ClairDeLune(CompositionBase):
     config: ConfigReverseEtl
 
@@ -51,7 +52,7 @@ class ClairDeLune(CompositionBase):
         )
 
         name = f'ReverseEtlMovement_{movement_parameters.name}'
-        
+
         movement = ReverseEtlMovement(
             name=name,
             start_phrase=start_phrase,
@@ -59,7 +60,7 @@ class ClairDeLune(CompositionBase):
             data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
             storage_to_destination_phrase=data_storage_to_rdbms_phrase,
             end_phrase=end_phrase
-        )    
+        )
         movement.setup(movement_parameters)
         return movement
 

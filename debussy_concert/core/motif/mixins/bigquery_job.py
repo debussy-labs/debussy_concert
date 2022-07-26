@@ -1,4 +1,3 @@
-import logging
 import re
 from typing import Optional, List, Union
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator

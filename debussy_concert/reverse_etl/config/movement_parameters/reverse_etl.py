@@ -15,6 +15,7 @@ class OutputConfig:
 class CsvFile(OutputConfig):
     field_delimiter: str
 
+
 class AvroFile(OutputConfig):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError("AvroFile is not implemented yet")
@@ -28,6 +29,7 @@ class ParquetFile(OutputConfig):
 class JsonFile(OutputConfig):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError("JsonFile is not implemented yet")
+
 
 def output_factory(output_config):
     format: str = output_config['format']
