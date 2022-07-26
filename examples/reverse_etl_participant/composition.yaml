@@ -12,7 +12,7 @@ dag_parameters:
     end_date:
       year: 2022
       month: 7
-      day: 14
+      day: 15
     description: Reverse ETL incremental ingestion from storage to rdbms base 
     default_args:
       owner: debussy
@@ -23,12 +23,17 @@ dag_parameters:
       - type:reverse_etl
       - tier:5
 extraction_movements:
-  - name: participant
+  - name: participant_partition
     reverse_etl_query: >
-      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular FROM modular-aileron-191222.reverse_etl.reverse_etl_participant 
-      WHERE DATE(created_at_lead)=DATE('{{ execution_date }}')
+      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular, CURRENT_TIMESTAMP as load_ts FROM modular-aileron-191222.reverse_etl.reverse_etl_participant 
+      WHERE created_at_lead=DATE('{{ execution_date }}')
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: created_at_lead
+    extraction_query_from_temp: >
+      SELECT id_page, id_lead, name_campain, created_at_lead, is_client_dotz, celular  
+      FROM `{reverse_etl_table_uri}`
+      WHERE created_at_lead=DATE('{{{{ execution_date }}}}')
+      QUALIFY RANK() OVER (PARTITION BY created_at_lead ORDER BY load_ts DESC) = 1
     output_config:
       format: CSV
       file_name: participant_{{ execution_date }}.csv
