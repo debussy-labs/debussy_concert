@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: sakila
+    schema: raw
+    tables:
+      - name: mssql_sakila_city
+      - name: mssql_sakila_country
+
+models:
+  - name: denormalized_city
+    description: "Denormalized table of cities and countries"
+    columns:
+      - name: city_id
+        description: City PK
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: country
+        description: Country name
+        tests:
+          - not_null

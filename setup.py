@@ -8,6 +8,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "Inject",
-        "yaml_env_var_parser"
+        "yaml_env_var_parser",
+        "dbt-bigquery"
     ]
 )
