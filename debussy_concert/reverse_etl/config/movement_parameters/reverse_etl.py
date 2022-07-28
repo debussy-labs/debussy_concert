@@ -14,6 +14,7 @@ class OutputConfig:
 @dataclass(frozen=True)
 class CsvFile(OutputConfig):
     field_delimiter: str
+    print_header: bool = True
 
 class AvroFile(OutputConfig):
     def __init__(self, *args, **kwargs):
@@ -52,9 +53,8 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     destination_type: str
     output_config: OutputConfig
     destination_connection_id: str
-    extraction_query_from_temp: Optional[str] = None
-    destination_object_path: Optional[str] = None
-    destination_table: Optional[str] = None
+    extraction_query_from_temp: str
+    destination_object_path: str    
 
     def __post_init__(self):
         output_config = output_factory(self.output_config)
