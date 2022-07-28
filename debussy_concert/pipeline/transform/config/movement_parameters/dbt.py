@@ -4,7 +4,7 @@ from debussy_concert.core.config.movement_parameters.base import MovementParamet
 
 
 @dataclass(frozen=True)
-class DbtMovementParameters(MovementParametersBase):
+class DbtParameters:
     """
     :param profiles_dir: If set, passed as the `--profiles-dir` argument to the `dbt` command
     :type profiles_dir: str
@@ -33,9 +33,9 @@ class DbtMovementParameters(MovementParametersBase):
     :param schema: ???
     :type schema: bool
     """
+    dir: str
     profiles_dir: Optional[str] = None
     target: Optional[str] = None
-    dir: Optional[str] = '.'
     vars: Optional[dict] = None
     models: Optional[str] = None
     exclude: Optional[str] = None
@@ -46,3 +46,8 @@ class DbtMovementParameters(MovementParametersBase):
     full_refresh: Optional[bool] = False
     data: Optional[bool] = False
     schema: Optional[bool] = False
+
+
+@dataclass(frozen=True)
+class DbtMovementParameters(MovementParametersBase):
+    dbt_run_parameters: DbtParameters

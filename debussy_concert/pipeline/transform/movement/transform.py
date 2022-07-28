@@ -13,6 +13,7 @@ class TransformationMovement(MovementBase):
         self,
         start_phrase: PStartPhrase,
         # pre_condition_verification_phrase TODO
+        # test_data_integrity_phrase TODO <-- pular etapa que gera o dado em produção em caso de falha nos testes. notificar? slack?
         data_warehouse_transformation_phrase,
         end_phrase: PEndPhrase,
         name=None

@@ -3,7 +3,7 @@ from airflow_dbt.operators.dbt_operator import DbtRunOperator
 from debussy_concert.core.motif.motif_base import MotifBase
 
 
-class CreateBigQueryTableMotif(MotifBase):
+class DbtRunMotif(MotifBase):
     def __init__(self, name=None, **dbt_args):
         self.dbt_args = dbt_args
         super().__init__(name=name)
