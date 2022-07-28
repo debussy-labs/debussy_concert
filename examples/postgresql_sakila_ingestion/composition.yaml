@@ -2,7 +2,7 @@ name: postgresql_sakila_ingestion_daily
 source_name: sakila
 source_type: postgresql
 description: PostgreSQL ingestion
-secret_manager_uri: projects/modular-aileron-191222/secrets/debussy_postgresql_dev
+secret_manager_uri: projects/${DEBUSSY_CONCERT__PROJECT}/secrets/debussy_postgresql_dev
 dataproc_config:
   machine_type: n1-standard-2
   num_workers: 0
@@ -14,7 +14,7 @@ dataproc_config:
   spark_jars_packages: org.postgresql:postgresql:42.4.0
 dag_parameters:
   dag_id: postgresql_sakila_ingestion_daily
-  description: postgresql ingestion for pixdict relational database.
+  description: Postgresql ingestion for pixdict relational database.
   catchup: true
   schedule_interval: "0 5 * * *"
   start_date:
