@@ -1,5 +1,5 @@
-import logging
 from debussy_concert.core.phrase.phrase_base import PhraseBase
+
 
 class DataWarehouseToReverseEtlPhrase(PhraseBase):
     def __init__(
