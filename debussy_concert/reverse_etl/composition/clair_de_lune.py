@@ -103,7 +103,7 @@ class ClairDeLune(CompositionBase):
             name='file_storage_to_build_insert_query_to_rdbms_motif',
             dbapi_hook=dbapi_hook,
             storage_hook=storage_hook,
-            destination_table=movement_parameters.destination_table
+            destination_table=movement_parameters.destination_object_path
         )
 
         phrase = StorageToDestinationPhrase(name='StorageToRdbmsDestinationPhrase',
