@@ -39,7 +39,7 @@ extraction_movements:
       file_name: participant_{{ execution_date }}.csv
       field_delimiter: ','
     destination_type: rdbms
-    destination_table: teste.participant
+    destination_object_path: teste.participant
     destination_connection_id: db_teste_connection_id
 
 
