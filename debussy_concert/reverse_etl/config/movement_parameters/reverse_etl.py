@@ -56,7 +56,7 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     output_config: OutputConfig
     destination_connection_id: str
     extraction_query_from_temp: str
-    destination_object_path: str    
+    destination_uri: str    
 
     def __post_init__(self):
         output_config = output_factory(self.output_config)

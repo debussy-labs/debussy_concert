@@ -39,5 +39,5 @@ extraction_movements:
       file_name: retl_unbounce_{{ execution_date }}.csv
       field_delimiter: ','
     destination_type: rdbms
-    destination_object_path: multiCampaign.participant   
+    destination_uri: multiCampaign.participant   
     destination_connection_id: unbounce_connection_id
