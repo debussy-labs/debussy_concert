@@ -26,7 +26,8 @@ class RdbmsIngestionComposition(DataIngestionBase):
         map_ = {
             'mysql': self.mysql_ingestion_movement_builder,
             'mssql': self.mssql_ingestion_movement_builder,
-            'postgresql': self.postgresql_ingestion_movement_builder
+            'postgresql': self.postgresql_ingestion_movement_builder,
+            'oracle': self.oracle_ingestion_movement_builder
         }
         rdbms_name = self.config.source_type.lower()
         builder = map_.get(rdbms_name)
@@ -90,4 +91,31 @@ class RdbmsIngestionComposition(DataIngestionBase):
 
     def postgresql_ingestion_movement_builder(
             self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
-        raise NotImplementedError("PostgreSQL ingestion is not implemented yet")
+        ingestion_to_raw_vault_phrase = self.postgresql_ingestion_to_raw_vault_phrase(movement_parameters)
+        return self.ingestion_movement_builder(
+            movement_parameters=movement_parameters,
+            ingestion_to_raw_vault_phrase=ingestion_to_raw_vault_phrase
+        )
+
+    def postgresql_ingestion_to_raw_vault_phrase(self, movement_parameters: RdbmsDataIngestionMovementParameters):
+
+        postgresql_jdbc_driver = "org.postgresql.Driver"
+        jdbc_url = "jdbc:postgresql://{host}:{port}/" + self.config.source_name
+
+        export_postgresql_to_gcs_motif = DataprocExportRdbmsTableToGcsMotif(
+            movement_parameters=movement_parameters,
+            gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema,
+            jdbc_driver=postgresql_jdbc_driver,
+            jdbc_url=jdbc_url,
+            main_python_file_uri=self.dataproc_main_python_file_uri
+        )
+
+        ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
+            export_data_to_storage_motif=export_postgresql_to_gcs_motif
+        )
+
+        return ingestion_to_raw_vault_phrase
+
+    def oracle_ingestion_movement_builder(
+            self, movement_parameters: RdbmsDataIngestionMovementParameters) -> DataIngestionMovement:
+        raise NotImplementedError("Oracle ingestion is not implemented yet")
