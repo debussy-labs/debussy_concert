@@ -1,9 +1,9 @@
-name: bigquery_ingestion_full
-source_name: example
-source_type: bigquery
-description: BigQuery ingestion
+name: sakila_transformation
+#source_name: example
+#source_type: bigquery
+description: BigQuery transformation
 dag_parameters:
-    dag_id: bigquery_ingestion_full
+    dag_id: sakila_transformation
     description: BigQuery full ingestion example. Fixing a partition and always overwriting it. Versioning on storage
     catchup: false
     schedule_interval: '*/30 * * * *' # At every minute.
@@ -12,7 +12,7 @@ dag_parameters:
       - framework:debussy_concert
       - project:example
       - source:bigquery
-      - type:ingestion
+      - type:transformation
       - load:full
       - tier:2
     default_args:

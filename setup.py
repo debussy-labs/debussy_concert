@@ -9,6 +9,7 @@ setup(
     install_requires=[
         "Inject",
         "yaml_env_var_parser",
-        "dbt-bigquery"
+        "dbt-bigquery",
+        "airflow-dbt"
     ]
 )

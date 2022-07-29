@@ -29,10 +29,6 @@ class TransformationMovement(MovementBase):
         ]
         super().__init__(name=name, phrases=phrases)
 
-    def setup(
-        self,
-        movement_parameters: MovementParametersBase
-    ):
-        self.movement_parameters = movement_parameters
+    def setup(self):
         self.data_warehouse_transformation_phrase.setup()
         return self

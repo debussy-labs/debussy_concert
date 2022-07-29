@@ -13,6 +13,7 @@ class DbtRunMotif(MotifBase):
 
     def build(self, workflow_dag, phrase_group):
         run_dbt = DbtRunOperator(
+            task_id="dbt_run",
             **self.dbt_args,
             dag=workflow_dag,
             task_group=phrase_group,

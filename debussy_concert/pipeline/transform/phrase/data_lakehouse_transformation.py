@@ -14,7 +14,7 @@ class DataLakehouseTransformationPhrase(PhraseBase):
         super().__init__(name=name,
                          motifs=motifs)
 
-    def setup(self, table_uri):
+    def setup(self):
         self.run_transformation_motif.setup()
         return self
 

@@ -20,7 +20,8 @@ class ConfigTransformComposition(ConfigComposition):
         for movement_parameters_dict in config["transformation_parameters"]:
             dbt_run_parameters = movement_parameters_dict['dbt_run_parameters']
             dbt_run_param = DbtParameters(**dbt_run_parameters)
-            movement_parameter = DbtMovementParameters(dbt_run_parameters=dbt_run_param)
+            name = movement_parameters_dict['name']
+            movement_parameter = DbtMovementParameters(name=name, dbt_run_parameters=dbt_run_param)
             movements_parameters.append(movement_parameter)
         del config["transformation_parameters"]
         config["movements_parameters"] = movements_parameters

@@ -19,8 +19,10 @@ class DbtTransformationComposition(CompositionBase):
             end_phrase=EndPhrase()
         )
         movement.setup()
-
+        return movement
     def data_warehouse_transformation_phrase(self, dbt_run_parameters: DbtParameters):
-        dbt_run_motif = DbtRunMotif(**dbt_run_parameters)
+        
+
+        dbt_run_motif = DbtRunMotif(**dbt_run_parameters.__dict__)
         transform_phrase = DataLakehouseTransformationPhrase(run_transformation_motif=dbt_run_motif)
         return transform_phrase
