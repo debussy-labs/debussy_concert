@@ -1,4 +1,5 @@
-![Debussy Concert](banner_debussy.png "Debussy Concert")
+<img src="https://github.com/DotzInc/debussy_concert/blob/master/docs/images/banner_debussy.png"/>
+
 # Debussy Concert
 Abstraction layers for Apache Airflow with musical theme. Depends on debussy_framework
 
