@@ -6,18 +6,31 @@ Abstraction layers for Apache Airflow with musical theme. Depends on debussy_fra
 Mount examples folder on airflow dags folder
 
 
-# Overview
+## Overview
 
-[Pt-BR]
+The framework's philosophy is to persist¹ the data after each transformation.
 
-**O framework tem por filosofia persistir¹ o dado depois de cada transformação.**
+With this philosophy in mind, the framework prioritizes ELT (Extract, Load, Transform) over ETL.
 
-Com essa filosofia em mente, o framework prioriza o ELT (Extract - Load - Transform) em vez do ETL.
+Data ingestion pipelines must implement a step of extracting the source data and persisting it in the Raw Vault layer on parquet whenever the data is loaded (duplicating the data when necessary), without making transformations to the content. Some adjusments to the data may be necessary to load the data in the parquet format. Then the file is loaded into the raw layer, removing the duplicate processing (data may still have duplicates!)
 
-Os pipelines de ingestão de dados devem implementar uma etapa de extrair a informação da fonte e persistir na camada Raw Vault em formato parquet sempre que o dado for carregado (duplicando o dado quando necessário), sem fazer transformações no conteúdo, podendo ser necessário fazer alguns ajustes para que o dado seja salvo em formato parquet. Depois o arquivo será carregado na camada raw removendo os processamentos duplicados (ainda pode ter dado duplicado!)
+The Reverse ETL pipeline in turn must extract the data from the data lakehouse and take it to the Reverse ETL dataset, where all the data must be persisted after the actual transformations. After that, the data must be taken to a storage layer in the format closest to what it will be sent to the destination. For example, in case of sending a CSV file to an SFTP, the CSV file that will be sent must be saved, in case of making a call in a REST endpoint, the body of the request must be saved as JSON. When the Reverse ETL targets another database, the .SQL with the record insertion code must be saved.
 
-O pipeline de ETL Reverso por sua vez deve extrair do lakehouse o dado levar para o dataset Reverse ETL onde todo o dado deve ser persistido após as transformações necessárias. Após isso o dado deve ser levado para a camada de storage no formato mais próximo possível do que será enviado ao destino. Por exemplo, no caso de mandar um arquivo csv para um sftp, o arquivo csv que será enviado deve ser salvo, no caso de fazer uma chamada em um endpoint REST, a body da requisição deve ser salvo como json. Quando o ETL Reverso tem como destino um outro banco de dados, o .sql com o código de inserção dos registros de ser salvo.
+The Transformation pipeline (still to be developed) will be done using dbt software (Data Build Tool)
 
-O pipeline de Transformação (ainda a ser desenvolvido) será feito utilizando o software `dbt` (Data Build Tool)
+¹ Persisted data can be discarded after some time, for example after 6 months it can go to cheaper storage and after 2 years it can be removed from a certain layer
 
-¹ O dado persistido pode ser descartado depois de algum tempo, por exemplo depois de 6 meses pode ir para um storage mais barato e depois de 2 anos ser removido de alguma determinada camada
+## Full Documentation
+See the [Wiki](https://github.com/DotzInc/debussy_concert/wiki) for full documentation, examples, operational details and other information.
+
+## Communication
+[GitHub Issues](https://github.com/DotzInc/debussy_concert/issues)
+
+## License
+Copyright 2022 Dotz, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
