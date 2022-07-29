@@ -1,3 +1,8 @@
+[![GitHub issues](https://img.shields.io/github/issues/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/issues)
+[![GitHub forks](https://img.shields.io/github/forks/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/network)
+[![GitHub stars](https://img.shields.io/github/stars/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/stargazers)
+[![GitHub license](https://img.shields.io/github/license/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/blob/master/LICENSE)
+
 <img src="https://github.com/DotzInc/debussy_concert/blob/master/docs/images/banner_debussy.png"/>
 
 # Debussy Concert
