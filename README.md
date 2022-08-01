@@ -60,6 +60,9 @@ See the [Wiki](https://github.com/DotzInc/debussy_concert/wiki) for full documen
 ## Communication
 [GitHub Issues](https://github.com/DotzInc/debussy_concert/issues)
 
+## Contributions
+We welcome all community contributions, whether by opening Github Issues, updating documentations, or updating the code directly. Please consult the [contribution guide](https://github.com/DotzInc/debussy_concert/wiki/Contributing-Guide) for details on how to contribute.
+
 ## License
 Copyright 2022 Dotz, Inc.
 
