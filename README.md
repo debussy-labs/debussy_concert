@@ -3,27 +3,56 @@
 [![GitHub stars](https://img.shields.io/github/stars/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/stargazers)
 [![GitHub license](https://img.shields.io/github/license/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/blob/master/LICENSE)
 
-<img src="https://github.com/DotzInc/debussy_concert/blob/master/docs/images/banner_debussy.png"/>
+
+<img align="right" src="https://github.com/DotzInc/debussy_concert/blob/master/docs/images/debussy_logo.png" width="250" height="250">
 
 # Debussy Concert
-Abstraction layers for Apache Airflow with musical theme. Depends on debussy_framework
 
-Mount examples folder on airflow dags folder
+Debussy Concert allows users to build first class data pipelines without needing to code. It's the core component of [Debussy](https://github.com/DotzInc/debussy_concert/wiki), a free, open-source, opinionated Data Architecture and Engineering framework, enabling data analysts and engineers to build better platforms and pipelines.
 
+Debussy Concert is a code generation engine for orchestration tools, currently supporting [Apache Airflow](https://airflow.apache.org/) only, but with others on the Roadmap. It provides abstraction layers in the form of a musical themed sementic model, decoupling the pipeline logic to the underlying orchestration tool, and enabling a low-code approach to data engineering.
 
-## Overview
+Key benefits:
 
-The framework's philosophy is to persist¹ the data after each transformation.
+&#10004; It provides lower time to delivery and costs related to data pipeline development, while enabling higher ROI <br />
+&#10004; Avoid pipeline debt by following sound software engineering design principles <br />
+&#10004; Ensure your platform is following data architecture best practices <br />
 
-With this philosophy in mind, the framework prioritizes ELT (Extract, Load, Transform) over ETL.
+## Quick Start
 
-Data ingestion pipelines must implement a step of extracting the source data and persisting it in the Raw Vault layer on parquet whenever the data is loaded (duplicating the data when necessary), without making transformations to the content. Some adjusments to the data may be necessary to load the data in the parquet format. Then the file is loaded into the raw layer, removing the duplicate processing (data may still have duplicates!)
+Debussy works on any installation of Apache Airflow 2.0, but since we currently support only GCP based data platforms as the target Data Lakehouse, we recommend a deployment to [Cloud Composer](https://cloud.google.com/composer).
 
-The Reverse ETL pipeline in turn must extract the data from the data lakehouse and take it to the Reverse ETL dataset, where all the data must be persisted after the actual transformations. After that, the data must be taken to a storage layer in the format closest to what it will be sent to the destination. For example, in case of sending a CSV file to an SFTP, the CSV file that will be sent must be saved, in case of making a call in a REST endpoint, the body of the request must be saved as JSON. When the Reverse ETL targets another database, the .SQL with the record insertion code must be saved.
+In order to use Debussy, you first need to go through the following steps:
 
-The Transformation pipeline (still to be developed) will be done using dbt software (Data Build Tool)
+1. [Select or create a Google Cloud Platform project](https://console.cloud.google.com/cloud-resource-manager).
+2. [Enable billing for your project](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project).
+3. [Create a Cloud Composer 2 environment](https://cloud.google.com/composer/docs/composer-2/create-environments).
+4. Install Debussy on your Cloud Composer instance.
 
-¹ Persisted data can be discarded after some time, for example after 6 months it can go to cheaper storage and after 2 years it can be removed from a certain layer
+Integrations
+-------------------------------------------------------------------------------
+Debussy works with the tools and systems that you're already using with your data, including:
+
+<table>
+	<thead>
+		<tr>
+			<th colspan="2">Integration</th>
+			<th>Notes</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://raw.githubusercontent.com/apache/airflow/master/docs/apache-airflow/img/logos/wordmark_1.png" /></td><td style="width: 200px;">Apache Airflow           </td><td>An open source orchestration engine</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://spark.apache.org/images/spark-logo-trademark.png" />                             </td><td style="width: 200px;">Spark                    </td><td>Open source distributed processing engine, used for batch ingestions</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://beam.apache.org/images/beam_logo_navbar.png" />                             </td><td style="width: 200px;">Apache Beam                    </td><td>Open source distributed processing engine, used for realtime ingestions</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://assets.website-files.com/60d5e12b5c772dbf7315804e/62cddd0e6400a93d1dbcdf37_Google%20Cloud%20Storage.svg" />   </td><td style="width: 200px;">Google Cloud Storage                   </td><td>Cloud based blob storage</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://raw.githubusercontent.com/gist/nelsonauner/be8160f2e576a327bfcde085b334f622/raw/b4ec25dd4d698abdc37e6c1887ec69ddcca1d27d/google_bigquery_logo.svg" /></td><td style="width: 200px;">BigQuery</td><td>Google serverless massive-scale SQL analytics platform</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://www.mysql.com/common/logos/powered-by-mysql-167x86.png" />                       </td><td style="width: 200px;">MySQL                    </td><td>Leading open source database</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png" />          </td><td style="width: 200px;">PostgreSQL                 </td><td>Leading open source database</td></tr>
+<tr><td style="text-align: center; height=40px;"><img height="40" src="https://www.oracle.com/a/ocom/img/jdbc.svg" />                                         </td><td style="width: 200px;">Other SQL Relational DBs </td><td>Most RDBMS are supported via JDBC drivers thorugh Spark</td></tr>		
+<tr><td style="text-align: center; height=40px;"><img height="40" src="https://braze-marketing-assets.s3.amazonaws.com/images/partner_logos/amazon-s3.png" />   </td><td style="width: 200px;">AWS S3                   </td><td>Cloud based blob storage</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://cdn.brandfolder.io/5H442O3W/as/pl546j-7le8zk-5guop3/Slack_RGB.png" />            </td><td style="width: 200px;">Slack                    </td><td> Get automatic data pipeline notifications!</td></tr>
+	</tbody>
+</table>
 
 ## Full Documentation
 See the [Wiki](https://github.com/DotzInc/debussy_concert/wiki) for full documentation, examples, operational details and other information.
