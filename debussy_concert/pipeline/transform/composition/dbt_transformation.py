@@ -1,5 +1,4 @@
 from debussy_concert.core.composition.composition_base import CompositionBase
-from debussy_concert.pipeline.transform.config.transform import ConfigTransformComposition
 from debussy_concert.pipeline.transform.config.movement_parameters.dbt import DbtMovementParameters, DbtParameters
 from debussy_concert.pipeline.transform.motif.run_transformation import DbtRunMotif
 from debussy_concert.pipeline.transform.movement.transform import TransformationMovement
@@ -20,9 +19,11 @@ class DbtTransformationComposition(CompositionBase):
         )
         movement.setup()
         return movement
-    def data_warehouse_transformation_phrase(self, dbt_run_parameters: DbtParameters):
-        
 
-        dbt_run_motif = DbtRunMotif(**dbt_run_parameters.__dict__)
+    def data_warehouse_transformation_phrase(self, dbt_run_parameters: DbtParameters):
+        dbt_run_motif = DbtRunMotif(
+            dbt_run_parameters=dbt_run_parameters
+        )
+
         transform_phrase = DataLakehouseTransformationPhrase(run_transformation_motif=dbt_run_motif)
         return transform_phrase

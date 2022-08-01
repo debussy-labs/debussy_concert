@@ -1,6 +1,4 @@
 name: sakila_transformation
-#source_name: example
-#source_type: bigquery
 description: BigQuery transformation
 dag_parameters:
     dag_id: sakila_transformation
