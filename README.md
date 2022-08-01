@@ -42,15 +42,13 @@ Debussy works with the tools and systems that you're already using with your dat
 	</thead>
 	<tbody>
 		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://raw.githubusercontent.com/apache/airflow/master/docs/apache-airflow/img/logos/wordmark_1.png" /></td><td style="width: 200px;">Apache Airflow           </td><td>An open source orchestration engine</td></tr>
-		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://spark.apache.org/images/spark-logo-trademark.png" />                             </td><td style="width: 200px;">Spark                    </td><td>Open source distributed processing engine, used for batch ingestions</td></tr>
-		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://beam.apache.org/images/beam_logo_navbar.png" />                             </td><td style="width: 200px;">Apache Beam                    </td><td>Open source distributed processing engine, used for realtime ingestions</td></tr>
+		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://spark.apache.org/images/spark-logo-trademark.png" />                             </td><td style="width: 200px;">Spark                    </td><td>Open source distributed processing engine, used for the ingestions</td></tr>
 		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://assets.website-files.com/60d5e12b5c772dbf7315804e/62cddd0e6400a93d1dbcdf37_Google%20Cloud%20Storage.svg" />   </td><td style="width: 200px;">Google Cloud Storage                   </td><td>Cloud based blob storage</td></tr>
 		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://raw.githubusercontent.com/gist/nelsonauner/be8160f2e576a327bfcde085b334f622/raw/b4ec25dd4d698abdc37e6c1887ec69ddcca1d27d/google_bigquery_logo.svg" /></td><td style="width: 200px;">BigQuery</td><td>Google serverless massive-scale SQL analytics platform</td></tr>
 		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://www.mysql.com/common/logos/powered-by-mysql-167x86.png" />                       </td><td style="width: 200px;">MySQL                    </td><td>Leading open source database</td></tr>
 		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png" />          </td><td style="width: 200px;">PostgreSQL                 </td><td>Leading open source database</td></tr>
 <tr><td style="text-align: center; height=40px;"><img height="40" src="https://www.oracle.com/a/ocom/img/jdbc.svg" />                                         </td><td style="width: 200px;">Other SQL Relational DBs </td><td>Most RDBMS are supported via JDBC drivers thorugh Spark</td></tr>		
 <tr><td style="text-align: center; height=40px;"><img height="40" src="https://braze-marketing-assets.s3.amazonaws.com/images/partner_logos/amazon-s3.png" />   </td><td style="width: 200px;">AWS S3                   </td><td>Cloud based blob storage</td></tr>
-		<tr><td style="text-align: center; height=40px;"><img height="40" src="https://cdn.brandfolder.io/5H442O3W/as/pl546j-7le8zk-5guop3/Slack_RGB.png" />            </td><td style="width: 200px;">Slack                    </td><td> Get automatic data pipeline notifications!</td></tr>
 	</tbody>
 </table>
 
