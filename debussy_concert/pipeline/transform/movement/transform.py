@@ -4,8 +4,6 @@ from debussy_concert.core.movement.protocols import (
     PEndPhrase
 )
 
-from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
-
 
 class TransformationMovement(MovementBase):
 

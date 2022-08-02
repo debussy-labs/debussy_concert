@@ -20,6 +20,8 @@ class DbtRunMotif(MotifBase):
     def build(self, workflow_dag, phrase_group):
         run_dbt = DbtRunOperator(
             task_id="dbt_run",
+            dag=workflow_dag,
+            task_group=phrase_group,
             dir=self.dbt_run_parameters.dir,
             profiles_dir=self.dbt_run_parameters.profiles_dir,
             target=self.dbt_run_parameters.target,
