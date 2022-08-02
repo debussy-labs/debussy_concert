@@ -1,0 +1,31 @@
+config:
+  use_colors: false
+  warn_error: true
+
+bigquery_lakehouse:
+  outputs:
+    dev:
+      dataset: temp_poc_dbt
+      database: ${DEBUSSY_CONCERT__PROJECT}
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      location: US
+      method: service-account-json
+      priority: interactive
+      threads: 1
+      type: bigquery
+  target: dev
+
+bigquery_default:
+  outputs:
+    dev:
+      dataset: temp_poc_dbt
+      database: ${DEBUSSY_CONCERT__PROJECT}
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      location: US
+      method: oauth
+      priority: interactive
+      threads: 1
+      type: bigquery
+  target: dev

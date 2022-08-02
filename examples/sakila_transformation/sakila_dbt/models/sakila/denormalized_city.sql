@@ -9,7 +9,9 @@ country as (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY country_id ORDER BY _ts_ingestion DESC) = 1
 ),
 denormalized as (
-select city.city_id, city.city, country.country
+select city.city_id, city.city, country.country,
+    TIMESTAMP("{{ var('execution_date') }}") as _airflow_execution_date,
+    "{{ env_var('DEBUSSY_CONCERT__PROJECT') }}" as _project
 from city
 join country on city.country_id = country.country_id
 )

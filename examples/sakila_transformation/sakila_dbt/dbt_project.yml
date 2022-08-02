@@ -3,7 +3,7 @@ name: 'sakila_dbt'
 version: '1.0.0'
 config-version: 2
 
-profile: 'bigquery'
+profile: 'bigquery_lakehouse'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -12,9 +12,9 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-log-path: /tmp/sakila/logs
-target-path: /tmp/sakila/target
-packages-install-path: /tmp/sakila/dbt_packages
+log-path: /tmp/sakila_dbt/logs
+target-path: /tmp/sakila_dbt/target
+packages-install-path: /tmp/sakila_dbt/dbt_packages
 
 #target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
