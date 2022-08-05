@@ -5,9 +5,10 @@ from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.pipeline.transform.config.movement_parameters.dbt import DbtParameters
 
 
+import json
+import os
 from airflow.models import BaseOperator
 from airflow.hooks.base import BaseHook
-import json
 from pathlib import Path
 from yaml_env_var_parser import load as yaml_load
 from yaml import safe_dump
@@ -56,6 +57,10 @@ class ParseDbtProfilesFile(BaseOperator):
 
 
 class DebussyDbtRunOperator(DbtRunOperator):
+    def __init__(self, project_name, profiles_dir=None, target=None, *args, **kwargs):
+        self.project_name = project_name
+        super().__init__(profiles_dir=profiles_dir, target=target, *args, **kwargs)
+
     def shallow_stringfy_dict(self, dict_: dict):
         new_dict = {}
         for key, value in dict_.items():
@@ -66,7 +71,21 @@ class DebussyDbtRunOperator(DbtRunOperator):
         new_dict = self.shallow_stringfy_dict(context)
         return new_dict
 
+    def config_dbt_path_env_vars(self):
+        """
+        The precedence order is: CLI flag > env var > dbt_project.yml
+        """
+        base_path = f"/tmp/{self.project_name}_dbt"
+        log_path = base_path + "/logs"
+        target_path = base_path + "/target"
+        packages_path = base_path + "/dbt_packages"
+        os.environ['DBT_LOG_PATH'] = log_path
+        os.environ['DBT_TARGET_PATH'] = target_path
+        # FIXME: this env var is not working and there is no doc on dbt on how to set this besides dbt_project.yaml
+        # os.environ['DBT_PACKAGES_INSTALL_PATH'] = packages_path
+
     def execute(self, context):
+        self.config_dbt_path_env_vars()
         new_context = self.stringfy_context(context)
         if self.vars is None:
             self.vars = new_context
@@ -109,6 +128,7 @@ class DbtRunMotif(MotifBase):
         run_dbt = DebussyDbtRunOperator(
             task_id="dbt_run",
             dag=workflow_dag,
+            project_name=self.config.name,
             task_group=task_group,
             dir=self.dbt_run_parameters.dir,
             profiles_dir=final_profile_dir,

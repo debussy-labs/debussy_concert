@@ -12,9 +12,7 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-log-path: /tmp/sakila_dbt/logs
-target-path: /tmp/sakila_dbt/target
-packages-install-path: /tmp/sakila_dbt/dbt_packages
+packages-install-path: /tmp/sakila_transformation/dbt_packages
 
 #target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
