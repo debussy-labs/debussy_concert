@@ -82,7 +82,8 @@ class DebussyDbtRunOperator(DbtRunOperator):
         os.environ['DBT_LOG_PATH'] = log_path
         os.environ['DBT_TARGET_PATH'] = target_path
         # FIXME: this env var is not working and there is no doc on dbt on how to set this besides dbt_project.yaml
-        # os.environ['DBT_PACKAGES_INSTALL_PATH'] = packages_path
+        # so this is not done automatic and this env var should be read on dbt_project.yaml
+        os.environ['DBT_PACKAGES_INSTALL_PATH'] = packages_path
 
     def execute(self, context):
         self.config_dbt_path_env_vars()
@@ -100,9 +101,11 @@ class DbtRunMotif(MotifBase):
     def __init__(
             self,
             dbt_run_parameters: DbtParameters,
+            movement_name,
             name=None
     ):
         self.dbt_run_parameters = dbt_run_parameters
+        self.movement_name = movement_name
         super().__init__(name=name)
 
     def setup(self):
@@ -128,7 +131,7 @@ class DbtRunMotif(MotifBase):
         run_dbt = DebussyDbtRunOperator(
             task_id="dbt_run",
             dag=workflow_dag,
-            project_name=self.config.name,
+            project_name=self.movement_name,
             task_group=task_group,
             dir=self.dbt_run_parameters.dir,
             profiles_dir=final_profile_dir,

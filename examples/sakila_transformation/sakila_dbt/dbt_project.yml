@@ -12,7 +12,7 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-packages-install-path: /tmp/sakila_transformation/dbt_packages
+packages-install-path: "{{ env_var('DBT_PACKAGES_INSTALL_PATH') }}"
 
 #target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`

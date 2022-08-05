@@ -10,7 +10,8 @@ from debussy_concert.pipeline.transform.phrase.data_lakehouse_transformation imp
 class DbtTransformationComposition(CompositionBase):
     def dbt_transformation_builder(self, movement_parameters: DbtMovementParameters) -> TransformationMovement:
         data_warehouse_transformation_phrase = self.data_warehouse_transformation_phrase(
-            dbt_run_parameters=movement_parameters.dbt_run_parameters
+            dbt_run_parameters=movement_parameters.dbt_run_parameters,
+            movement_name=movement_parameters.name
         )
         movement = TransformationMovement(
             start_phrase=StartPhrase(),
@@ -20,9 +21,11 @@ class DbtTransformationComposition(CompositionBase):
         movement.setup()
         return movement
 
-    def data_warehouse_transformation_phrase(self, dbt_run_parameters: DbtParameters):
+    def data_warehouse_transformation_phrase(self, dbt_run_parameters: DbtParameters,
+                                             movement_name):
         dbt_run_motif = DbtRunMotif(
-            dbt_run_parameters=dbt_run_parameters
+            dbt_run_parameters=dbt_run_parameters,
+            movement_name=movement_name
         )
 
         transform_phrase = DataLakehouseTransformationPhrase(run_transformation_motif=dbt_run_motif)
