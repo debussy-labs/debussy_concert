@@ -1,0 +1,53 @@
+name: mysql_sakila_ingestion_hourly
+source_name: sakila
+source_type: mysql
+description: mysql ingestion
+secret_manager_uri: projects/modular-aileron-191222/secrets/debussy_mysql_dev
+dataproc_config:
+  machine_type: n1-standard-2
+  num_workers: 0
+  subnet: subnet-cluster-services
+  parallelism: 60
+  pip_packages:
+    - google-cloud-secret-manager
+dag_parameters:
+  dag_id: mysql_sakila_ingestion_hourly
+  description: Mysql ingestion for sakila sample relational database.
+  catchup: true
+  schedule_interval: "@hourly"
+  max_active_runs: 1
+  start_date:
+    year: 2014
+    month: 9
+    day: 25
+    hour: 22
+  end_date:
+    year: 2014
+    month: 9
+    day: 25
+    hour: 23
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - source:mysql
+    - type:ingestion
+    - load:incremental
+    - tier:5
+  default_args:
+    owner: debussy
+ingestion_parameters:
+  - name: address
+    extraction_query: >
+      SELECT address_id, address, address2, district, city_id, postal_code, phone, location, last_update
+      FROM sakila.address
+      WHERE last_update >= '{{ ${MYSQL_SAKILA_HOURLY_WINDOW_START} }}'
+        AND last_update <  '{{ ${MYSQL_SAKILA_HOURLY_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mysql_sakila_ingestion/table_schemas/mysql_sakila_address.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_HOURLY_WINDOW_START}
+        }}/_ts_window_end={{ ${MYSQL_SAKILA_HOURLY_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d%H') }}"
