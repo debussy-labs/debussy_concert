@@ -14,7 +14,7 @@ dataproc_config:
   spark_jars_packages: org.postgresql:postgresql:42.4.0
 dag_parameters:
   dag_id: postgresql_sakila_ingestion_daily
-  description: Postgresql ingestion for sakila relational database.
+  description: Postgresql ingestion for sakila sample relational database.
   catchup: true
   schedule_interval: "0 5 * * *"
   start_date:

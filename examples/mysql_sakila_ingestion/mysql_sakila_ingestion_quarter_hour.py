@@ -8,9 +8,14 @@ from debussy_concert.core.service.workflow.airflow import AirflowService
 
 
 dags_folder = conf.get('core', 'dags_folder')
-os.environ['DEBUSSY_CONCERT__DAGS_FOLDER'] = dags_folder  # of course you can set this on your system env var
-env_file = f'{dags_folder}/examples/pixdict/environment.yaml'
-composition_file = f'{dags_folder}/examples/pixdict/composition_daily.yaml'
+
+os.environ['DEBUSSY_CONCERT__DAGS_FOLDER'] = dags_folder
+os.environ['MYSQL_SAKILA_QUARTER_HOUR_WINDOW_START'] = "execution_date.strftime('%Y-%m-%d 00:00:00')"
+os.environ['MYSQL_SAKILA_QUARTER_HOUR_WINDOW_END'] = "next_execution_date.strftime('%Y-%m-%d 00:00:00')"
+
+env_file = f'{dags_folder}/examples/mysql_sakila_ingestion/environment.yaml'
+composition_file = f'{dags_folder}/examples/mysql_sakila_ingestion/composition_quarter_hour.yaml'
+
 workflow_service = AirflowService()
 config_composition = ConfigRdbmsDataIngestion.load_from_file(
     composition_config_file_path=composition_file,
@@ -19,5 +24,9 @@ config_composition = ConfigRdbmsDataIngestion.load_from_file(
 inject_dependencies(workflow_service, config_composition)
 
 debussy_composition = RdbmsIngestionComposition()
+debussy_composition.dataproc_main_python_file_uri = (
+    f"gs://{config_composition.environment.artifact_bucket}/pyspark-scripts"
+    "/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
+)
 
 dag = debussy_composition.auto_play()

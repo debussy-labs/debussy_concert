@@ -1,0 +1,62 @@
+fields:
+  - name: film_id
+    data_type: INT64
+    description: A surrogate primary key used to uniquely identify each film in the table.
+  - name: title
+    data_type: STRING
+    description: The title of the film.
+  - name: description
+    data_type: STRING
+    description: A short description or plot summary of the film.
+  - name: release_year
+    data_type: DATE
+    description: The year in which the movie was released.
+  - name: language_id
+    data_type: INT64
+    description: A foreign key pointing at the language table; identifies the language of the film.
+  - name: original_language_id
+    data_type: INT64
+    description: A foreign key pointing at the language table; identifies the original language of the film. Used when a film has been dubbed into a new language.
+  - name: rental_duration
+    data_type: INT64
+    description: The length of the rental period, in days.
+  - name: rental_rate
+    data_type: NUMERIC
+    description: The cost to rent the film for the period specified in the rental_duration column
+  - name: length
+    data_type: INT64
+    description: The duration of the film, in minutes
+  - name: replacement_cost
+    data_type: NUMERIC
+    description: The amount charged to the customer if the film is not returned or is returned in a damaged state
+  - name: rating
+    data_type: STRING
+    description: "The rating assigned to the film. Can be one of: G, PG, PG-13, R, or NC-17"
+  - name: special_features
+    data_type: BYTES
+    description: "Lists which common special features are included on the DVD. Can be zero or more of: Trailers, Commentaries, Deleted Scenes, Behind the Scenes"
+  - name: last_update
+    data_type: TIMESTAMP
+    description: When the row was created or most recently updated
+  - name: _load_flag
+    data_type: STRING
+    description: incr = incremental data ingestion; full = full data ingestion
+  - name: _ts_window_start
+    data_type: TIMESTAMP
+    description: Ingestion window start at source timezone
+  - name: _ts_window_end
+    data_type: TIMESTAMP
+    description: Ingestion window end at source timezone
+  - name: _ts_logical
+    data_type: TIMESTAMP
+    description: Airflow logical date
+  - name: _ts_ingestion
+    data_type: TIMESTAMP
+    description: Clock time at Airflow when the ingestion was executed
+  - name: _hash_key
+    data_type: STRING
+    description: An MD5 surrogate hash key used to uniquely identify each record of the source
+partitioning:
+  field: _ts_window_start
+  type: time
+  granularity: DAY
