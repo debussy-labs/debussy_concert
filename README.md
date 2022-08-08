@@ -59,7 +59,11 @@ See the [Wiki](https://github.com/DotzInc/debussy_concert/wiki) for full documen
 [GitHub Issues](https://github.com/DotzInc/debussy_concert/issues)
 
 ## Contributions
-We welcome all community contributions, whether by opening Github Issues, updating documentations, or updating the code directly. Please consult the [contribution guide](https://github.com/DotzInc/debussy_concert/wiki/Contributing-Guide) for details on how to contribute.
+We welcome all community contributions!
+
+In order to have a more open and welcoming community, Debussy adheres to a [code of conduct](https://github.com/DotzInc/debussy_concert/wiki/Code-of-Conduct) adapted from Contributor Covenant.
+
+Please read through our [contributing guidelines](https://github.com/DotzInc/debussy_concert/wiki/Contributing-Guide). Included are directions for opening issues, coding standards, and notes on development.
 
 ## License
 Copyright 2022 Dotz, Inc.
