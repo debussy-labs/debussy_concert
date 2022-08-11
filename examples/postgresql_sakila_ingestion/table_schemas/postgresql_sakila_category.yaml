@@ -4,7 +4,7 @@ fields:
     description: A surrogate primary key used to uniquely identify each category in the table
   - name: name
     data_type: STRING
-    description:
+    description: The name of the category
   - name: last_update
     data_type: TIMESTAMP
     description: When the row was created or most recently updated
