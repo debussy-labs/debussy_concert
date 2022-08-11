@@ -1,9 +1,6 @@
 from dataclasses import dataclass
 
-
 from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
-from typing import Optional
-
 
 @dataclass(frozen=True)
 class OutputConfig:
