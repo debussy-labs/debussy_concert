@@ -52,7 +52,7 @@ config_composition = ConfigRdbmsDataIngestion(
     description='mysql ingestion yamless',
     source_type='mysql',
     source_name='sakila',
-    secret_manager_uri='projects/modular-aileron-191222/secrets/debussy_mysql_dev',
+    secret_manager_uri=f'projects/{config_environment.project}/secrets/debussy_mysql_dev',
     dataproc_config={
         "machine_type": 'n1-standard-2',
         "num_workers": 0,
