@@ -1,0 +1,22 @@
+name: sakila_transformation
+description: BigQuery transformation
+dag_parameters:
+    dag_id: sakila_transformation
+    description: Sakila transformation example using Dbt
+    catchup: false
+    schedule_interval: '*/30 * * * *' # At every minute.
+    start_date: !!timestamp 2022-01-01 00:00:00
+    tags:
+      - framework:debussy_concert
+      - project:example
+      - source:bigquery
+      - type:transformation
+      - load:full
+      - tier:2
+    default_args:
+      owner: debussy
+transformation_parameters:
+  - name: sakila
+    dbt_run_parameters:
+      dir: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
+      profiles_dir: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
