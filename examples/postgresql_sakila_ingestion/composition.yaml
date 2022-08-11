@@ -17,6 +17,7 @@ dag_parameters:
   description: Postgresql ingestion for sakila sample relational database.
   catchup: true
   schedule_interval: "0 5 * * *"
+  max_active_runs: 1
   start_date:
     year: 2006
     month: 2
