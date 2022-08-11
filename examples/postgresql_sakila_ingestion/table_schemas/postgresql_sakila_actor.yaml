@@ -4,10 +4,10 @@ fields:
     description: A surrogate primary key used to uniquely identify each actor in the table
   - name: first_name
     data_type: STRING
-    description:
+    description: The actor first name
   - name: last_name
     data_type: STRING
-    description:
+    description: The actor last name
   - name: last_update
     data_type: TIMESTAMP
     description: When the row was created or most recently updated
