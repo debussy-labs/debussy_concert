@@ -17,7 +17,7 @@ from debussy_framework.v3.hooks.storage_hook import GCSHook
 from debussy_framework.v3.hooks.db_api_hook import MySqlConnectorHook
 
 
-class ClairDeLune(CompositionBase):
+class BigQueryToMysql(CompositionBase):
     config: ConfigReverseEtl
 
     def bigquery_to_storage_reverse_etl_to_rdbms_movement_builder(
