@@ -1,0 +1,19 @@
+partitioning:
+    type: time
+    granularity: YEAR
+    field: _logical_ts
+fields:
+  - name: visible_data
+    data_type: string
+    description: Sample of a visible data column
+  - name: tagged_data
+    data_type: string
+    description: Sample of a tagged data column
+    tags:
+      - projects/${DEBUSSY_CONCERT__PROJECT}/locations/us/taxonomies/7116118859404248139/policyTags/1292142209458831269 # high
+  - name: _logical_ts
+    data_type: date
+    description: Airflow logical date
+  - name: _ingestion_ts
+    data_type: timestamp
+    description: Clock time at when the ingestion was executed
