@@ -1,7 +1,7 @@
 from debussy_concert.core.composition.composition_base import CompositionBase
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
-from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning, HivePartitioningOptions
+from debussy_concert.core.motif.mixins.bigquery_job import HivePartitioningOptions
 from debussy_concert.data_ingestion.config.base import ConfigDataIngestionBase
 from debussy_concert.data_ingestion.config.movement_parameters.time_partitioned import TimePartitionedDataIngestionMovementParameters
 from debussy_concert.data_ingestion.movement.data_ingestion import DataIngestionMovement
@@ -75,6 +75,9 @@ class DataIngestionBase(CompositionBase):
         return motif
 
     def create_or_update_table_phrase(self, table_definition):
-        create_table_motif = CreateBigQueryTableMotif(table=table_definition)
+        create_table_motif = CreateBigQueryTableMotif(
+            table=table_definition,
+            gcp_conn_id=self.config.environment.data_lakehouse_connection_id
+        )
         create_or_update_table_phrase = CreateOrUpdateRawTablePhrase(create_table_motif=create_table_motif)
         return create_or_update_table_phrase
