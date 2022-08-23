@@ -53,7 +53,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         "boot_disk_size_gb": 1000,
     }
     endpoint_enable_http_port_access = True
-    idle_seconds_delete_ttl = 300
+    idle_seconds_delete_ttl = 8 * 60  # 8 minutes
     _cluster_name_task_id = None
 
     def __init__(
