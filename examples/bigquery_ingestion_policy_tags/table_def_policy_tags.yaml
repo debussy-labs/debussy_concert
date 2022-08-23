@@ -10,7 +10,7 @@ fields:
     data_type: string
     description: Sample of a tagged data column
     tags:
-      - projects/${DEBUSSY_CONCERT__PROJECT}/locations/us/taxonomies/7116118859404248139/policyTags/1292142209458831269 # high
+      - projects/${DEBUSSY_CONCERT__PROJECT}/locations/us/taxonomies/6490801880292513178/policyTags/1853854002968858960 # high
   - name: _logical_ts
     data_type: date
     description: Airflow logical date
