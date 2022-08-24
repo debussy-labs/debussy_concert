@@ -16,4 +16,3 @@ class GoogleCloudLakeHouseService:
         if partitioning is not None:
             partitioning = partitioning.to_dict()
         return partitioning
-

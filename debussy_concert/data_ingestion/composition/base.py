@@ -48,7 +48,8 @@ class DataIngestionBase(CompositionBase):
             gcp_conn_id=self.config.environment.data_lakehouse_connection_id,
             source_uri_prefix=source_uri_prefix,
             gcs_partition=gcs_partition,
-            destination_partition=movement_parameters.data_partitioning.destination_partition
+            destination_partition=movement_parameters.data_partitioning.destination_partition,
+            table_definition=movement_parameters.raw_table_definition
         )
         gcs_raw_vault_to_bigquery_raw_phrase = RawVaultStorageLoadToDataWarehouseRawPhrase(
             load_table_from_storage_motif=load_bigquery_from_gcs
@@ -57,7 +58,7 @@ class DataIngestionBase(CompositionBase):
 
     def load_bigquery_from_gcs_hive_partition_motif(
             self, gcp_conn_id, source_uri_prefix,
-            gcs_partition, destination_partition):
+            gcs_partition, destination_partition, table_definition):
         hive_options = HivePartitioningOptions()
         hive_options.mode = "AUTO"
         hive_options.source_uri_prefix = source_uri_prefix
@@ -69,6 +70,7 @@ class DataIngestionBase(CompositionBase):
             write_disposition='WRITE_TRUNCATE',
             create_disposition='CREATE_IF_NEEDED',
             hive_partitioning_options=hive_options,
+            table_definition=table_definition,
             schema_update_options=None,
             gcp_conn_id=gcp_conn_id
         )

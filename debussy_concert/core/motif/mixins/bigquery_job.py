@@ -139,8 +139,9 @@ class BigQueryJobMixin:
                            source_format: str,
                            write_disposition: Optional[str] = None,
                            create_disposition: Optional[str] = None,
+                           schema: Optional[dict] = None,
                            schema_update_options: Optional[List[str]] = None,
-                           time_partitioning: Optional[BigQueryTimePartitioning] = None,
+                           time_partitioning: Optional[dict] = None,
                            hive_partitioning_options: Optional[HivePartitioningOptions] = None):
         """
             https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
@@ -148,7 +149,6 @@ class BigQueryJobMixin:
         destination_table_ref = TableReference(table_uri=destination_table).to_dict()
         if isinstance(source_uris, str):
             source_uris = [source_uris]
-        time_partitioning_ref = time_partitioning.to_dict() if time_partitioning else None
         hive_partitioning_options_ref = hive_partitioning_options.to_api_repr() if hive_partitioning_options else None
         return {
             "load": {
@@ -157,8 +157,9 @@ class BigQueryJobMixin:
                 "sourceFormat": source_format,
                 "createDisposition": create_disposition,
                 "writeDisposition": write_disposition,
+                "schema": schema,
                 "schemaUpdateOptions": schema_update_options,
-                "timePartitioning": time_partitioning_ref,
+                "timePartitioning": time_partitioning,
                 "hivePartitioningOptions": hive_partitioning_options_ref
             }
         }
