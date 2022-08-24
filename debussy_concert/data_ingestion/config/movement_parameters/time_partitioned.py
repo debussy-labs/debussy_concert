@@ -14,7 +14,7 @@ class BigQueryDataPartitioning:
 class TimePartitionedDataIngestionMovementParameters(MovementParametersBase):
     extract_connection_id: str
     data_partitioning: BigQueryDataPartitioning
-    raw_table_definition: str
+    raw_table_definition: str or BigQueryTable
 
     def __post_init__(self):
         if not isinstance(self.data_partitioning, BigQueryDataPartitioning):

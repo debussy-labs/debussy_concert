@@ -23,17 +23,18 @@ def get_example_table():
                 'data_type': 'RECORD',
                 'constraint': 'REPEATED',
                 'fields': [
+                        {
+                            'name': 'home',
+                            'data_type': 'STRING'
+                        },
                     {
-                        'name': 'home',
-                        'data_type': 'STRING'
-                    },
-                    {
-                        'name': 'work',
-                        'data_type': 'STRING'
+                            'name': 'work',
+                            'data_type': 'STRING'
                     }
                 ]
             }
         ]
+
     }
     return BigQueryTable.load_from_dict(table_dict)
 
@@ -46,6 +47,7 @@ def test_get_table_schema():
             'description': 'id of the user',
             'type': 'STRING',
             'mode': 'REQUIRED',
+            'policy_tags': {'names': []},  # defaults to empty list
             'fields': None  # defaults do None
         },
         {
@@ -53,6 +55,7 @@ def test_get_table_schema():
             'description': 'email of the user',
             'type': 'STRING',
             'mode': 'REQUIRED',
+            'policy_tags': {'names': []},
             'fields': None
         },
         {
@@ -60,21 +63,24 @@ def test_get_table_schema():
             'description': 'home and work addresses of the user',
             'type': 'RECORD',
             'mode': 'REPEATED',
+            'policy_tags': {'names': []},
             'fields': [
                     {
                         'name': 'home',
                         'description': None,  # defaults do None
                         'type': 'STRING',
                         'mode': None,  # defaults do None
-                        'fields': None
+                        'fields': None,
+                        'policy_tags': {'names': []}
                     },
                 {
                         'name': 'work',
                         'description': None,
                         'type': 'STRING',
                         'mode': None,
-                        'fields': None
-                    }
+                        'fields': None,
+                        'policy_tags': {'names': []}
+                }
             ]
         }
     ]
