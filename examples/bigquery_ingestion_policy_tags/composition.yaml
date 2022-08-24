@@ -1,9 +1,9 @@
-name: bigquery_ingestion_policty_tags
+name: bigquery_ingestion_policy_tags
 source_name: example
 source_type: bigquery
 description: BigQuery policy tags example
 dag_parameters:
-    dag_id: bigquery_ingestion_policty_tags
+    dag_id: bigquery_ingestion_policy_tags
     description: BigQuery policy tags example
     catchup: false
     schedule_interval: null

@@ -19,5 +19,4 @@ class GoogleCloudLakeHouseService:
 
     @staticmethod
     def get_table_resource(table: BigQueryTable):
-        print(table.as_dict())
         return table.as_dict()
