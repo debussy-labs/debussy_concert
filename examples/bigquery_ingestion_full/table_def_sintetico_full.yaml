@@ -5,6 +5,7 @@ partitioning:
 fields:
   - name: data
     data_type: string
+    description: Sample data column
   - name: airflow_logical_date
     description: Airflow logical date timestamp
     data_type: timestamp

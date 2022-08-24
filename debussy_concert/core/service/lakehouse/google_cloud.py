@@ -4,7 +4,7 @@ from debussy_concert.core.entities.table import BigQueryTable
 class GoogleCloudLakeHouseService:
     @staticmethod
     def get_table_schema(table: BigQueryTable):
-        table_fields = table.fields
+        table_fields = table.schema.fields
         table_schema = []
         for field in table_fields:
             table_schema.append(field.get_field_schema())
@@ -16,3 +16,7 @@ class GoogleCloudLakeHouseService:
         if partitioning is not None:
             partitioning = partitioning.to_dict()
         return partitioning
+
+    @staticmethod
+    def get_table_resource(table: BigQueryTable):
+        return table.as_dict()

@@ -1,5 +1,5 @@
-from dataclasses import dataclass, asdict
-from typing import Any, List, Optional
+from dataclasses import dataclass, asdict, field as dataclass_field
+from typing import List, Optional
 
 
 from yaml_env_var_parser import load as yaml_load
@@ -24,6 +24,11 @@ class TableField:
 
     def get_field_schema(self):
         raise NotImplementedError
+
+
+@dataclass
+class BigQueryPolicyTags:
+    names: List[str]
 
 
 @dataclass
@@ -56,6 +61,7 @@ class BigQueryTableField:
     type: str
     mode: str = 'NULLABLE'
     fields: Optional[List['BigQueryTableField']] = None
+    policy_tags: Optional[BigQueryPolicyTags] = dataclass_field(default=BigQueryPolicyTags([]))
 
     def __post_init__(self):
         # those should be upper case
@@ -75,17 +81,20 @@ class BigQueryTableField:
             for inner_fields in fields_key:
                 bq_field = cls.load_from_internal_table_field_interface_dict(inner_fields)
                 fields.append(bq_field)
+        policy_tags = field_dict.get('tags', [])
+        bq_policy_tags = BigQueryPolicyTags(names=policy_tags)
         field_schema = cls(
             name=field_dict['name'],
             description=field_dict.get('description'),
             type=field_dict['data_type'],
             mode=field_dict.get('constraint'),
-            fields=fields
-        )
+            fields=fields,
+            policy_tags=bq_policy_tags)
         return field_schema
 
     def get_field_schema(self):
-        return asdict(self)
+        schema = asdict(self)
+        return schema
 
 
 class Partitioning:
@@ -93,6 +102,7 @@ class Partitioning:
     field: str
 
 
+@dataclass
 class BigQueryTimePartitioning:
     """
      NOTE: might exist an implementation for this in the google.cloud.bigquery sdk, i could not find it
@@ -104,14 +114,15 @@ class BigQueryTimePartitioning:
         "requirePartitionFilter": boolean # deprecated
      }
     """
+    type: str
+    expiration_ms: Optional[str] = None
+    field: Optional[str] = None
 
-    def __init__(self, type: str, expiration_ms: Optional[str] = None, field: Optional[str] = None):
-        _type = type.upper()
-        if _type not in ('DAY', 'HOUR', 'MONTH', 'YEAR'):
+    def __post_init__(self):
+        type_ = self.type.upper()
+        if type_ not in ('DAY', 'HOUR', 'MONTH', 'YEAR'):
             raise ValueError(f"Invalid type: {type}")
-        self.type = _type
-        self.expiration_ms = expiration_ms
-        self.field = field
+        self.type = type_
 
     def to_dict(self) -> dict:
         ret = {
@@ -131,9 +142,8 @@ class BigQueryTimePartitioning:
 
 
 @dataclass
-class Table:
+class TableSchema:
     fields: List[TableField]
-    partitioning: Any
 
     @classmethod
     def load_from_dict(cls, table_dict):
@@ -143,11 +153,8 @@ class Table:
             fields.append(field)
         return cls(fields=fields)
 
-    @classmethod
-    def load_from_file(cls, file_path: str):
-        with open(file_path) as file:
-            table_dict = yaml_load(file)
-        return cls.load_from_dict(table_dict)
+    def as_dict(self):
+        return asdict(self)
 
 
 def data_partitioning_factory(data_partitioning):
@@ -161,8 +168,7 @@ def data_partitioning_factory(data_partitioning):
     return output_cls.load_from_internal_partitioning_interface_dict(data_partitioning)
 
 
-class BigQueryTable(Table):
-    partitioning: BigQueryTimePartitioning
+class BigQueryTableSchema(TableSchema):
 
     @classmethod
     def load_from_dict(cls, table_dict):
@@ -170,7 +176,28 @@ class BigQueryTable(Table):
         for field_dict in table_dict['fields']:
             field = BigQueryTableField.load_from_internal_table_field_interface_dict(field_dict)
             fields.append(field)
+        return cls(fields=fields)
+
+
+@dataclass
+class BigQueryTable:
+    schema: BigQueryTableSchema
+    partitioning: BigQueryTimePartitioning
+
+    @classmethod
+    def load_from_dict(cls, table_dict):
+        print(table_dict)
+        schema = BigQueryTableSchema.load_from_dict(table_dict)
         partitioning = None
         if partitioning_dict := table_dict.get('partitioning'):
             partitioning = data_partitioning_factory(partitioning_dict)
-        return cls(fields=fields, partitioning=partitioning)
+        return cls(schema=schema, partitioning=partitioning)
+
+    @classmethod
+    def load_from_file(cls, file_path: str):
+        with open(file_path) as file:
+            table_dict = yaml_load(file)
+        return cls.load_from_dict(table_dict)
+
+    def as_dict(self):
+        return asdict(self)
