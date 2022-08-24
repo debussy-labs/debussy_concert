@@ -1,20 +1,25 @@
 import datetime as dt
 from dataclasses import dataclass
+
 from airflow.configuration import conf
-from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
-from debussy_concert.core.motif.motif_base import MotifBase
+from debussy_concert.core.config.config_dag_parameters import \
+    ConfigDagParameters
 from debussy_concert.core.config.config_environment import ConfigEnvironment
-from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
-from debussy_concert.core.service.workflow.airflow import AirflowService
-from debussy_concert.data_ingestion.composition.base import DataIngestionBase
-from debussy_concert.data_ingestion.config.movement_parameters.time_partitioned import (
-    TimePartitionedDataIngestionMovementParameters,
-    BigQueryDataPartitioning)
-from debussy_concert.data_ingestion.phrase.ingestion_to_raw_vault import IngestionSourceToRawVaultStoragePhrase
-from debussy_concert.data_ingestion.config.base import ConfigDataIngestionBase
+from debussy_concert.core.motif.motif_base import MotifBase
+from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
 from debussy_concert.core.service.injection import inject_dependencies
-from debussy_framework.v3.operators.storage_to_storage import StorageToStorageOperator
+from debussy_concert.core.service.workflow.airflow import AirflowService
+from debussy_concert.pipeline.data_ingestion.composition.base import \
+    DataIngestionBase
+from debussy_concert.pipeline.data_ingestion.config.base import \
+    ConfigDataIngestionBase
+from debussy_concert.pipeline.data_ingestion.config.movement_parameters.time_partitioned import (
+    BigQueryDataPartitioning, TimePartitionedDataIngestionMovementParameters)
+from debussy_concert.pipeline.data_ingestion.phrase.ingestion_to_raw_vault import \
+    IngestionSourceToRawVaultStoragePhrase
 from debussy_framework.v3.hooks.storage_hook import GCSHook, S3Hook
+from debussy_framework.v3.operators.storage_to_storage import \
+    StorageToStorageOperator
 
 dags_folder = conf.get('core', 'dags_folder')
 
@@ -110,13 +115,13 @@ gcs_source = SourceInfo(
         'gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_full/'
         '_load_flag=full/_logical_ts=1970-01-01/_ingestion_ts=2022-04-29 16:33:00.218627+00:00/'
         '000000000000.parquet'),
-    raw_table_definition=f'{dags_folder}/examples/storage_ingestion/table_def_gcs.yaml'
+    raw_table_definition=f'{dags_folder}/examples/storage_ingestion/table_schemas/table_def_gcs.yaml'
 )
 s3_source = SourceInfo(
     storage_type='s3',
     extract_connection_id='aws_noverde',
     file_uri='s3://dotz-integracao-stg/0.parquet',
-    raw_table_definition=f'{dags_folder}/examples/storage_ingestion/table_def_s3.yaml'
+    raw_table_definition=f'{dags_folder}/examples/storage_ingestion/table_schemas/table_def_s3.yaml'
 )
 
 movements_parameters = []
