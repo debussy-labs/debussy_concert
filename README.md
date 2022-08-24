@@ -8,11 +8,24 @@
 
 # Debussy Concert
 
-Debussy Concert allows users to build first class data pipelines without needing to code. It's the core component of [Debussy](https://github.com/DotzInc/debussy_concert/wiki), a free, open-source, opinionated Data Architecture and Engineering framework, enabling data analysts and engineers to build better platforms and pipelines.
+[Debussy](https://github.com/DotzInc/debussy_concert/wiki) is a free, open-source, opinionated Data Architecture and Engineering framework. It enables data analysts and engineers to build better data platforms through first class data pipelines, following a low-code and self-service approach. 
 
-Debussy Concert is a code generation engine for orchestration tools, currently supporting [Apache Airflow](https://airflow.apache.org/) only, but with others on the Roadmap. It provides abstraction layers in the form of a musical themed sementic model, decoupling the pipeline logic to the underlying orchestration tool, and enabling a low-code approach to data engineering.
+## Description
 
-Key benefits:
+In the data engineering field, everyone is reinventing the wheel all the time – it's still rare to see the adoption of software engineering best practices, such as [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself), [KISS](https://en.wikipedia.org/wiki/KISS_principle) or [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it). Despite the existence of several tools for data orchestration (e.g. [Apache Airflow](https://airflow.apache.org/), [Prefect](https://www.prefect.io/), [Dagster](https://dagster.io/)) and distributed data processing (e.g. [Apache Spark](https://spark.apache.org/), [Apache Beam](https://beam.apache.org/)), every time a new data pipeline demand arises it usually implies lengthy development projects. Think of developing a web application without the help of a web framework such as [Django](https://www.djangoproject.com/) or [Flask](https://palletsprojects.com/p/flask/)!
+
+What's even worse, although sharing key concepts, these data orchestration tools have very distinct syntaxes and features, making migrations a daunting task! Moreover, simply adopting these tools does not guarantee that best practices are being followed, including with regard to data architecture (think of data modeling, data management lifecycle, among others).
+
+While lots of companies have faced these same issues, most of them have decided to develop their own in-house solutions, missing the opportunity for colaboration and wider adoption of data architecture and sofware engineering best practices.
+
+With that in mind, we created Debussy! Debussy Concert is the core component of Debussy. It's a code generation engine for orchestration tools, currently supporting only Airflow, but with others on the Roadmap. It provides abstraction layers in the form of a musical themed semantic model, decoupling the pipeline logic to the underlying orchestration tool, and enabling a low-code approach to data engineering. We also provides pipelines templates (e.g. data ingestion, data transformation and reverse ETL) built with our engine, while always striving to offer the aforementioned best practices.
+
+## Key Features
+- Dynamic data pipeline generation from YAML configuration files or directly through Python
+- Provides a semantic model for data pipeline development, abstracting the inner orchestration engine
+- Enables seamless integration of first class data projects, such as Airflow, Spark, and dbt
+
+## Key Benefits
 
 &#10004; It provides lower time to delivery and costs related to data pipeline development, while enabling higher ROI <br />
 &#10004; Avoid pipeline debt by following sound software engineering design principles <br />
@@ -27,7 +40,8 @@ In order to use Debussy, you first need to go through the following steps:
 1. [Select or create a Google Cloud Platform project](https://console.cloud.google.com/cloud-resource-manager).
 2. [Enable billing for your project](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project).
 3. [Create a Cloud Composer 2 environment](https://cloud.google.com/composer/docs/composer-2/create-environments).
-4. Install Debussy on your Cloud Composer instance.
+4. Install Debussy on your Cloud Composer instance: just upload the project to your `plugins/` folder.
+5. Check our [User's Guide](https://github.com/DotzInc/debussy_concert/wiki/User's-Guide) and [examples](https://github.com/DotzInc/debussy_concert/tree/master/examples) to learn how to use it!
 
 Integrations
 -------------------------------------------------------------------------------
