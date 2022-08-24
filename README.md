@@ -10,6 +10,28 @@
 
 [Debussy](https://github.com/DotzInc/debussy_concert/wiki) is a free, open-source, opinionated Data Architecture and Engineering framework. It enables data analysts and engineers to build better data platforms through first class data pipelines, following a low-code and self-service approach. 
 
+<h3 align="center">
+  <a href="#description">Description</a>
+  <span> · </span>
+  <a href="#key-features">Key Features</a>
+  <span> · </span>
+  <a href="#key-benefits">Key Benefits</a>
+  <span> · </span>
+  <a href="#quick-start">Quick Start</a>
+  <span> · </span>
+  <a href="#integrations">Integrations</a>
+  </br>
+  <a href="#full-documentation">Full Documentation</a>
+  <span> · </span>
+  <a href="#communication">Communication</a>
+  <span> · </span>
+  <a href="#contributions">Contributions</a>
+  <span> · </span>
+  <a href="#license">License</a>
+</h3>
+
+---
+
 ## Description
 
 In the data engineering field, everyone is reinventing the wheel all the time – it's still rare to see the adoption of software engineering best practices, such as [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself), [KISS](https://en.wikipedia.org/wiki/KISS_principle) or [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it). Despite the existence of several tools for data orchestration (e.g. [Apache Airflow](https://airflow.apache.org/), [Prefect](https://www.prefect.io/), [Dagster](https://dagster.io/)) and distributed data processing (e.g. [Apache Spark](https://spark.apache.org/), [Apache Beam](https://beam.apache.org/)), every time a new data pipeline demand arises it usually implies lengthy development projects. Think of developing a web application without the help of a web framework such as [Django](https://www.djangoproject.com/) or [Flask](https://palletsprojects.com/p/flask/)!
