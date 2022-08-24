@@ -10,7 +10,7 @@
 
 [Debussy](https://github.com/DotzInc/debussy_concert/wiki) is a free, open-source, opinionated Data Architecture and Engineering framework. It enables data analysts and engineers to build better data platforms through first class data pipelines, following a low-code and self-service approach. 
 
-<h3 align="center">
+<p align="center">
   <a href="#description">Description</a>
   <span> · </span>
   <a href="#key-features">Key Features</a>
