@@ -1,10 +1,14 @@
 from debussy_concert.core.composition.composition_base import CompositionBase
-from debussy_concert.pipeline.transform.config.movement_parameters.dbt import DbtMovementParameters, DbtParameters
-from debussy_concert.pipeline.transform.motif.run_transformation import DbtRunMotif
-from debussy_concert.pipeline.transform.movement.transform import TransformationMovement
-from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
-from debussy_concert.pipeline.transform.phrase.data_lakehouse_transformation import DataLakehouseTransformationPhrase
+from debussy_concert.core.phrase.utils.start import StartPhrase
+from debussy_concert.pipeline.data_transformation.config.movement_parameters.dbt import (
+    DbtMovementParameters, DbtParameters)
+from debussy_concert.pipeline.data_transformation.motif.run_transformation import \
+    DbtRunMotif
+from debussy_concert.pipeline.data_transformation.movement.transform import \
+    TransformationMovement
+from debussy_concert.pipeline.data_transformation.phrase.data_lakehouse_transformation import \
+    DataLakehouseTransformationPhrase
 
 
 class DbtTransformationComposition(CompositionBase):

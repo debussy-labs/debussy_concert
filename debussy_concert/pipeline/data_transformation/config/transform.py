@@ -3,7 +3,7 @@ from yaml_env_var_parser import load as yaml_load
 from debussy_concert.core.config.config_environment import ConfigEnvironment
 from debussy_concert.core.config.config_composition import ConfigComposition
 from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
-from debussy_concert.pipeline.transform.config.movement_parameters.dbt import DbtMovementParameters, DbtParameters
+from debussy_concert.pipeline.data_transformation.config.movement_parameters.dbt import DbtMovementParameters, DbtParameters
 
 
 class ConfigTransformComposition(ConfigComposition):

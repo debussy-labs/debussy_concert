@@ -1,18 +1,18 @@
 from debussy_concert.core.composition.composition_base import CompositionBase
-from debussy_concert.reverse_etl.movement.reverse_etl import ReverseEtlMovement
-from debussy_concert.reverse_etl.config.reverse_etl import ConfigReverseEtl
-from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import (
+from debussy_concert.pipeline.reverse_etl.movement.reverse_etl import ReverseEtlMovement
+from debussy_concert.pipeline.reverse_etl.config.reverse_etl import ConfigReverseEtl
+from debussy_concert.pipeline.reverse_etl.config.movement_parameters.reverse_etl import (
     OutputConfig, CsvFile, ReverseEtlMovementParameters)
 
 from debussy_concert.core.phrase.utils.start import StartPhrase
 from debussy_concert.core.phrase.utils.end import EndPhrase
-from debussy_concert.reverse_etl.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
-from debussy_concert.reverse_etl.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
-from debussy_concert.reverse_etl.phrase.storage_to_destination import StorageToDestinationPhrase
-from debussy_concert.reverse_etl.motif.bigquery_query_job import BigQueryQueryJobMotif
-from debussy_concert.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
+from debussy_concert.pipeline.reverse_etl.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
+from debussy_concert.pipeline.reverse_etl.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
+from debussy_concert.pipeline.reverse_etl.phrase.storage_to_destination import StorageToDestinationPhrase
+from debussy_concert.pipeline.reverse_etl.motif.bigquery_query_job import BigQueryQueryJobMotif
+from debussy_concert.pipeline.reverse_etl.motif.bigquery_extract_job import BigQueryExtractJobMotif
 from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning
-from debussy_concert.reverse_etl.motif.storage_to_storage_motif import StorageToStorageMotif
+from debussy_concert.pipeline.reverse_etl.motif.storage_to_storage_motif import StorageToStorageMotif
 from debussy_framework.v3.hooks.storage_hook import GCSHook, SFTPHook
 
 

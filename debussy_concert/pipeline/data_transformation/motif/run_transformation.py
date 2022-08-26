@@ -2,7 +2,7 @@ from airflow.utils.task_group import TaskGroup
 
 from airflow_dbt.operators.dbt_operator import DbtRunOperator
 from debussy_concert.core.motif.motif_base import MotifBase
-from debussy_concert.pipeline.transform.config.movement_parameters.dbt import DbtParameters
+from debussy_concert.pipeline.data_transformation.config.movement_parameters.dbt import DbtParameters
 
 
 import json

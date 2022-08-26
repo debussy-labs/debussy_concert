@@ -1,5 +1,5 @@
 from tests.test_reverse_etl.create_test_movement import csv_reverse_etl_movement
-from debussy_concert.reverse_etl.movement.reverse_etl import ReverseEtlMovement
+from debussy_concert.pipeline.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 
 
 def test_DataWarehouseToReverseEtlPhrase(inject_testing):

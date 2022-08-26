@@ -1,4 +1,4 @@
-from debussy_concert.reverse_etl.config.movement_parameters.reverse_etl import CsvFile, ReverseEtlMovementParameters
+from debussy_concert.pipeline.reverse_etl.config.movement_parameters.reverse_etl import CsvFile, ReverseEtlMovementParameters
 
 from tests.test_reverse_etl.create_test_movement import csv_reverse_etl_movement_dummy_phrases
 
