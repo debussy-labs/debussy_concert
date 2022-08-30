@@ -5,9 +5,18 @@ from airflow.providers.google.cloud.operators.dataproc import (
 from debussy_concert.core.motif.motif_base import PClusterMotifMixin
 
 
+class DebussyDataprocDeleteClusterOperator(DataprocDeleteClusterOperator):
+    def execute(self, context: dict):
+        from google.api_core.exceptions import NotFound
+        try:
+            super().execute(context)
+        except NotFound:
+            self.log.info("Cluster not found. It may already have been deleted.")
+
+
 class DataprocClusterHandlerMixin:
     def delete_dataproc_cluster(self: PClusterMotifMixin, dag, task_group) -> DataprocDeleteClusterOperator:
-        delete_dataproc_cluster = DataprocDeleteClusterOperator(
+        delete_dataproc_cluster = DebussyDataprocDeleteClusterOperator(
             task_id="delete_dataproc_cluster",
             project_id=self.config.environment.project,
             cluster_name=self.cluster_name,
