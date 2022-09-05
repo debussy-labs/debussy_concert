@@ -5,9 +5,12 @@ from tests.resource.core_for_testing import DummyDag, DummyMotif, create_empty_p
 
 def csv_reverse_etl_movement_dummy_phrases():
     start_phrase = create_empty_phrase("start_phrase")
-    data_warehouse_to_reverse_etl_phrase = create_empty_phrase("data_warehouse_to_reverse_etl_phrase")
+    data_warehouse_to_reverse_etl_phrase = create_empty_phrase(
+        "data_warehouse_to_reverse_etl_phrase"
+    )
     data_warehouse_reverse_etl_to_storage_phrase = create_empty_phrase(
-        "data_warehouse_reverse_etl_to_storage_phrase")
+        "data_warehouse_reverse_etl_to_storage_phrase"
+    )
     storage_to_destination_phrase = create_empty_phrase("storage_to_destination_phrase")
     end_phrase = create_empty_phrase("end_phrase")
     movement = ReverseEtlMovement(
@@ -15,8 +18,7 @@ def csv_reverse_etl_movement_dummy_phrases():
         data_warehouse_to_reverse_etl_phrase=data_warehouse_to_reverse_etl_phrase,
         data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
         storage_to_destination_phrase=storage_to_destination_phrase,
-        end_phrase=end_phrase
-
+        end_phrase=end_phrase,
     )
     retl_mov_param = movement.config.movements_parameters[0]
     movement.setup(movement_parameters=retl_mov_param)
@@ -27,27 +29,42 @@ def csv_reverse_etl_movement_dummy_phrases():
 
 
 def csv_reverse_etl_movement():
-    from debussy_concert.pipeline.reverse_etl.phrase.dw_to_reverse_etl import DataWarehouseToReverseEtlPhrase
-    from debussy_concert.pipeline.reverse_etl.phrase.reverse_etl_to_storage import DataWarehouseReverseEtlToTempToStoragePhrase
-    from debussy_concert.pipeline.reverse_etl.phrase.storage_to_destination import StorageToDestinationPhrase
+    from debussy_concert.pipeline.reverse_etl.phrase.dw_to_reverse_etl import (
+        DataWarehouseToReverseEtlPhrase,
+    )
+    from debussy_concert.pipeline.reverse_etl.phrase.reverse_etl_to_storage import (
+        DataWarehouseReverseEtlToTempToStoragePhrase,
+    )
+    from debussy_concert.pipeline.reverse_etl.phrase.storage_to_destination import (
+        StorageToDestinationPhrase,
+    )
+
     start_phrase = create_empty_phrase("start_phrase")
     end_phrase = create_empty_phrase("end_phrase")
 
     data_warehouse_to_reverse_etl_phrase = DataWarehouseToReverseEtlPhrase(
-        dw_to_reverse_etl_motif=DummyMotif(name='dw_to_reverse_etl_motif'))
-    data_warehouse_reverse_etl_to_storage_phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
-        datawarehouse_reverse_etl_to_temp_table_motif=DummyMotif(name='datawarehouse_reverse_etl_to_temp_table_motif'),
-        export_temp_table_to_storage_motif=DummyMotif(name='export_temp_table_to_storage_motif'))
+        dw_to_reverse_etl_motif=DummyMotif(name="dw_to_reverse_etl_motif")
+    )
+    data_warehouse_reverse_etl_to_storage_phrase = (
+        DataWarehouseReverseEtlToTempToStoragePhrase(
+            datawarehouse_reverse_etl_to_temp_table_motif=DummyMotif(
+                name="datawarehouse_reverse_etl_to_temp_table_motif"
+            ),
+            export_temp_table_to_storage_motif=DummyMotif(
+                name="export_temp_table_to_storage_motif"
+            ),
+        )
+    )
     storage_to_destination_phrase = StorageToDestinationPhrase(
-        storage_to_destination_motif=DummyMotif(name='storage_to_destination_motif'))
+        storage_to_destination_motif=DummyMotif(name="storage_to_destination_motif")
+    )
 
     movement = ReverseEtlMovement(
         start_phrase=start_phrase,
         data_warehouse_to_reverse_etl_phrase=data_warehouse_to_reverse_etl_phrase,
         data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
         storage_to_destination_phrase=storage_to_destination_phrase,
-        end_phrase=end_phrase
-
+        end_phrase=end_phrase,
     )
     retl_mov_param = movement.config.movements_parameters[0]
     movement.setup(movement_parameters=retl_mov_param)
