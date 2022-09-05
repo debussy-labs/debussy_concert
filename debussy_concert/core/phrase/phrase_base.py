@@ -16,11 +16,13 @@ class PPhrase(Protocol):
 class PhraseBase(PPhrase):
     @inject.params(config=ConfigComposition, workflow_service=PWorkflowService)
     def __init__(
-            self, *,
-            config: ConfigComposition,
-            workflow_service: PWorkflowService,
-            motifs: Sequence[PMotif] = None,
-            name=None) -> None:
+        self,
+        *,
+        config: ConfigComposition,
+        workflow_service: PWorkflowService,
+        motifs: Sequence[PMotif] = None,
+        name=None
+    ) -> None:
         self.name = name or self.__class__.__name__
         self.config = config
         self.motifs = motifs or list()
@@ -34,7 +36,8 @@ class PhraseBase(PPhrase):
 
     def build(self, workflow_dag, movement_group):
         phrase_group = self.workflow_service.phrase_group(
-            group_id=self.name, workflow_dag=workflow_dag, movement_group=movement_group)
+            group_id=self.name, workflow_dag=workflow_dag, movement_group=movement_group
+        )
         current_task = self.motifs[0].build(workflow_dag, phrase_group)
         for motif in self.motifs[1:]:
             motif_task = motif.build(workflow_dag, phrase_group)

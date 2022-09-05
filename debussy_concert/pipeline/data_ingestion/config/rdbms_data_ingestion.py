@@ -5,7 +5,9 @@ from yaml_env_var_parser import load as yaml_load
 from debussy_concert.core.config.config_environment import ConfigEnvironment
 from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
 from debussy_concert.pipeline.data_ingestion.config.base import ConfigDataIngestionBase
-from debussy_concert.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import RdbmsDataIngestionMovementParameters
+from debussy_concert.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import (
+    RdbmsDataIngestionMovementParameters,
+)
 
 
 @dataclass(frozen=True)
@@ -22,9 +24,13 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
             config = yaml_load(file)
         config["environment"] = env_config
 
-        extract_movements = [RdbmsDataIngestionMovementParameters.load_from_dict(parameters)
-                             for parameters in config["ingestion_parameters"]]
+        extract_movements = [
+            RdbmsDataIngestionMovementParameters.load_from_dict(parameters)
+            for parameters in config["ingestion_parameters"]
+        ]
         del config["ingestion_parameters"]
         config["movements_parameters"] = extract_movements
-        config["dag_parameters"] = ConfigDagParameters.create_from_dict(config["dag_parameters"])
+        config["dag_parameters"] = ConfigDagParameters.create_from_dict(
+            config["dag_parameters"]
+        )
         return cls(**config)

@@ -7,4 +7,4 @@ class MovementParametersBase:
     name: str
 
 
-MovementParametersType = TypeVar('MovementParametersType', bound=MovementParametersBase)
+MovementParametersType = TypeVar("MovementParametersType", bound=MovementParametersBase)

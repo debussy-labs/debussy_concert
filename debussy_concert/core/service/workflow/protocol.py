@@ -1,7 +1,11 @@
 from typing import Protocol
 
 from debussy_concert.core.entities.protocols import (
-    PMotifGroup, PPhraseGroup, PMovementGroup, PWorkflowDag)
+    PMotifGroup,
+    PPhraseGroup,
+    PMovementGroup,
+    PWorkflowDag,
+)
 
 
 class PWorkflowService(Protocol):

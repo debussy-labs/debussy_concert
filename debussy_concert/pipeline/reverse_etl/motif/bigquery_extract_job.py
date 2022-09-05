@@ -4,21 +4,21 @@ from debussy_concert.core.motif.mixins.bigquery_job import BigQueryJobMixin
 
 
 class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):
-    def __init__(self,
-                 field_delimiter: Optional[str] = ',',
-                 destination_format: Optional[str] = 'CSV',
-                 print_header: Optional[bool] = True,
-                 gcp_conn_id='google_cloud_default',
-                 name=None):
+    def __init__(
+        self,
+        field_delimiter: Optional[str] = ",",
+        destination_format: Optional[str] = "CSV",
+        print_header: Optional[bool] = True,
+        gcp_conn_id="google_cloud_default",
+        name=None,
+    ):
         super().__init__(name=name)
         self.field_delimiter = field_delimiter
         self.destination_format = destination_format
         self.print_header = print_header
         self.gcp_conn_id = gcp_conn_id
 
-    def setup(self,
-              source_table_uri: str,
-              destination_uris: Union[List[str], str]):
+    def setup(self, source_table_uri: str, destination_uris: Union[List[str], str]):
         self.source_table_uri = source_table_uri
         self.destination_uris = destination_uris
         return self
@@ -29,14 +29,15 @@ class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):
         if self.destination_uris is None:
             raise ValueError("destination_uris cant be none. initialize on setup")
         bigquery_job_operator = self.insert_job_operator(
-            dag, phrase_group,
+            dag,
+            phrase_group,
             self.extract_configuration(
                 self.source_table_uri,
                 self.destination_uris,
                 self.field_delimiter,
                 self.destination_format,
-                self.print_header
+                self.print_header,
             ),
-            self.gcp_conn_id
+            self.gcp_conn_id,
         )
         return bigquery_job_operator

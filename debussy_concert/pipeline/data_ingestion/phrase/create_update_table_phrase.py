@@ -1,4 +1,6 @@
-from debussy_concert.core.movement.protocols import PIngestionSourceToRawVaultStoragePhrase
+from debussy_concert.core.movement.protocols import (
+    PIngestionSourceToRawVaultStoragePhrase,
+)
 from debussy_concert.core.phrase.phrase_base import PhraseBase
 
 
@@ -10,7 +12,7 @@ class CreateOrUpdateRawTablePhrase(PhraseBase, PIngestionSourceToRawVaultStorage
         check_table_exist_motif=None,
         update_table_motif=None,
         branching_motif=None,
-        name=None
+        name=None,
     ) -> None:
         self.check_table_exist_motif = check_table_exist_motif
         self.create_table_motif = create_table_motif
@@ -20,14 +22,12 @@ class CreateOrUpdateRawTablePhrase(PhraseBase, PIngestionSourceToRawVaultStorage
             self.check_table_exist_motif,
             self.create_table_motif,
             self.update_table_motif,
-            self.branching_motif
+            self.branching_motif,
         ]
-        super().__init__(name=name,
-                         motifs=motifs)
+        super().__init__(name=name, motifs=motifs)
 
     def setup(self, table_uri):
-        self.create_table_motif.setup(
-            table_uri=table_uri)
+        self.create_table_motif.setup(table_uri=table_uri)
         # self.check_table_exist_motif.setup(
         #     table_uri=destination_table_uri
         # )
@@ -40,5 +40,6 @@ class CreateOrUpdateRawTablePhrase(PhraseBase, PIngestionSourceToRawVaultStorage
 
     def build(self, workflow_dag, movement_group):
         phrase_group = self.workflow_service.phrase_group(
-            group_id=self.name, workflow_dag=workflow_dag, movement_group=movement_group)
+            group_id=self.name, workflow_dag=workflow_dag, movement_group=movement_group
+        )
         return self.create_table_motif.build(workflow_dag, phrase_group)

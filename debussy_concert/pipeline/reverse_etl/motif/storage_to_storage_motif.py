@@ -1,15 +1,22 @@
 from airflow.utils.task_group import TaskGroup
 
-from debussy_framework.v3.operators.storage_to_storage import StorageToStorageOperator, StorageHookInterface
+from debussy_airflow.operators.storage_to_storage_operator import (
+    StorageToStorageOperator,
+    StorageHookInterface,
+)
 
 from debussy_concert.core.motif.motif_base import MotifBase
 
 
 class StorageToStorageMotif(MotifBase):
-    def __init__(self, *,
-                 origin_storage_hook: StorageHookInterface,
-                 destiny_storage_hook: StorageHookInterface, destiny_file_uri,
-                 name=None) -> None:
+    def __init__(
+        self,
+        *,
+        origin_storage_hook: StorageHookInterface,
+        destiny_storage_hook: StorageHookInterface,
+        destiny_file_uri,
+        name=None
+    ) -> None:
         super().__init__(name=name)
         self.origin_storage_hook = origin_storage_hook
         self.destiny_storage_hook = destiny_storage_hook
@@ -26,7 +33,7 @@ class StorageToStorageMotif(MotifBase):
             destination_storage_hook=self.destiny_storage_hook,
             destination_file_uri=self.destiny_file_uri,
             dag=dag,
-            task_group=parent_task_group
+            task_group=parent_task_group,
         )
         return operator
 

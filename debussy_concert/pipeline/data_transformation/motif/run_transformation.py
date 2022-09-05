@@ -2,7 +2,9 @@ from airflow.utils.task_group import TaskGroup
 
 from airflow_dbt.operators.dbt_operator import DbtRunOperator
 from debussy_concert.core.motif.motif_base import MotifBase
-from debussy_concert.pipeline.data_transformation.config.movement_parameters.dbt import DbtParameters
+from debussy_concert.pipeline.data_transformation.config.movement_parameters.dbt import (
+    DbtParameters,
+)
 
 
 import json
@@ -15,15 +17,25 @@ from yaml import safe_dump
 
 
 class DebussyDbtRunOperator(DbtRunOperator):
-    file_name = Path('profiles.yml')
-    tmp_folder_template = '/tmp/{project_name}_dbt/'
+    file_name = Path("profiles.yml")
+    tmp_folder_template = "/tmp/{project_name}_dbt/"
 
-    def __init__(self, project_name, connection_id, profiles_dir=None, target=None, *args, **kwargs):
+    def __init__(
+        self,
+        project_name,
+        connection_id,
+        profiles_dir=None,
+        target=None,
+        *args,
+        **kwargs
+    ):
         self.project_name = project_name
         super().__init__(profiles_dir=profiles_dir, target=target, *args, **kwargs)
         self._profiles_dir = Path(profiles_dir) if profiles_dir else None
         self.connection_id = connection_id
-        self.base_path = Path(self.tmp_folder_template.format(project_name=self.project_name))
+        self.base_path = Path(
+            self.tmp_folder_template.format(project_name=self.project_name)
+        )
 
     def shallow_stringfy_dict(self, dict_: dict):
         new_dict = {}
@@ -40,23 +52,25 @@ class DebussyDbtRunOperator(DbtRunOperator):
             return
 
         for key, value in yaml_content.items():
-            if key == 'config':
+            if key == "config":
                 continue
-            outputs: dict = value['outputs']
+            outputs: dict = value["outputs"]
             for target in outputs.values():
-                if target['method'].lower() == 'service-account-json':
+                if target["method"].lower() == "service-account-json":
                     conn = BaseHook.get_connection(self.connection_id)
-                    keyfile_extra = conn.extra_dejson['extra__google_cloud_platform__keyfile_dict']
-                    target['keyfile_json'] = json.loads(keyfile_extra)
+                    keyfile_extra = conn.extra_dejson[
+                        "extra__google_cloud_platform__keyfile_dict"
+                    ]
+                    target["keyfile_json"] = json.loads(keyfile_extra)
 
     def read_profiles_file(self, path: Path):
-        with open(path, 'r') as handle:
+        with open(path, "r") as handle:
             content = yaml_load(handle)
         return content
 
     def create_profiles_file(self, path: Path, content: dict):
         path.parent.mkdir(exist_ok=True, parents=True)
-        with open(path, 'w+') as handle:
+        with open(path, "w+") as handle:
             safe_dump(content, handle)
 
     def update_profiles(self):
@@ -75,11 +89,11 @@ class DebussyDbtRunOperator(DbtRunOperator):
         log_path = self.base_path / "logs"
         target_path = self.base_path / "target"
         packages_path = self.base_path / "dbt_packages"
-        os.environ['DBT_LOG_PATH'] = str(log_path)
-        os.environ['DBT_TARGET_PATH'] = str(target_path)
+        os.environ["DBT_LOG_PATH"] = str(log_path)
+        os.environ["DBT_TARGET_PATH"] = str(target_path)
         # FIXME: this env var is not working and there is no doc on dbt on how to set this besides dbt_project.yaml
         # so this is not done automatic and this env var should be read on dbt_project.yaml
-        os.environ['DBT_PACKAGES_INSTALL_PATH'] = str(packages_path)
+        os.environ["DBT_PACKAGES_INSTALL_PATH"] = str(packages_path)
 
     def execute(self, context):
         if self._profiles_dir:
@@ -94,13 +108,7 @@ class DebussyDbtRunOperator(DbtRunOperator):
 
 
 class DbtRunMotif(MotifBase):
-
-    def __init__(
-            self,
-            dbt_run_parameters: DbtParameters,
-            movement_name,
-            name=None
-    ):
+    def __init__(self, dbt_run_parameters: DbtParameters, movement_name, name=None):
         self.dbt_run_parameters = dbt_run_parameters
         self.movement_name = movement_name
         super().__init__(name=name)
@@ -128,7 +136,7 @@ class DbtRunMotif(MotifBase):
             warn_error=self.dbt_run_parameters.warn_error,
             full_refresh=self.dbt_run_parameters.full_refresh,
             data=self.dbt_run_parameters.data,
-            schema=self.dbt_run_parameters.schema
+            schema=self.dbt_run_parameters.schema,
         )
 
         return run_dbt

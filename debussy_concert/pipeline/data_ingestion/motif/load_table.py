@@ -1,22 +1,28 @@
 from typing import Optional
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.motif.mixins.bigquery_job import (
-    BigQueryJobMixin, BigQueryTimePartitioning, HivePartitioningOptions)
+    BigQueryJobMixin,
+    BigQueryTimePartitioning,
+    HivePartitioningOptions,
+)
 
 
 class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
-    def __init__(self, *,
-                 source_format: str,
-                 gcs_partition: str,
-                 destination_partition: str,
-                 write_disposition: Optional[str] = None,
-                 create_disposition: Optional[str] = None,
-                 hive_partitioning_options: Optional[HivePartitioningOptions] = None,
-                 time_partitioning: Optional[BigQueryTimePartitioning] = None,
-                 schema_update_options=None,
-                 gcp_conn_id='google_cloud_default',
-                 name=None,
-                 **op_kw_args) -> None:
+    def __init__(
+        self,
+        *,
+        source_format: str,
+        gcs_partition: str,
+        destination_partition: str,
+        write_disposition: Optional[str] = None,
+        create_disposition: Optional[str] = None,
+        hive_partitioning_options: Optional[HivePartitioningOptions] = None,
+        time_partitioning: Optional[BigQueryTimePartitioning] = None,
+        schema_update_options=None,
+        gcp_conn_id="google_cloud_default",
+        name=None,
+        **op_kw_args,
+    ) -> None:
         super().__init__(name=name)
         self.source_format = source_format
         self.gcs_partition = gcs_partition
@@ -29,16 +35,16 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         self.gcp_conn_id = gcp_conn_id
         self.op_kw_args = op_kw_args
 
-    def setup(self, source_storage_uri_prefix: str,
-              destination_table_uri=None):
-        self.source_uri = (f"{source_storage_uri_prefix}/"
-                           f'{self.gcs_partition}/'
-                           f'*.parquet')
-        self.destination_table = f'{destination_table_uri}${self.destination_partition}'
+    def setup(self, source_storage_uri_prefix: str, destination_table_uri=None):
+        self.source_uri = (
+            f"{source_storage_uri_prefix}/" f"{self.gcs_partition}/" f"*.parquet"
+        )
+        self.destination_table = f"{destination_table_uri}${self.destination_partition}"
 
     def build(self, dag, phrase_group):
         bigquery_job_operator = self.insert_job_operator(
-            dag, phrase_group,
+            dag,
+            phrase_group,
             self.load_configuration(
                 destination_table=self.destination_table,
                 source_uris=self.source_uri,
@@ -47,9 +53,9 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
                 create_disposition=self.create_disposition,
                 schema_update_options=self.schema_update_options,
                 time_partitioning=self.time_partitioning,
-                hive_partitioning_options=self.hive_partitioning_options
+                hive_partitioning_options=self.hive_partitioning_options,
             ),
             self.gcp_conn_id,
-            **self.op_kw_args
+            **self.op_kw_args,
         )
         return bigquery_job_operator

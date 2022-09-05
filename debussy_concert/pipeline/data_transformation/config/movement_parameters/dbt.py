@@ -33,6 +33,7 @@ class DbtParameters:
     :param schema: ???
     :type schema: bool
     """
+
     dir: str
     profiles_dir: Optional[str] = None
     target: Optional[str] = None
@@ -40,7 +41,7 @@ class DbtParameters:
     models: Optional[str] = None
     exclude: Optional[str] = None
     select: Optional[str] = None
-    dbt_bin: Optional[str] = 'dbt'
+    dbt_bin: Optional[str] = "dbt"
     verbose: Optional[bool] = True
     warn_error: Optional[bool] = False
     full_refresh: Optional[bool] = False

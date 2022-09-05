@@ -3,7 +3,9 @@ from typing import List
 from dataclasses import dataclass
 
 from debussy_concert.core.config.config_composition import ConfigComposition
-from debussy_concert.pipeline.data_ingestion.config.movement_parameters.time_partitioned import TimePartitionedDataIngestionMovementParameters
+from debussy_concert.pipeline.data_ingestion.config.movement_parameters.time_partitioned import (
+    TimePartitionedDataIngestionMovementParameters,
+)
 
 
 @dataclass(frozen=True)

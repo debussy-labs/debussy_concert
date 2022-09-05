@@ -9,9 +9,9 @@ from debussy_concert.core.service.workflow.protocol import PWorkflowService
 
 
 class GroupColor(Enum):
-    MOVEMENT = '#f7dbdb'
-    PHRASE = '#dcedfc'
-    MOTIF = '#fff684'
+    MOVEMENT = "#f7dbdb"
+    PHRASE = "#dcedfc"
+    MOTIF = "#fff684"
 
 
 class AirflowService(PWorkflowService):
@@ -22,7 +22,7 @@ class AirflowService(PWorkflowService):
             dag=workflow_dag,
             parent_group=phrase_group,
             tooltip=description,
-            ui_color=GroupColor.MOTIF.value
+            ui_color=GroupColor.MOTIF.value,
         )
 
     @staticmethod
@@ -32,7 +32,7 @@ class AirflowService(PWorkflowService):
             dag=workflow_dag,
             parent_group=movement_group,
             tooltip=description,
-            ui_color=GroupColor.PHRASE.value
+            ui_color=GroupColor.PHRASE.value,
         )
 
     @staticmethod
@@ -41,7 +41,7 @@ class AirflowService(PWorkflowService):
             group_id=group_id,
             dag=workflow_dag,
             tooltip=description,
-            ui_color=GroupColor.MOVEMENT.value
+            ui_color=GroupColor.MOVEMENT.value,
         )
 
     @staticmethod

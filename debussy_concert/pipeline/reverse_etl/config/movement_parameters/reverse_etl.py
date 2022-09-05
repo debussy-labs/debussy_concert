@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
 
+
 @dataclass(frozen=True)
 class OutputConfig:
     format: str
@@ -30,16 +31,16 @@ class JsonFile(OutputConfig):
 
 
 def output_factory(output_config):
-    format: str = output_config['format']
+    format: str = output_config["format"]
     mapping = {
-        'csv': CsvFile,
-        'avro': AvroFile,
-        'parquet': ParquetFile,
-        'json': JsonFile
+        "csv": CsvFile,
+        "avro": AvroFile,
+        "parquet": ParquetFile,
+        "json": JsonFile,
     }
     output_cls = mapping.get(format.lower())
     if output_cls is None:
-        raise TypeError(f'Format `{format}` is not supported')
+        raise TypeError(f"Format `{format}` is not supported")
     return output_cls(**output_config)
 
 
@@ -53,13 +54,13 @@ class ReverseEtlMovementParameters(MovementParametersBase):
     output_config: OutputConfig
     destination_connection_id: str
     extraction_query_from_temp: str
-    destination_uri: str    
+    destination_uri: str
 
     def __post_init__(self):
         output_config = output_factory(self.output_config)
         # hack for frozen dataclass https://stackoverflow.com/a/54119384
         # overwriting output_config with output_factory instance
-        object.__setattr__(self, 'output_config', output_config)
+        object.__setattr__(self, "output_config", output_config)
 
     @classmethod
     def load_from_dict(cls, movement_parameters):

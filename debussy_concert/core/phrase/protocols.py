@@ -34,9 +34,7 @@ class PCreateExternalTableMotif(PMotif, Protocol):
     destination_table_uri: str
 
     def setup(
-        self,
-        source_bucket_uri_prefix: str,
-        destination_project_dataset_table: str
+        self, source_bucket_uri_prefix: str, destination_project_dataset_table: str
     ):
         pass
 

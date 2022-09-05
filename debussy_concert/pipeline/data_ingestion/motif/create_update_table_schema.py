@@ -1,11 +1,14 @@
 from airflow.utils.task_group import TaskGroup
 from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryCreateEmptyTableOperator,
-    BigQueryUpdateTableOperator
+    BigQueryUpdateTableOperator,
 )
 from debussy_concert.core.motif.mixins.bigquery_job import TableReference
 from debussy_concert.core.motif.motif_base import MotifBase
-from debussy_concert.core.service.lakehouse.google_cloud import GoogleCloudLakeHouseService, BigQueryTable
+from debussy_concert.core.service.lakehouse.google_cloud import (
+    GoogleCloudLakeHouseService,
+    BigQueryTable,
+)
 
 
 class CreateBigQueryTableMotif(MotifBase):
@@ -20,9 +23,11 @@ class CreateBigQueryTableMotif(MotifBase):
         self.table_ref = TableReference(table_uri=table_uri)
 
     def build(self, workflow_dag, phrase_group):
-        task_group = TaskGroup(group_id=self.name, dag=workflow_dag, parent_group=phrase_group)
+        task_group = TaskGroup(
+            group_id=self.name, dag=workflow_dag, parent_group=phrase_group
+        )
         create_table = BigQueryCreateEmptyTableOperator(
-            task_id='create_empty_table',
+            task_id="create_empty_table",
             bigquery_conn_id=self.gcp_conn_id,
             project_id=self.table_ref.project_id,
             dataset_id=self.table_ref.dataset_id,
@@ -30,10 +35,10 @@ class CreateBigQueryTableMotif(MotifBase):
             schema_fields=self.bq_schema,
             time_partitioning=self.bq_partitioning,
             dag=workflow_dag,
-            task_group=task_group
+            task_group=task_group,
         )
         update_table = BigQueryUpdateTableOperator(
-            task_id='update_table_resources',
+            task_id="update_table_resources",
             dag=workflow_dag,
             task_group=task_group,
             table_resource=self.bq_table_resource,
@@ -42,8 +47,5 @@ class CreateBigQueryTableMotif(MotifBase):
             dataset_id=self.table_ref.dataset_id,
             table_id=self.table_ref.table_id,
         )
-        self.workflow_service.chain_tasks(
-            create_table,
-            update_table
-        )
+        self.workflow_service.chain_tasks(create_table, update_table)
         return task_group
