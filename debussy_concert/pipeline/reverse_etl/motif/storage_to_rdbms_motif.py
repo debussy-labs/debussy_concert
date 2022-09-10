@@ -1,4 +1,4 @@
-from debussy_airflow.hooks.db_api_hook import DbApiInterface
+from debussy_airflow.hooks.db_api_hook import DbApiHookInterface
 from debussy_airflow.hooks.storage_hook import StorageHookInterface
 from debussy_airflow.operators.storage_to_rdbms_operator import StorageToRdbmsOperator
 
@@ -10,7 +10,7 @@ class StorageToRdbmsQueryMotif(MotifBase):
 
     def __init__(
         self,
-        dbapi_hook: DbApiInterface,
+        dbapi_hook: DbApiHookInterface,
         storage_hook: StorageHookInterface,
         destination_table: str,
         name=None,
