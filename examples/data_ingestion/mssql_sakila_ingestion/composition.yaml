@@ -40,7 +40,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_country.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mssql_sakila_ingestion/table_schemas/mssql_sakila_country.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
@@ -55,7 +55,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_city.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mssql_sakila_ingestion/table_schemas/mssql_sakila_city.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
@@ -70,7 +70,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_store.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mssql_sakila_ingestion/table_schemas/mssql_sakila_store.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
@@ -85,7 +85,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_inventory.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mssql_sakila_ingestion/table_schemas/mssql_sakila_inventory.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
@@ -100,7 +100,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${MSSQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${MSSQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mssql_sakila_ingestion/table_schemas/mssql_sakila_staff.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mssql_sakila_ingestion/table_schemas/mssql_sakila_staff.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}

@@ -41,7 +41,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_START} }}'
         AND last_update <  '{{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/mysql_sakila_ingestion/table_schemas/mysql_sakila_rental.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion/table_schemas/mysql_sakila_rental.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_START}

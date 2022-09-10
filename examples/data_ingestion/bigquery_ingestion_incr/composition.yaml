@@ -3,26 +3,26 @@ source_name: example
 source_type: bigquery
 description: BigQuery ingestion
 dag_parameters:
-    dag_id: bigquery_ingestion_incr
-    description: BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage
-    catchup: false
-    schedule_interval: '*/30 * * * *' # At every minute.
-    start_date:
-      year: 2022
-      month: 1
-      day: 1
-    tags:
-      - framework:debussy_concert
-      - project:example
-      - source:bigquery
-      - type:ingestion
-      - load:incremental
-      - tier:1
-    default_args:
-      owner: debussy
+  dag_id: bigquery_ingestion_incr
+  description: BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage
+  catchup: false
+  schedule_interval: "*/30 * * * *" # At every minute.
+  start_date:
+    year: 2022
+    month: 1
+    day: 1
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - source:bigquery
+    - type:ingestion
+    - load:incremental
+    - tier:1
+  default_args:
+    owner: debussy
 ingestion_parameters:
   - name: sintetico_incr
-    raw_table_definition:  ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/bigquery_ingestion_incr/table_def_sintetico_incr.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/bigquery_ingestion_incr/table_def_sintetico_incr.yaml
     extraction_query: >
       SELECT 'dado' as data,
       TIMESTAMP '{{ execution_date }}' as airflow_logical_date,

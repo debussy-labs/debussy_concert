@@ -20,9 +20,9 @@ os.environ[
     "MYSQL_SAKILA_QUARTER_HOUR_WINDOW_END"
 ] = "next_execution_date.strftime('%Y-%m-%d 00:00:00')"
 
-env_file = f"{dags_folder}/examples/mysql_sakila_ingestion/environment.yaml"
+env_file = f"{dags_folder}/examples/environment.yaml"
 composition_file = (
-    f"{dags_folder}/examples/mysql_sakila_ingestion/composition_quarter_hour.yaml"
+    f"{dags_folder}/examples/data_ingestion/mysql_sakila_ingestion/composition_quarter_hour.yaml"
 )
 
 workflow_service = AirflowService()

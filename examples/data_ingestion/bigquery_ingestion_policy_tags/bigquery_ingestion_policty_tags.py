@@ -16,9 +16,9 @@ os.environ[
     "DEBUSSY_CONCERT__DAGS_FOLDER"
 ] = dags_folder  # of course you can set this on your system env var
 
-env_file = f"{dags_folder}/examples/bigquery_ingestion_policy_tags/environment.yaml"
+env_file = f"{dags_folder}/examples/environment.yaml"
 composition_file = (
-    f"{dags_folder}/examples/bigquery_ingestion_policy_tags/composition.yaml"
+    f"{dags_folder}/examples/data_ingestion/bigquery_ingestion_policy_tags/composition.yaml"
 )
 
 workflow_service = AirflowService()

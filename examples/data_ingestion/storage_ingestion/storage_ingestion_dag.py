@@ -116,7 +116,8 @@ class StorageParquetDataIngestionComposition(DataIngestionBase):
         self, movement_parameters: StorageParquetDataIngestionMovementParameters
     ):
 
-        data_to_raw_vault_motif = self.get_motif_from_source(movement_parameters)
+        data_to_raw_vault_motif = self.get_motif_from_source(
+            movement_parameters)
         movement_builder = self.ingestion_movement_builder(
             movement_parameters=movement_parameters,
             ingestion_to_raw_vault_phrase=self.storage_ingestion_to_raw_vault_phrase(
@@ -142,13 +143,13 @@ gcs_source = SourceInfo(
         "_load_flag=full/_logical_ts=1970-01-01/_ingestion_ts=2022-04-29 16:33:00.218627+00:00/"
         "000000000000.parquet"
     ),
-    raw_table_definition=f"{dags_folder}/examples/storage_ingestion/table_schemas/table_def_gcs.yaml",
+    raw_table_definition=f"{dags_folder}/examples/data_ingestion/storage_ingestion/table_schemas/table_def_gcs.yaml",
 )
 s3_source = SourceInfo(
     storage_type="s3",
     extract_connection_id="aws_noverde",
     file_uri="s3://dotz-integracao-stg/0.parquet",
-    raw_table_definition=f"{dags_folder}/examples/storage_ingestion/table_schemas/table_def_s3.yaml",
+    raw_table_definition=f"{dags_folder}/examples/data_ingestion/storage_ingestion/table_schemas/table_def_s3.yaml",
 )
 
 movements_parameters = []
@@ -182,7 +183,7 @@ dag_parameters = ConfigDagParameters(
     ],
 )
 workflow_service = AirflowService()
-env_file_path = f"{dags_folder}/examples/storage_ingestion/environment.yaml"
+env_file_path = f"{dags_folder}/examples/environment.yaml"
 env_config = ConfigEnvironment.load_from_file(env_file_path)
 config_composition = ConfigDataIngestionBase(
     name="storage_data_ingestion_example",
