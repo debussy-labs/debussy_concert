@@ -9,7 +9,9 @@ from debussy_concert.pipeline.reverse_etl.config.reverse_etl import ConfigRevers
 dags_folder = conf.get("core", "dags_folder")
 
 env_file = f"{dags_folder}/examples/environment.yaml"
-composition_file = f"{dags_folder}/examples/reverse_etl/reverse_etl_synthetic/composition.yaml"
+composition_file = (
+    f"{dags_folder}/examples/reverse_etl/reverse_etl_synthetic/composition.yaml"
+)
 
 reverse_etl_config = ConfigReverseEtl.load_from_file(
     composition_config_file_path=composition_file, env_file_path=env_file

@@ -21,9 +21,7 @@ os.environ[
 ] = "next_execution_date.strftime('%Y-%m-%d 00:00:00')"
 
 env_file = f"{dags_folder}/examples/environment.yaml"
-composition_file = (
-    f"{dags_folder}/examples/data_ingestion/postgresql_sakila_ingestion/composition.yaml"
-)
+composition_file = f"{dags_folder}/examples/data_ingestion/postgresql_sakila_ingestion/composition.yaml"
 
 workflow_service = AirflowService()
 config_composition = ConfigRdbmsDataIngestion.load_from_file(
