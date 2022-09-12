@@ -94,6 +94,8 @@ See the [Wiki](https://github.com/DotzInc/debussy_concert/wiki) for full documen
 ## Communication
 [GitHub Issues](https://github.com/DotzInc/debussy_concert/issues)
 
+[Discord Server](https://discord.gg/FpNX79pY)
+
 ## Contributions
 We welcome all community contributions!
 
