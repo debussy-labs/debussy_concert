@@ -66,6 +66,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         "boot_disk_size_gb": 1000,
     }
     endpoint_enable_http_port_access = True
+    internal_ip_only = False
     idle_seconds_delete_ttl = 8 * 60  # 8 minutes
     _cluster_name_task_id = None
 
@@ -112,6 +113,9 @@ class DataprocExportRdbmsTableToGcsMotif(
         self.endpoint_enable_http_port_access = self.config.dataproc_config.get(
             "endpoint_enable_http_port_access", self.endpoint_enable_http_port_access
         )
+        self.internal_ip_only = self.config.dataproc_config.get(
+            "internal_ip_only", self.internal_ip_only
+        )
 
     @property
     def config(self) -> ConfigRdbmsDataIngestion:
@@ -140,6 +144,7 @@ class DataprocExportRdbmsTableToGcsMotif(
             "gce_cluster_config": {
                 "zone_uri": zone,
                 "subnetwork_uri": self.config.dataproc_config["subnet"],
+                "internal_ip_only": self.internal_ip_only,
                 "tags": self.cluster_tags,
                 "metadata": {
                     "gcs-connector-version": self.gcs_connector_version,
@@ -211,7 +216,8 @@ class DataprocExportRdbmsTableToGcsMotif(
         )
 
         cluster_name_id = self.cluster_name_id(dag, task_group)
-        self._cluster_name_task_id = self.build_cluster_name(dag, cluster_name_id)
+        self._cluster_name_task_id = self.build_cluster_name(
+            dag, cluster_name_id)
 
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
         jdbc_to_raw_vault = self.jdbc_to_raw_vault(
