@@ -53,6 +53,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         "boot_disk_size_gb": 1000,
     }
     endpoint_enable_http_port_access = True
+    internal_ip_only = False
     idle_seconds_delete_ttl = 8 * 60  # 8 minutes
     _cluster_name_task_id = None
 
@@ -91,6 +92,8 @@ class DataprocExportRdbmsTableToGcsMotif(
             "software_config_image_version", self.software_config_image_version)
         self.endpoint_enable_http_port_access = self.config.dataproc_config.get(
             "endpoint_enable_http_port_access", self.endpoint_enable_http_port_access)
+        self.internal_ip_only = self.config.dataproc_config.get(
+            "internal_ip_only", self.internal_ip_only)
 
     @property
     def config(self) -> ConfigRdbmsDataIngestion:
@@ -117,6 +120,7 @@ class DataprocExportRdbmsTableToGcsMotif(
             "gce_cluster_config": {
                 "zone_uri": zone,
                 "subnetwork_uri": self.config.dataproc_config["subnet"],
+                "internal_ip_only": self.internal_ip_only,
                 "tags": self.cluster_tags,
                 "metadata": {
                     "gcs-connector-version": self.gcs_connector_version,
