@@ -1,8 +1,8 @@
 from airflow.configuration import conf
 from debussy_concert.core.service.injection import inject_dependencies
 from debussy_concert.core.service.workflow.airflow import AirflowService
-from debussy_concert.pipeline.reverse_etl.composition.childrens_corner import (
-    ChildrensCorner,
+from debussy_concert.pipeline.reverse_etl.composition.bigquery_to_storage import (
+    ReverseEtlBigQueryToStorageComposition,
 )
 from debussy_concert.pipeline.reverse_etl.config.reverse_etl import ConfigReverseEtl
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     composition_file = f"{path}/composition.yaml"
 
 
-composition: ChildrensCorner = ChildrensCorner()
+composition: ReverseEtlBigQueryToStorageComposition = ReverseEtlBigQueryToStorageComposition()
 reverse_etl_movement_fn = composition.bigquery_to_storage_reverse_etl_movement_builder
 
 dag = composition.play(reverse_etl_movement_fn)
