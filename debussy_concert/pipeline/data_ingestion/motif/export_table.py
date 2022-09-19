@@ -67,7 +67,6 @@ class DataprocExportRdbmsTableToGcsMotif(
     }
     endpoint_enable_http_port_access = True
     internal_ip_only = False
-    internal_ip_only = False
     idle_seconds_delete_ttl = 8 * 60  # 8 minutes
     _cluster_name_task_id = None
 
@@ -145,7 +144,6 @@ class DataprocExportRdbmsTableToGcsMotif(
             "gce_cluster_config": {
                 "zone_uri": zone,
                 "subnetwork_uri": self.config.dataproc_config["subnet"],
-                "internal_ip_only": self.internal_ip_only,
                 "internal_ip_only": self.internal_ip_only,
                 "tags": self.cluster_tags,
                 "metadata": {
