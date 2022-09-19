@@ -21,7 +21,8 @@ class PMovement(Protocol):
 class MovementBase(PMovement):
     @inject.params(config=ConfigComposition, workflow_service=PWorkflowService)
     def __init__(
-        self, *,
+        self,
+        *,
         config: ConfigComposition,
         workflow_service: PWorkflowService,
         phrases: Sequence[PPhrase],
@@ -36,7 +37,9 @@ class MovementBase(PMovement):
         return self.build(*args, **kwargs)
 
     def build(self, workflow_dag) -> PMovementGroup:
-        movement_group = self.workflow_service.movement_group(group_id=self.name, workflow_dag=workflow_dag)
+        movement_group = self.workflow_service.movement_group(
+            group_id=self.name, workflow_dag=workflow_dag
+        )
         current_task_group = self.phrases[0].build(workflow_dag, movement_group)
 
         for phrase in self.phrases[1:]:

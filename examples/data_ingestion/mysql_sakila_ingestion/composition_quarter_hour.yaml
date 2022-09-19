@@ -1,0 +1,51 @@
+name: mysql_sakila_ingestion_quarter_hour
+source_name: sakila
+source_type: mysql
+description: mysql ingestion
+secret_manager_uri: projects/modular-aileron-191222/secrets/debussy_mysql_dev
+dataproc_config:
+  machine_type: n1-standard-2
+  num_workers: 0
+  subnet: subnet-cluster-services
+  parallelism: 60
+  pip_packages:
+    - google-cloud-secret-manager
+dag_parameters:
+  dag_id: mysql_sakila_ingestion_quarter_hour
+  description: Mysql ingestion for sakila sample relational database.
+  catchup: true
+  schedule_interval: "*/15 * * * *" # every 15 minutes (quarter-hour)
+  max_active_runs: 1
+  start_date:
+    year: 2006
+    month: 2
+    day: 15
+  end_date:
+    year: 2006
+    month: 2
+    day: 24
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - source:mysql
+    - type:ingestion
+    - load:incremental
+    - tier:5
+  default_args:
+    owner: debussy
+ingestion_parameters:
+  - name: rental
+    extraction_query: >
+      SELECT rental_id, rental_date, inventory_id, customer_id, return_date, staff_id, last_update
+      FROM sakila.rental
+      WHERE last_update >= '{{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_START} }}'
+        AND last_update <  '{{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion/table_schemas/mysql_sakila_rental.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_START}
+        }}/_ts_window_end={{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d%H') }}"

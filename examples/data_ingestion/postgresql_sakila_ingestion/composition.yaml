@@ -1,0 +1,83 @@
+name: postgresql_sakila_ingestion_daily
+source_name: sakila
+source_type: postgresql
+description: PostgreSQL ingestion
+secret_manager_uri: projects/${DEBUSSY_CONCERT__PROJECT}/secrets/debussy_postgresql_dev
+dataproc_config:
+  machine_type: n1-standard-2
+  num_workers: 0
+  subnet: subnet-cluster-services
+  parallelism: 60
+  pip_packages:
+    - google-cloud-secret-manager
+  software_config_image_version: "2.0"
+  spark_jars_packages: org.postgresql:postgresql:42.4.0
+dag_parameters:
+  dag_id: postgresql_sakila_ingestion_daily
+  description: Postgresql ingestion for sakila sample relational database.
+  catchup: true
+  schedule_interval: "0 5 * * *"
+  max_active_runs: 1
+  start_date:
+    year: 2006
+    month: 2
+    day: 15
+  end_date:
+    year: 2006
+    month: 2
+    day: 16
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - source:postgresql
+    - type:ingestion
+    - load:incremental
+    - tier:5
+  default_args:
+    owner: debussy
+ingestion_parameters:
+  - name: actor
+    extraction_query: >
+      SELECT actor_id, first_name, last_name, last_update
+      FROM public.actor
+      WHERE last_update >= '{{ ${POSTGRESQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${POSTGRESQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_actor.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${POSTGRESQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: category
+    extraction_query: >
+      SELECT category_id, "name", last_update
+      FROM public.category
+      WHERE last_update >= '{{ ${POSTGRESQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${POSTGRESQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_category.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${POSTGRESQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: language
+    extraction_query: >
+      SELECT language_id, "name", last_update
+      FROM public."language"
+      WHERE last_update >= '{{ ${POSTGRESQL_SAKILA_WINDOW_START} }}'
+      AND last_update   <  '{{ ${POSTGRESQL_SAKILA_WINDOW_END} }}'
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_language.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
+        }}/_ts_window_end={{ ${POSTGRESQL_SAKILA_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"

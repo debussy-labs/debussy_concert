@@ -2,7 +2,11 @@ from dataclasses import dataclass
 from debussy_concert.core.phrase.phrase_base import PhraseBase
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.service.workflow.protocol import (
-    PMotifGroup, PPhraseGroup, PMovementGroup, PWorkflowDag)
+    PMotifGroup,
+    PPhraseGroup,
+    PMovementGroup,
+    PWorkflowDag,
+)
 
 
 class TaskMixin:
@@ -31,8 +35,7 @@ class DummyMotif(MotifBase, TaskMixin):
         self._setup = kwargs
 
     def build(self, workflow_dag, phrase_group) -> PMotifGroup:
-        self.build_args = {"workflow_dag": workflow_dag,
-                           "phrase_group": phrase_group}
+        self.build_args = {"workflow_dag": workflow_dag, "phrase_group": phrase_group}
         return self
 
 
@@ -63,5 +66,5 @@ class DummyDag(PWorkflowDag):
 
 
 def create_empty_phrase(name):
-    motif = DummyMotif(name=f'{name}_motif')
+    motif = DummyMotif(name=f"{name}_motif")
     return DummyPhrase(name=name, motifs=[motif])

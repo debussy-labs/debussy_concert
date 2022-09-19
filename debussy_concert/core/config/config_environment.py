@@ -30,11 +30,11 @@ class ConfigEnvironment:
             if value is None:
                 continue
 
-            env_key = f'{prefix}__{key}'.upper()
+            env_key = f"{prefix}__{key}".upper()
             os.environ[env_key] = value
 
     @classmethod
     def load_from_file(cls, file_path):
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             env_config = yaml_load(file)
         return cls(**env_config)
