@@ -1,0 +1,63 @@
+fields:
+- constraint: NULLABLE
+  data_type: INTEGER
+  description: PK Id da tabela para identificar os steps de cada worflow.
+  name: id
+- constraint: NULLABLE
+  data_type: INTEGER
+  description: FK Id do passo do workflow (tabela workflow_step_type).
+  name: workflow_step_type
+- constraint: NULLABLE
+  data_type: INTEGER
+  description: FK Id do workflow (tabela workflow_type).
+  name: workflow_id
+- data_type: INTEGER
+  description: Id do próximo passo em caso de sucesso no preenchimento do passo atual.
+  name: workflow_step_success_id
+- data_type: INTEGER
+  description: Id do próximo passo em caso de falha no preenchimento do passo atual.
+  name: workflow_step_failure_id
+- constraint: NULLABLE
+  data_type: TIMESTAMP
+  description: Data e hora em que o registro foi criado.
+  name: created
+- constraint: NULLABLE
+  data_type: TIMESTAMP
+  description: Data e hora em que o registro foi alterado.
+  name: updated
+- constraint: NULLABLE
+  data_type: BOOLEAN
+  description: Flag de deleção para controle de registros.
+  name: flag_deleted
+- data_type: STRING
+  description: Parâmetros do step (Caso haja algum preenchimento diferente).
+  name: step_parameters
+- data_type: INTEGER
+  description: tempo de expiração do workflow (Reset).
+  name: workflow_expire_hours
+- constraint: NULLABLE
+  data_type: BOOLEAN
+  description: placeholder
+  name: previous_allow
+- name: _flag_load
+  data_type: string
+  description: incr = incremental data ingestion; full = full data ingestion
+- name: _ts_logical
+  data_type: TIMESTAMP
+  description: Airflow logical date
+- name: _ts_ingestion
+  data_type: TIMESTAMP
+  description: Clock time at Airflow when the ingestion was executed
+- name: _ts_window_start
+  data_type: TIMESTAMP
+  description: Clock time at Airflow window start when the ingestion was executed
+- name: _ts_window_end
+  data_type: TIMESTAMP
+  description: Clock time at Airflow window end when the ingestion was finished
+- data_type: STRING
+  description: MD5 dos dados do registro (linha).
+  name: _hash_key
+partitioning:
+  field: _ts_window_start
+  granularity: DAY
+  type: time

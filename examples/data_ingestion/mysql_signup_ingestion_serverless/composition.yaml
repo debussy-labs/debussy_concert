@@ -1,0 +1,80 @@
+name: mysql_signup_ingestion
+source_name: signup
+source_type: mysql
+description: mysql ingestion
+secret_manager_uri: projects/${DEBUSSY_CONCERT__PROJECT}/secrets/dotz-mysql-prod
+dataproc_config:
+  type: serverless  
+  subnet: subnet-cluster-services  
+  pip_packages:
+    - google-cloud-secret-manager
+  spark_jars_packages:
+    - file:///usr/lib/spark/external/spark-avro.jar
+    - https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar
+    - gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar
+dag_parameters:
+    dag_id: ingestao_mysql_signup_serverless
+    description: Mysql ingestion for signup relational database.
+    catchup: false
+    schedule_interval: '0 6 * * *'
+    max_active_runs: 3
+    start_date:
+      year: 2020
+      month: 3
+      day: 14
+    tags:
+      - framework:debussy_concert
+      - project:signup
+      - source:mysql
+      - type:ingestion
+      - load:incremental
+      - tier:2
+    default_args:
+      owner: conta_onboarding
+ingestion_parameters:
+  - name: workflow_step_type_2
+    extraction_query: >
+      SELECT `id`, `name`, `description`, `created`, `updated`
+      FROM workflow_step_type
+      WHERE (
+        created >= TIMESTAMP('${SIGNUP_WINDOW_START}')
+      AND
+        created < TIMESTAMP('${SIGNUP_WINDOW_END}')
+      ) OR (
+        updated >= TIMESTAMP('${SIGNUP_WINDOW_START}')
+      AND
+        updated < TIMESTAMP('${SIGNUP_WINDOW_END}')
+      )
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_signup_ingestion_serverless/table_schemas/table_def_signup_workflow_step_type.yaml
+    data_partitioning:
+      gcs_partition_schema: "\
+        _flag_load=incr\
+        /_ts_window_start=${SIGNUP_WINDOW_START}\
+        /_ts_window_end=${SIGNUP_WINDOW_END}\
+        /_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}\
+        /_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: workflow_steps_2
+    extraction_query: >
+      SELECT `id`, `workflow_step_type`, `workflow_id`, `workflow_step_success_id`, `workflow_step_failure_id`, `created`, `updated`, `flag_deleted`, `step_parameters`, `workflow_expire_hours`, `previous_allow`
+      FROM workflow_steps
+      WHERE (
+        created >= TIMESTAMP('${SIGNUP_WINDOW_START}')
+      AND
+        created < TIMESTAMP('${SIGNUP_WINDOW_END}')
+      ) OR (
+        updated >= TIMESTAMP('${SIGNUP_WINDOW_START}')
+      AND
+        updated < TIMESTAMP('${SIGNUP_WINDOW_END}')
+      )
+    extract_connection_id: google_cloud_debussy
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_signup_ingestion_serverless/table_schemas/table_def_signup_workflow_steps.yaml
+    data_partitioning:
+      gcs_partition_schema: "\
+        _flag_load=incr\
+        /_ts_window_start=${SIGNUP_WINDOW_START}\
+        /_ts_window_end=${SIGNUP_WINDOW_END}\
+        /_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}\
+        /_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"

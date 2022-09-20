@@ -1,0 +1,42 @@
+fields:
+- constraint: NULLABLE
+  data_type: INTEGER
+  description: PK Id do log gerado.
+  name: id
+- constraint: NULLABLE
+  data_type: STRING
+  description: Nome do passo Ex. LoginPosForm.
+  name: name
+- data_type: STRING
+  description: Descrição do passo, indicando o seu significado dentro do workflow.
+  name: description
+- constraint: NULLABLE
+  data_type: TIMESTAMP
+  description: Data e hora de criação do registro.
+  name: created
+- constraint: NULLABLE
+  data_type: TIMESTAMP
+  description: Data e hora de alteração do registro.
+  name: updated
+- name: _flag_load
+  data_type: string
+  description: incr = incremental data ingestion; full = full data ingestion
+- name: _ts_logical
+  data_type: TIMESTAMP
+  description: Airflow logical date
+- name: _ts_ingestion
+  data_type: TIMESTAMP
+  description: Clock time at Airflow when the ingestion was executed
+- name: _ts_window_start
+  data_type: TIMESTAMP
+  description: Clock time at Airflow window start when the ingestion was executed
+- name: _ts_window_end
+  data_type: TIMESTAMP
+  description: Clock time at Airflow window end when the ingestion was finished
+- data_type: STRING
+  description: MD5 dos dados do registro (linha).
+  name: _hash_key
+partitioning:
+  field: _ts_window_start
+  granularity: DAY
+  type: time

@@ -2,7 +2,10 @@ from airflow import DAG
 from airflow.utils.task_group import TaskGroup
 from google.protobuf.duration_pb2 import Duration
 from airflow.operators.python_operator import PythonOperator
-from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
+from airflow.providers.google.cloud.operators.dataproc import (
+    DataprocSubmitJobOperator,	
+    DataprocCreateBatchOperator,	
+)
 
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
 from debussy_concert.core.motif.motif_base import MotifBase, PClusterMotifMixin
@@ -281,3 +284,67 @@ class DataprocExportRdbmsTableToGcsMotif(
         )
 
         return jdbc_to_raw_vault
+
+	            "pyspark_batch": {	
+                "main_python_file_uri": self.main_python_file_uri,	
+                "args": [	
+                    self.jdbc_driver,	
+                    self.jdbc_url,	
+                    secret_uri,	
+                    self.config.source_name,	
+                    self.movement_parameters.extraction_query,	
+                    run_ts,	
+                    f"{self.destination_storage_uri}/{self.gcs_partition}",	
+                ],	
+                "jar_file_uris": self.spark_jars_packages,	
+            },	
+            "environment_config": {	
+                "execution_config": {	
+                    "subnetwork_uri": self.config.dataproc_config["subnet"]	
+                },	
+            },	
+        }	
+        return batch	
+    def setup(self, destination_storage_uri: str):	
+        self.destination_storage_uri = destination_storage_uri	
+        return self	
+    def build(self, dag, parent_task_group: TaskGroup):	
+        task_group = TaskGroup(	
+            group_id=self.name, dag=dag, parent_group=parent_task_group	
+        )	
+        start = StartOperator(	
+            phase=self.movement_parameters.name, dag=dag, task_group=task_group	
+        )	
+        batch_id = self.batch_job_id(dag, task_group)	
+        self._batch_id_task_id = self.build_batch_id_task_id(dag, batch_id)	
+        create_dataproc_serverless = self.submit_job(dag, task_group)	
+        self.workflow_service.chain_tasks(start, batch_id, create_dataproc_serverless)	
+        return task_group	
+    def build_batch_id_task_id(self, dag: DAG, batch_id):	
+        # max number of characters for dataproc serverless names is 34	
+        # for usage in serverless_name property	
+        return (	
+            f"dby{{{{ ti.xcom_pull(dag_id='{dag.dag_id}', task_ids='{batch_id.task_id}') }}}}"	
+            f"-{self.config.source_name.replace('_', '').lower()[:22]}"	
+            f"-{self.movement_parameters.name.replace('_', '').lower()[:22]}"	
+        )	
+    def batch_job_id(self, dag, task_group):	
+        batch_id = PythonOperator(	
+            task_id="batch_job_id",	
+            python_callable=lambda x: x,	
+            op_args=["{{ ti.job_id }}"],	
+            dag=dag,	
+            task_group=task_group,	
+        )	
+        return batch_id	
+    def submit_job(self, dag, task_group) -> DataprocCreateBatchOperator:	
+        create_dataproc_serverless = DataprocCreateBatchOperator(	
+            task_id="create_dataproc_serverless",	
+            project_id=self.config.environment.project,	
+            batch=self.batch_config,	
+            region=self.config.environment.region,	
+            batch_id=self.batch_id,	
+            dag=dag,	
+            task_group=task_group,	
+        )	
+        return create_dataproc_serverless
