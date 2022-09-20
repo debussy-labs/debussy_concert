@@ -216,8 +216,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         )
 
         cluster_name_id = self.cluster_name_id(dag, task_group)
-        self._cluster_name_task_id = self.build_cluster_name(
-            dag, cluster_name_id)
+        self._cluster_name_task_id = self.build_cluster_name(dag, cluster_name_id)
 
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
         jdbc_to_raw_vault = self.jdbc_to_raw_vault(

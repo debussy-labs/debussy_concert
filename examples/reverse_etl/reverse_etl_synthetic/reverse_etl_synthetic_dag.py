@@ -31,7 +31,9 @@ if __name__ == "__main__":
     composition_file = f"{path}/composition.yaml"
 
 
-composition: ReverseEtlBigQueryToStorageComposition = ReverseEtlBigQueryToStorageComposition()
+composition: ReverseEtlBigQueryToStorageComposition = (
+    ReverseEtlBigQueryToStorageComposition()
+)
 reverse_etl_movement_fn = composition.bigquery_to_storage_reverse_etl_movement_builder
 
 dag = composition.play(reverse_etl_movement_fn)
