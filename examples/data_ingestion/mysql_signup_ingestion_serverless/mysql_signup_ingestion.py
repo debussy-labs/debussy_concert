@@ -13,8 +13,8 @@ os.environ['DEBUSSY_CONCERT__DAGS_FOLDER'] = dags_folder
 os.environ['SIGNUP_WINDOW_START'] = "{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}"
 os.environ['SIGNUP_WINDOW_END'] = "{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}"
 
-env_file = f'{dags_folder}/examples/data_ingestion/environment.yaml'
-composition_file = f'{dags_folder}/examples/data_ingestion/mysql_signup_ingestion_serverless/composition.yaml'
+env_file = f'{dags_folder}/examples/environment.yaml'
+composition_file = f'{dags_folder}/examples/data_ingestion/ingestao_mysql_signup_serverless/composition.yaml'
 workflow_service = AirflowService()
 
 config_composition = ConfigRdbmsDataIngestion.load_from_file(

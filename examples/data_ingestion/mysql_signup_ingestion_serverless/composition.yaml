@@ -46,7 +46,7 @@ ingestion_parameters:
         updated < TIMESTAMP('${SIGNUP_WINDOW_END}')
       )
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_signup_ingestion_serverless/table_schemas/table_def_signup_workflow_step_type.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/ingestao_mysql_signup_serverless/table_schemas/table_def_signup_workflow_step_type.yaml
     data_partitioning:
       gcs_partition_schema: "\
         _flag_load=incr\
@@ -69,7 +69,7 @@ ingestion_parameters:
         updated < TIMESTAMP('${SIGNUP_WINDOW_END}')
       )
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_signup_ingestion_serverless/table_schemas/table_def_signup_workflow_steps.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/ingestao_mysql_signup_serverless/table_schemas/table_def_signup_workflow_steps.yaml
     data_partitioning:
       gcs_partition_schema: "\
         _flag_load=incr\
