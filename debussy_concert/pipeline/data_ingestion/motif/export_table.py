@@ -1,10 +1,11 @@
 from airflow import DAG
 from airflow.utils.task_group import TaskGroup
+from typing import Any, Optional, Sequence, Dict
 from google.protobuf.duration_pb2 import Duration
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.google.cloud.operators.dataproc import (
-    DataprocSubmitJobOperator,	
-    DataprocCreateBatchOperator,	
+    DataprocSubmitJobOperator,
+    DataprocCreateBatchOperator,
 )
 
 from debussy_concert.core.phrase.protocols import PExportDataToStorageMotif
@@ -47,6 +48,39 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
         )
 
         return self
+
+
+class DataprocServerlessSubmitJobOperator(DataprocCreateBatchOperator):
+    template_fields: Sequence[str] = (
+        "project_id",
+        "batch",
+        "batch_id",
+        "region",
+        "impersonation_chain",
+    )
+
+    def __init__(
+        self,        
+        region: Optional[str] = None,
+        project_id: Optional[str] = None,
+        batch: Dict[str, Any] = None,
+        batch_id: Optional[str] = None,
+        timeout: Optional[float] = None,
+        gcp_conn_id: str = "google_cloud_default",
+        **kwargs
+    ):
+        super().__init__(            
+            region=region,
+            project_id=project_id,
+            batch=batch,
+            batch_id=batch_id,
+            timeout=timeout,
+            gcp_conn_id=gcp_conn_id,
+            **kwargs
+        )
+
+    def execute(self, context):
+        DataprocCreateBatchOperator.execute(self, context)
 
 
 class DataprocExportRdbmsTableToGcsMotif(
@@ -219,8 +253,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         )
 
         cluster_name_id = self.cluster_name_id(dag, task_group)
-        self._cluster_name_task_id = self.build_cluster_name(
-            dag, cluster_name_id)
+        self._cluster_name_task_id = self.build_cluster_name(dag, cluster_name_id)
 
         create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
         jdbc_to_raw_vault = self.jdbc_to_raw_vault(
@@ -392,8 +425,8 @@ class DataprocServerlessExportRdbmsTableToGcsMotif(
         )
         return batch_id
 
-    def submit_job(self, dag, task_group) -> DataprocCreateBatchOperator:
-        create_dataproc_serverless = DataprocCreateBatchOperator(
+    def submit_job(self, dag, task_group) -> DataprocServerlessSubmitJobOperator:
+        create_dataproc_serverless = DataprocServerlessSubmitJobOperator(
             task_id="create_dataproc_serverless",
             project_id=self.config.environment.project,
             batch=self.batch_config,
