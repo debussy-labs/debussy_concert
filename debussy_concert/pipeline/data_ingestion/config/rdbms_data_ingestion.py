@@ -33,4 +33,18 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
         config["dag_parameters"] = ConfigDagParameters.create_from_dict(
             config["dag_parameters"]
         )
+
+        if all(key in config for key in ("dataproc_config", "dataproc_serverless_config")):
+            raise ValueError(
+                "Use either dataproc_config or dataproc_serverless_config, not both!")
+
+        if any(key in config for key in ("dataproc_config", "dataproc_serverless_config")):
+            if config.get("dataproc_serverless_config") is not None:
+                config["dataproc_config"] = config.pop(
+                    "dataproc_serverless_config")
+                config["dataproc_config"]["type"] = "serverless"
+        else:
+            raise ValueError(
+                "Required dataproc_config (or dataproc_serverless_config) config parameter missing!")
+
         return cls(**config)
