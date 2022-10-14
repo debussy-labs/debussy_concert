@@ -3,9 +3,8 @@ source_name: sakila
 source_type: mysql
 description: mysql ingestion
 secret_manager_uri: projects/modular-aileron-191222/secrets/debussy_mysql_dev
-dataproc_config:
-  type: serverless  
-  subnet: subnet-cluster-services  
+dataproc_serverless_config:
+  subnet: subnet-cluster-services
   pip_packages:
     - google-cloud-secret-manager
   spark_jars_packages:
