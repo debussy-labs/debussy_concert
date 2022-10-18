@@ -1,0 +1,50 @@
+fields:
+  - name: address_id
+    data_type: INT64
+    description: A surrogate primary key used to uniquely identify each address in the table
+  - name: address
+    data_type: STRING
+    description: The first line of an address
+  - name: address2
+    data_type: STRING
+    description: An optional second line of an address
+  - name: district
+    data_type: STRING
+    description: The region of an address, this may be a state, province, prefecture, etc
+  - name: city_id
+    data_type: INT64
+    description: A foreign key pointing to the city table
+  - name: postal_code
+    data_type: STRING
+    description: The postal code or ZIP code of the address (where applicable)
+  - name: phone
+    data_type: STRING
+    description: The telephone number for the address
+  - name: last_update
+    data_type: TIMESTAMP
+    description: When the row was created or most recently updated
+  - name: location
+    data_type: BYTES
+    description: A Geometry column with a spatial index on it
+  - name: _load_flag
+    data_type: STRING
+    description: incr = incremental data ingestion; full = full data ingestion
+  - name: _ts_window_start
+    data_type: TIMESTAMP
+    description: Ingestion window start at source timezone
+  - name: _ts_window_end
+    data_type: TIMESTAMP
+    description: Ingestion window end at source timezone
+  - name: _ts_logical
+    data_type: TIMESTAMP
+    description: Airflow logical date
+  - name: _ts_ingestion
+    data_type: TIMESTAMP
+    description: Clock time at Airflow when the ingestion was executed
+  - name: _hash_key
+    data_type: STRING
+    description: An MD5 surrogate hash key used to uniquely identify each record of the source
+partitioning:
+  field: _ts_logical
+  type: time
+  granularity: HOUR

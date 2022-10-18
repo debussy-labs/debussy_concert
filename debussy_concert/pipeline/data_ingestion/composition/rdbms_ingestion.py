@@ -16,6 +16,7 @@ from debussy_concert.pipeline.data_ingestion.phrase.ingestion_to_raw_vault impor
 )
 from debussy_concert.pipeline.data_ingestion.motif.export_table import (
     DataprocExportRdbmsTableToGcsMotif,
+    DataprocServerlessExportRdbmsTableToGcsMotif,
 )
 
 
@@ -103,7 +104,32 @@ class RdbmsIngestionComposition(DataIngestionBase):
         movement_parameters: RdbmsDataIngestionMovementParameters,
     ):
 
-        export_rdbms_to_gcs_motif = DataprocExportRdbmsTableToGcsMotif(
+        map_ = {
+            "serverless": self.dataproc_serverless_export_rdbms_table_to_gcs(
+                jdbc_driver, jdbc_url, movement_parameters
+            ),
+            "managed": self.dataproc_managed_export_rdbms_table_to_gcs(
+                jdbc_driver, jdbc_url, movement_parameters
+            ),
+        }
+        dataproc_type = self.config.dataproc_config.get("type", "managed")
+        export_rdbms_to_gcs_motif = map_.get(dataproc_type)
+        if not export_rdbms_to_gcs_motif:
+            raise NotImplementedError(
+                f"Invalid dataproc type: {dataproc_type} not implemented"
+            )
+        ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
+            export_data_to_storage_motif=export_rdbms_to_gcs_motif
+        )
+        return ingestion_to_raw_vault_phrase
+
+    def dataproc_managed_export_rdbms_table_to_gcs(
+        self,
+        jdbc_driver,
+        jdbc_url,
+        movement_parameters: RdbmsDataIngestionMovementParameters,
+    ):
+        return DataprocExportRdbmsTableToGcsMotif(
             movement_parameters=movement_parameters,
             gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema,
             jdbc_driver=jdbc_driver,
@@ -111,8 +137,16 @@ class RdbmsIngestionComposition(DataIngestionBase):
             main_python_file_uri=self.dataproc_main_python_file_uri,
         )
 
-        ingestion_to_raw_vault_phrase = IngestionSourceToRawVaultStoragePhrase(
-            export_data_to_storage_motif=export_rdbms_to_gcs_motif
+    def dataproc_serverless_export_rdbms_table_to_gcs(
+        self,
+        jdbc_driver,
+        jdbc_url,
+        movement_parameters: RdbmsDataIngestionMovementParameters,
+    ):
+        return DataprocServerlessExportRdbmsTableToGcsMotif(
+            movement_parameters=movement_parameters,
+            gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema,
+            jdbc_driver=jdbc_driver,
+            jdbc_url=jdbc_url,
+            main_python_file_uri=self.dataproc_main_python_file_uri,
         )
-
-        return ingestion_to_raw_vault_phrase
