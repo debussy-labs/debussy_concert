@@ -1,0 +1,33 @@
+name: gcs_ingestion_full
+source_name: example
+source_type: sftp
+description: Gcs ingestion
+dag_parameters:
+  dag_id: gcs_to_sftp_responsys_ingestion_full
+  description: Gcs full ingestion example. Fixing a partition and always overwriting it. Versioning on storage
+  catchup: false
+  schedule_interval: "* 1 * * *" # At every minute.
+  start_date: !!timestamp 2022-10-17 00:00:00
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - source:sftp
+    - type:ingestion
+    - load:full
+    - tier:2
+  default_args:
+    owner: debussy
+ingestion_parameters:
+  - name: bounce_responsys_full
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/gcs_ingestion_full/table_bounce_responsys.yaml
+    extract_connection_id: google_cloud_debussy
+    output_config:
+      format: CSV
+      file_name: bounce_responsys_{{ execution_date }}.csv
+      field_delimiter: ','
+    destination_type: gcs
+    destination_uri: gs://autodelete_dev_bucket/responsys/bounce_{{ execution_date }}.csv
+    destination_connection_id: google_cloud_debussy
+    data_partitioning:
+      gcs_partition_schema: _load_flag=full/_ts_window_start=0001-01-01 00:00:00/_ts_window_end=9999-01-01 00:00:00/_logical_ts=1970-01-01/_ingestion_ts={{ dag_run.start_date }}
+      destination_partition: 1970
