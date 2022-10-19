@@ -5,11 +5,11 @@ from debussy_concert.core.entities.bigquery_table import BigQueryTable, BigQuery
 class GoogleCloudLakeHouseService:
     @staticmethod
     def convert_table(table: Table) -> BigQueryTable:
-        ...
+        raise NotImplementedError("TBD")
 
     @staticmethod
     def convert_partitioning(partitioning: Partitioning) -> BigQueryTimePartitioning:
-        ...
+        raise NotImplementedError("TBD")
 
     @staticmethod
     def convert_table_field(table: TableField) -> BigQueryTableField:
