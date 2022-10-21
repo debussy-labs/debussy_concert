@@ -14,7 +14,7 @@ class ReverseEtlMovement(MovementBase):
         start_phrase: PStartPhrase,
         data_warehouse_to_reverse_etl_phrase,
         data_warehouse_reverse_etl_to_storage_phrase,
-        storage_to_destination_phrase,
+        storage_to_destination_phrases,
         end_phrase: PEndPhrase,
         name=None,
     ) -> None:
@@ -24,15 +24,16 @@ class ReverseEtlMovement(MovementBase):
         self.data_warehouse_reverse_etl_to_storage_phrase = (
             data_warehouse_reverse_etl_to_storage_phrase
         )
-        self.storage_to_destination_phrase = storage_to_destination_phrase
+        self.storage_to_destination_phrases = storage_to_destination_phrases
         self.end_phrase = end_phrase
         phrases = [
             self.start_phrase,
             self.data_warehouse_to_reverse_etl_phrase,
             self.data_warehouse_reverse_etl_to_storage_phrase,
-            self.storage_to_destination_phrase,
-            self.end_phrase,
         ]
+        for storage_to_destination_phrase in self.storage_to_destination_phrases:
+            phrases.append(storage_to_destination_phrase)
+        phrases.append(self.end_phrase)
         super().__init__(name=name, phrases=phrases)
 
     @property
@@ -72,7 +73,8 @@ class ReverseEtlMovement(MovementBase):
             extraction_query=self.datawarehouse_reverse_etl_extraction_query,
             storage_uri_prefix=self.reverse_etl_bucket_uri_prefix,
         )
-        self.storage_to_destination_phrase.setup(
-            storage_uri_prefix=self.reverse_etl_bucket_uri_prefix
-        )
+        for storage_to_destination_phrase in self.storage_to_destination_phrases:
+            storage_to_destination_phrase.setup(
+                storage_uri_prefix=self.reverse_etl_bucket_uri_prefix
+            )
         return self
