@@ -11,7 +11,8 @@ from debussy_concert.pipeline.reverse_etl.motif.storage_to_storage_motif import 
     StorageToStorageMotif,
 )
 
-from debussy_airflow.debussy_airflow.hooks.storage_hook import GCSHook, SFTPHook
+from debussy_airflow.hooks.storage_hook import GCSHook, SFTPHook
+
 
 class GcsIngestionComposition(DataIngestionBase):
     config: ConfigBigQueryDataIngestion
@@ -27,7 +28,7 @@ class GcsIngestionComposition(DataIngestionBase):
         return dag
 
     def storage_ingestion_movement_builder(
-       self, movement_parameters: GcsMovementParameters
+        self, movement_parameters: GcsMovementParameters
     ) -> DataIngestionMovement:
 
         return self.ingestion_movement_builder(
@@ -35,8 +36,7 @@ class GcsIngestionComposition(DataIngestionBase):
             ingestion_to_raw_vault_phrase=self.storage_to_destination_phrase(
                 movement_parameters
             ),
-        )    
-    
+        )
 
     def storage_to_destination_phrase(
         self, movement_parameters: GcsMovementParameters
@@ -51,7 +51,8 @@ class GcsIngestionComposition(DataIngestionBase):
         destiny_storage_hook = GCSHook(
             gcp_conn_id=self.config.environment.data_lakehouse_connection_id
         )
-        origin_storage_hook = HookCls(movement_parameters.destination_connection_id)
+        origin_storage_hook = HookCls(
+            movement_parameters.destination_connection_id)
         storage_to_storage_motif = StorageToStorageMotif(
             name=f"gcs_to_{destination_type}_motif",
             origin_storage_hook=origin_storage_hook,
