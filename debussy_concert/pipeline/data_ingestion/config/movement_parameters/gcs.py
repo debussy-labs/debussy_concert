@@ -3,6 +3,7 @@ from debussy_concert.pipeline.data_ingestion.config.movement_parameters.time_par
     TimePartitionedDataIngestionMovementParameters,
 )
 
+
 @dataclass(frozen=True)
 class OutputConfig:
     format: str
@@ -42,6 +43,7 @@ def output_factory(output_config):
     if output_cls is None:
         raise TypeError(f"Format `{format}` is not supported")
     return output_cls(**output_config)
+
 
 @dataclass(frozen=True)
 class GcsMovementParameters(

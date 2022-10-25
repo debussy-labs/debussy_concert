@@ -116,7 +116,8 @@ class StorageParquetDataIngestionComposition(DataIngestionBase):
         self, movement_parameters: StorageParquetDataIngestionMovementParameters
     ):
 
-        data_to_raw_vault_motif = self.get_motif_from_source(movement_parameters)
+        data_to_raw_vault_motif = self.get_motif_from_source(
+            movement_parameters)
         movement_builder = self.ingestion_movement_builder(
             movement_parameters=movement_parameters,
             ingestion_to_raw_vault_phrase=self.storage_ingestion_to_raw_vault_phrase(
