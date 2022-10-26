@@ -1,33 +1,12 @@
-import os
+from debussy_concert.utils.easy_setup import setup_this_composition_for_airflow
 
-from airflow.configuration import conf
-from debussy_concert.core.service.injection import inject_dependencies
-from debussy_concert.core.service.workflow.airflow import AirflowService
-from debussy_concert.pipeline.data_ingestion.composition.bigquery_ingestion import (
-    BigQueryIngestionComposition,
+dags_folder_rel_path_env_file = "examples/environment.yaml"
+dags_folder_rel_path_composition_file = (
+    "examples/data_ingestion/bigquery_ingestion_incr/composition.yaml"
 )
-from debussy_concert.pipeline.data_ingestion.config.bigquery_data_ingestion import (
-    ConfigBigQueryDataIngestion,
+debussy_composition = setup_this_composition_for_airflow(
+    dags_folder_rel_path_composition_file,
+    dags_folder_rel_path_env_file,
+    'ingestion_bigquery'
 )
-
-dags_folder = conf.get("core", "dags_folder")
-
-os.environ[
-    "DEBUSSY_CONCERT__DAGS_FOLDER"
-] = dags_folder  # of course you can set this on your system env var
-
-env_file = f"{dags_folder}/examples/environment.yaml"
-composition_file = (
-    f"{dags_folder}/examples/data_ingestion/bigquery_ingestion_incr/composition.yaml"
-)
-
-workflow_service = AirflowService()
-config_composition = ConfigBigQueryDataIngestion.load_from_file(
-    composition_config_file_path=composition_file, env_file_path=env_file
-)
-
-inject_dependencies(workflow_service, config_composition)
-
-debussy_composition = BigQueryIngestionComposition()
-
 dag = debussy_composition.auto_play()
