@@ -1,6 +1,6 @@
 name: storage_ingestion_incr
-source_name: storage
-source_type: gcs
+source_type: storage
+source_name: gcs
 description: Incremental storage GCS ingestion example
 dag_parameters:
   dag_id: storage_ingestion_incr
@@ -11,7 +11,7 @@ dag_parameters:
   start_date:
     year: 2022
     month: 10
-    day: 24
+    day: 27
   tags:
     - framework:debussy_concert
     - project:example
@@ -22,14 +22,15 @@ dag_parameters:
   default_args:
     owner: debussy
 ingestion_parameters:
-  - name: gcs_sakila_country_csv
+  - name: sakila_country_csv
     source_config:
-      type: gcs
-      format: CSV
-      field_delimiter: ","
-      uri: gs://autodelete_dev_bucket/sample/sakila_country_{{ execution_date }}.csv
       connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/storage_sakila_ingestion_incr/table_schemas/gcs_sakila_country_csv.yaml
+      type: gcs
+      is_dir: false
+      field_delimiter: ","
+      uri: gs://autodelete_dev_bucket/sample/sakila_country.csv
+      format: CSV
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/storage_sakila_ingestion_incr/table_schemas/sakila_country.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${STORAGE_INGESTION_WINDOW_START}
@@ -37,14 +38,31 @@ ingestion_parameters:
         }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
       destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
-  - name: sftp_sakila_country_csv
+  - name: sakila_country_csv_wildcard
     source_config:
-      type: sftp
-      format: CSV
+      connection_id: google_cloud_debussy
+      type: gcs
+      is_dir: false
       field_delimiter: ","
-      uri: sakila_country_{{ execution_date }}.csv
-      connection_id: sftp_default
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/storage_sakila_ingestion_incr/table_schemas/sftp_sakila_country_csv.yaml
+      uri: gs://autodelete_dev_bucket/sample/sakila_country_*.csv
+      format: CSV
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/storage_sakila_ingestion_incr/table_schemas/sakila_country.yaml
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${STORAGE_INGESTION_WINDOW_START}
+        }}/_ts_window_end={{ ${STORAGE_INGESTION_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+  - name: sakila_country_csv_zip
+    source_config:
+      connection_id: google_cloud_debussy
+      type: gcs
+      is_dir: false
+      field_delimiter: ","
+      uri: gs://autodelete_dev_bucket/sample/sakila_country.zip
+      format: CSV
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/storage_sakila_ingestion_incr/table_schemas/sakila_country.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${STORAGE_INGESTION_WINDOW_START}
