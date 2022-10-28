@@ -8,10 +8,11 @@ from debussy_concert.core.entities.table import BigQueryTable
 
 @dataclass(frozen=True)
 class SourceConfig:
-    type: str
-    format: str
-    uri: str
     connection_id: str
+    type: str
+    uri: str
+    is_dir: bool
+    format: str
 
 
 @dataclass(frozen=True)
@@ -20,14 +21,14 @@ class CsvFile(SourceConfig):
     print_header: bool = True
 
 
+class ParquetFile(SourceConfig):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+
+
 class AvroFile(SourceConfig):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError("AvroFile is not implemented yet")
-
-
-class ParquetFile(SourceConfig):
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError("ParquetFile is not implemented yet")
 
 
 class JsonFile(SourceConfig):
@@ -39,8 +40,8 @@ def source_factory(source_config):
     format: str = source_config["format"]
     mapping = {
         "csv": CsvFile,
-        "avro": AvroFile,
         "parquet": ParquetFile,
+        "avro": AvroFile,
         "json": JsonFile,
     }
     source_cls = mapping.get(format.lower())

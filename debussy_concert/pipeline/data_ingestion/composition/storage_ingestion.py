@@ -66,6 +66,7 @@ class StorageIngestionComposition(DataIngestionBase):
             source_storage_hook=source_storage_hook,
             raw_vault_hook=raw_vault_hook,
             source_file_uri=movement_parameters.source_config.uri,
+            is_dir=movement_parameters.source_config.is_dir,
             file_transformer_callable=file_transformer_fn,
             gcs_partition=movement_parameters.data_partitioning.gcs_partition_schema,
         )

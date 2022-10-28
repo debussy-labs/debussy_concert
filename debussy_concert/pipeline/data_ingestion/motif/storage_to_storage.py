@@ -9,7 +9,8 @@ def csv_to_parquet(tmp_file_uri: str) -> str:
     import pandas as pd
     print(f'Transforming file {tmp_file_uri}')
     table_origin = pd.read_csv(
-        tmp_file_uri, keep_default_na=False, na_values=None)
+        tmp_file_uri, keep_default_na=False, na_values=None, dtype=str
+    )
     file_suffix = '.csv'
     suffix_len = len(file_suffix)
     if tmp_file_uri.endswith('file_suffix'):
@@ -27,6 +28,7 @@ class StorageToRawVaultMotif(MotifBase):
         source_storage_hook,
         raw_vault_hook,
         source_file_uri,
+        is_dir,
         file_transformer_callable: Callable = None,
         gcs_partition=None,
         name=None
@@ -35,6 +37,7 @@ class StorageToRawVaultMotif(MotifBase):
         self.source_storage_hook = source_storage_hook
         self.raw_vault_hook = raw_vault_hook
         self.source_file_uri = source_file_uri
+        self.is_dir = is_dir
         self.file_transformer_callable = file_transformer_callable
         self.gcs_partition = gcs_partition
 
@@ -47,6 +50,7 @@ class StorageToRawVaultMotif(MotifBase):
             task_id="storage_to_raw_vault_gcs",
             origin_storage_hook=self.source_storage_hook,
             origin_file_uri=self.source_file_uri,
+            is_dir=self.is_dir,
             destination_storage_hook=self.raw_vault_hook,
             destination_file_uri=self.gcs_schema_uri + "0.parquet",
             file_transformer_fn=self.file_transformer_callable,
