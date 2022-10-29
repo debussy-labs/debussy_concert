@@ -34,6 +34,19 @@ class ConfigReverseEtl(ConfigComposition):
         with open(composition_config_file_path) as file:
             config = yaml_load(file)
         config["environment"] = env_config
+
+        # support for legacy compositions (bigquery_to_mysql, bigquery_to_storage) with single destination
+        for movement in config["extraction_movements"]:
+            if movement.get("destinations") is None:
+                movement["destinations"] = [
+                    {
+                        'name': movement.get("name"),
+                        'type': movement.pop("destination_type"),
+                        'uri': movement.pop("destination_uri"),
+                        'connection_id': movement.pop("destination_connection_id")
+                    }
+                ]
+
         extract_movements = [
             ReverseEtlMovementParameters.load_from_dict(parameters)
             for parameters in config["extraction_movements"]
