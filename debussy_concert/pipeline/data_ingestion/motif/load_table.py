@@ -1,8 +1,9 @@
 from typing import Optional
+from debussy_concert.core.service.lakehouse.google_cloud import GoogleCloudLakeHouseService
+from debussy_concert.core.entities.table import BigQueryTable
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.motif.mixins.bigquery_job import (
     BigQueryJobMixin,
-    BigQueryTimePartitioning,
     HivePartitioningOptions,
 )
 
@@ -17,7 +18,7 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         write_disposition: Optional[str] = None,
         create_disposition: Optional[str] = None,
         hive_partitioning_options: Optional[HivePartitioningOptions] = None,
-        time_partitioning: Optional[BigQueryTimePartitioning] = None,
+        table_definition: Optional[BigQueryTable] = None,
         schema_update_options=None,
         gcp_conn_id="google_cloud_default",
         name=None,
@@ -29,7 +30,7 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         self.destination_partition = destination_partition
         self.write_disposition = write_disposition
         self.create_disposition = create_disposition
-        self.time_partitioning = time_partitioning
+        self.table_definition = table_definition
         self.hive_partitioning_options = hive_partitioning_options
         self.schema_update_options = schema_update_options
         self.gcp_conn_id = gcp_conn_id
@@ -42,6 +43,11 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         self.destination_table = f"{destination_table_uri}${self.destination_partition}"
 
     def build(self, dag, phrase_group):
+        schema = GoogleCloudLakeHouseService.get_table_schema(
+            self.table_definition)
+        schema = {'fields': [
+            field for field in schema if not field['name'].startswith('_')]}
+
         bigquery_job_operator = self.insert_job_operator(
             dag,
             phrase_group,
@@ -51,8 +57,8 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
                 source_format=self.source_format,
                 write_disposition=self.write_disposition,
                 create_disposition=self.create_disposition,
+                schema=schema,
                 schema_update_options=self.schema_update_options,
-                time_partitioning=self.time_partitioning,
                 hive_partitioning_options=self.hive_partitioning_options,
             ),
             self.gcp_conn_id,
