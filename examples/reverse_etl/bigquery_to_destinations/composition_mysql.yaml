@@ -1,8 +1,7 @@
-name: reverse_etl_storage_mysql
+name: reverse_etl_bigquery_to_mysql_destinations
 description: Reverse ETL example of sample data from BigQuery to MySQL database
 dag_parameters:
-  dag_id: reverse_etl_mysql_dag
-  catchup: true
+  dag_id: reverse_etl_bigquery_to_mysql_destinations
   schedule_interval: null
   max_active_runs: 1
   start_date:
@@ -37,7 +36,11 @@ extraction_movements:
       file_name: participant_{{ execution_date }}.csv
       field_delimiter: ","
     destinations:
-      - name: sakila_teste_example
+      - name: sakila_example_a
         type: mysql
-        uri: teste.example
-        connection_id: db_teste_connection_id
+        uri: sakila.example_a
+        connection_id: sakila_connection_id
+      - name: sakila_example_b
+        type: mysql
+        uri: sakila.example_b
+        connection_id: sakila_connection_id

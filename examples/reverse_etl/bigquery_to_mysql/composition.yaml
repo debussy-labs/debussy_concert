@@ -1,21 +1,20 @@
-name: reverse_etl_storage
-description: Reverse ETL example of sample data from BigQuery to an SFTP and GCS bucket
+name: reverse_etl_bigquery_to_mysql
+description: Reverse ETL example of sample data from BigQuery to a MySQL database
 dag_parameters:
-  dag_id: reverse_etl_storage_dag
+  dag_id: reverse_etl_bigquery_to_mysql
   schedule_interval: null
   max_active_runs: 1
   start_date:
     year: 2022
     month: 1
     day: 1
-  description: Reverse ETL example of sample data from BigQuery to an SFTP and GCS bucket
+  description: Reverse ETL example of sample data from BigQuery to a MySQL database
   default_args:
     owner: debussy
   tags:
     - framework:debussy_concert
     - project:example
-    - destiny:gcs
-    - destiny:sftp
+    - destiny:mysql
     - type:reverse_etl
     - tier:5
 extraction_movements:
@@ -36,12 +35,6 @@ extraction_movements:
       format: CSV
       file_name: retl_data_{{ execution_date }}.csv
       field_delimiter: ","
-    destinations:
-      - name: autodelete_dev_bucket
-        type: gcs
-        uri: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
-        connection_id: google_cloud_debussy
-      - name: sftpgo
-        type: sftp
-        uri: "" #its empty due to a bug in sftp hook on debussy framework that will be fixed later
-        connection_id: sftp_default
+    destination_type: gcs
+    destination_uri: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
+    destination_connection_id: google_cloud_debussy
