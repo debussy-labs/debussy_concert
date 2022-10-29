@@ -30,10 +30,9 @@ class ReverseEtlMovement(MovementBase):
             self.start_phrase,
             self.data_warehouse_to_reverse_etl_phrase,
             self.data_warehouse_reverse_etl_to_storage_phrase,
+            *self.storage_to_destination_phrases,
+            self.end_phrase
         ]
-        for storage_to_destination_phrase in self.storage_to_destination_phrases:
-            phrases.append(storage_to_destination_phrase)
-        phrases.append(self.end_phrase)
         super().__init__(name=name, phrases=phrases)
 
     @property
