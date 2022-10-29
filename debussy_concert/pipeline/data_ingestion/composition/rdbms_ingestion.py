@@ -25,12 +25,8 @@ class RdbmsIngestionComposition(DataIngestionBase):
 
     def __init__(self):
         super().__init__()
-        pyspark_scripts_uri = (
-            f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
-        )
-        self.dataproc_main_python_file_uri = (
-            f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py"
-        )
+        self.dataproc_main_python_file_uri = self.config.dataproc_config.get(
+            "pyspark_script")
 
     def auto_play(self):
         rdbms_builder_fn = self.rdbms_builder_fn()
@@ -48,7 +44,9 @@ class RdbmsIngestionComposition(DataIngestionBase):
         rdbms_name = self.config.source_type.lower()
         builder = map_.get(rdbms_name)
         if not builder:
-            raise NotImplementedError(f"Invalid rdbms: {rdbms_name} not implemented")
+            raise NotImplementedError(
+                f"Invalid rdbms: {rdbms_name} not implemented"
+            )
         return builder
 
     def mysql_ingestion_movement_builder(
@@ -56,7 +54,8 @@ class RdbmsIngestionComposition(DataIngestionBase):
     ) -> DataIngestionMovement:
 
         mysql_jdbc_driver = "com.mysql.cj.jdbc.Driver"
-        mysql_jdbc_url = "jdbc:mysql://{host}:{port}/" + self.config.source_name
+        mysql_jdbc_url = "jdbc:mysql://{host}:{port}/" + \
+            self.config.source_name
 
         return self.ingestion_movement_builder(
             movement_parameters=movement_parameters,
@@ -71,7 +70,8 @@ class RdbmsIngestionComposition(DataIngestionBase):
 
         mssql_jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
         mssql_jdbc_url = (
-            "jdbc:sqlserver://{host}:{port};databaseName=" + self.config.source_name
+            "jdbc:sqlserver://{host}:{port};databaseName=" +
+            self.config.source_name
         )
 
         return self.ingestion_movement_builder(
