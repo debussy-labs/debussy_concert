@@ -49,24 +49,30 @@ class BigQueryToDestinationsComposition(ReverseEtlBigQueryCompositionBase):
         """
         destination_phrases = []
         for destination in movement_parameters.destinations:
-            origin_gcs_hook = GCSHook(
-                gcp_conn_id=self.config.environment.data_lakehouse_connection_id
-            )
-            destination_name = destination["name"]
-            destination_type = destination["type"].lower()
-            destination_type_motif_map = {
-                "gcs": self.storage_to_gcs_motif(origin_gcs_hook, destination),
-                "sftp": self.storage_to_sftp_motif(origin_gcs_hook, destination),
-                "mysql": self.storage_to_mysql_motif(origin_gcs_hook, destination),
-            }
-            storage_to_destination_motif = destination_type_motif_map[destination_type]
-
-            phrase = StorageToDestinationPhrase(
-                name=f"StorageToDestinationPhrase_{destination_name}",
-                storage_to_destination_motif=storage_to_destination_motif
-            )
+            phrase = self.get_phrase_from_destination(destination)
             destination_phrases.append(phrase)
         return destination_phrases
+
+    def get_phrase_from_destination(self, destination):
+        origin_gcs_hook = GCSHook(
+            gcp_conn_id=self.config.environment.data_lakehouse_connection_id
+        )
+        destination_name = destination["name"]
+        destination_type = destination["type"].lower()
+        destination_type_motif_map = {
+            "gcs": self.storage_to_gcs_motif,
+            "sftp": self.storage_to_sftp_motif,
+            "mysql": self.storage_to_mysql_motif,
+        }
+        storage_to_destination_fn = destination_type_motif_map[destination_type]
+
+        phrase = StorageToDestinationPhrase(
+            name=f"StorageToDestinationPhrase_{destination_name}",
+            storage_to_destination_motif=storage_to_destination_fn(
+                origin_gcs_hook, destination)
+        )
+
+        return phrase
 
     def storage_to_gcs_motif(self, origin_gcs_hook, destination):
         return StorageToStorageMotif(
