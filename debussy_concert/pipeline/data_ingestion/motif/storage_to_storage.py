@@ -5,6 +5,10 @@ from debussy_airflow.operators.storage_to_storage_operator import \
     StorageToStorageOperator
 
 
+def parquet_to_parquet(tmp_file_uri: str) -> str:
+    return tmp_file_uri
+
+
 def csv_to_parquet(tmp_file_uri: str) -> str:
     import pandas as pd
     print(f'Transforming file {tmp_file_uri}')
@@ -53,6 +57,7 @@ class StorageToRawVaultMotif(MotifBase):
             is_dir=self.is_dir,
             destination_storage_hook=self.raw_vault_hook,
             destination_file_uri=self.gcs_schema_uri + "0.parquet",
+            # file_filter_fn
             file_transformer_fn=self.file_transformer_callable,
             dag=dag,
             task_group=phrase_group,

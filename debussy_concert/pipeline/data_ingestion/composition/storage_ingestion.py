@@ -7,7 +7,8 @@ from debussy_concert.pipeline.data_ingestion.config.movement_parameters.storage_
     StorageDataIngestionMovementParameters
 from debussy_concert.pipeline.data_ingestion.motif.storage_to_storage import (
     StorageToRawVaultMotif,
-    csv_to_parquet
+    csv_to_parquet,
+    parquet_to_parquet
 )
 from debussy_airflow.hooks.storage_hook import GCSHook, SFTPHook, S3Hook
 
@@ -57,7 +58,7 @@ class StorageIngestionComposition(DataIngestionBase):
         source_format = movement_parameters.source_config.format.lower()
         file_transformer_fn_map = {
             "csv": csv_to_parquet,
-            "parquet": None
+            "parquet": parquet_to_parquet
         }
         file_transformer_fn = file_transformer_fn_map[source_format]
 
