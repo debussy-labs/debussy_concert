@@ -6,7 +6,7 @@ dag_parameters:
   dag_id: bigquery_ingestion_full
   description: BigQuery full ingestion example. Fixing a partition and always overwriting it. Versioning on storage
   catchup: false
-  schedule_interval: "*/30 * * * *" # At every minute.
+  schedule_interval: "*/30 * * * *" # At every 30 minutes.
   start_date: !!timestamp 2022-01-01 00:00:00
   tags:
     - framework:debussy_concert

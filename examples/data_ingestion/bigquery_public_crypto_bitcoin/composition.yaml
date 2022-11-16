@@ -1,0 +1,38 @@
+name: bigquery_public_crypto_bitcoin
+source_name: bitcoin
+source_type: bigquery
+description: BigQuery ingestion
+dag_parameters:
+  dag_id: bigquery_public_crypto_bitcoin
+  description: BigQuery incremental ingestion of bitcoin dataset
+  catchup: on
+  schedule_interval: "0 10 * * *" # Every day at 10:00.
+  start_date: !!timestamp 2022-11-01 00:00:00
+  end_date: !!timestamp 2022-11-05  00:00:00 # just a few days of data as this will cost real money
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - project:bitcoin
+    - source:bigquery
+    - type:ingestion
+    - load:incremental
+    - tier:1
+  default_args:
+    owner: satoshi
+ingestion_parameters:
+  - name: blocks
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/bigquery_public_crypto_bitcoin/table_schemas/table_def_blocks.yaml
+    extraction_query: >
+      SELECT `hash` , size, number, `timestamp`, timestamp_month FROM `bigquery-public-data.crypto_bitcoin.blocks`
+      WHERE `timestamp` >= '{{ ${BITCOIN_WINDOW_START} }}'
+      AND `timestamp` < '{{ ${BITCOIN_WINDOW_END} }}'
+      AND timestamp_month >= DATE('{{ ${BITCOIN_WINDOW_START} }}')
+      AND timestamp_month < DATE('{{ ${BITCOIN_WINDOW_END} }}')
+    extract_connection_id: google_cloud_debussy
+    data_partitioning:
+      gcs_partition_schema: >-
+        _load_flag=incr/_ts_window_start={{ ${BITCOIN_WINDOW_START}
+        }}/_ts_window_end={{ ${BITCOIN_WINDOW_END}
+        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
+      destination_partition: "{{ macros.ds_format(execution_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d') }}"

@@ -1,0 +1,35 @@
+partitioning:
+    type: time
+    granularity: DAY
+    field: _ts_logical
+fields:
+  - name: hash
+    data_type: string
+    description: Hash of this block
+  - name: size
+    description: The size of block data in bytes
+    data_type: INTEGER
+  - name: number
+    description: The number of the block
+    data_type: INTEGER
+  - name: timestamp
+    description: Block creation timestamp specified in block header 
+    data_type: TIMESTAMP
+  - name: timestamp_month
+    description: Month of the block creation timestamp specified in block header
+    data_type: DATE
+  - name: _load_flag
+    data_type: string
+    description: incr = incremental data ingestion; full = full data ingestion
+  - name: _ts_window_start
+    data_type: TIMESTAMP
+    description: Ingestion window start at source timezone
+  - name: _ts_window_end
+    data_type: TIMESTAMP
+    description: Ingestion window end at source timezone
+  - name: _ts_logical
+    data_type: timestamp
+    description: Airflow logical date
+  - name: _ts_ingestion
+    data_type: timestamp
+    description: Clock time at when the ingestion was executed
