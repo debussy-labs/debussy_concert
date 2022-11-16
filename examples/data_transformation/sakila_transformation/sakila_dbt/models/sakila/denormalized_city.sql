@@ -17,4 +17,3 @@ join country on city.country_id = country.country_id
 )
 
 select * from denormalized
-

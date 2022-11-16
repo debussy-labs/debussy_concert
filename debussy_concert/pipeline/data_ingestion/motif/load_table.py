@@ -1,5 +1,7 @@
 from typing import Optional
-from debussy_concert.core.service.lakehouse.google_cloud import GoogleCloudLakeHouseService
+from debussy_concert.core.service.lakehouse.google_cloud import (
+    GoogleCloudLakeHouseService,
+)
 from debussy_concert.core.entities.table import BigQueryTable
 from debussy_concert.core.motif.motif_base import MotifBase
 from debussy_concert.core.motif.mixins.bigquery_job import (
@@ -43,10 +45,10 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         self.destination_table = f"{destination_table_uri}${self.destination_partition}"
 
     def build(self, dag, phrase_group):
-        schema = GoogleCloudLakeHouseService.get_table_schema(
-            self.table_definition)
-        schema = {'fields': [
-            field for field in schema if not field['name'].startswith('_')]}
+        schema = GoogleCloudLakeHouseService.get_table_schema(self.table_definition)
+        schema = {
+            "fields": [field for field in schema if not field["name"].startswith("_")]
+        }
 
         bigquery_job_operator = self.insert_job_operator(
             dag,

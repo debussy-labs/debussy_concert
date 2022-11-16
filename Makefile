@@ -28,4 +28,3 @@ mypy:
 
 install:
 	pip install -e .
-
