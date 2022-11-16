@@ -30,7 +30,7 @@ Debussy is a piece of the puzzle when it comes to being a data practitioner and 
     1. Promote your tool ONLY in #tool-and-service or when you introduce yourself in #introductions.
     2. Promote your tool in the tools channel once. Beyond answering questions about the tool multiple postings may be viewed as excessive and receive a warning.
     3. Mention your tool if someone mentions or is organic to a solution.
-2. If you see a partnership opportunity with Debussy please DM @Lawrence Fernandes#3444 and @Nilten#2847. We would love to create collaborative content and work with you if possible in promoting your product/service. 
+2. If you see a partnership opportunity with Debussy please DM @Lawrence Fernandes#3444 and @Nilten#2847. We would love to create collaborative content and work with you if possible in promoting your product/service.
 3. We will warn you if your promotion becomes excessive or not aligned with our code of conduct. If continued the result could end in you being removed from the discord community.
 4. **No Soliciting. Do not cold DM our users to promote your product. If we receive a valid soliciting complaint about you, we will remove you from the community.
 5. Have any questions about our promotional rules or want to run what you plan to share by us? DM @Lawrence Fernandes#3444.

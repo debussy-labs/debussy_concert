@@ -137,8 +137,7 @@ class BigQueryJobMixin:
             "PARQUET",
             "AVRO",
         ):
-            raise ValueError(
-                f"Invalid destination_format: {destination_format}")
+            raise ValueError(f"Invalid destination_format: {destination_format}")
         source_table_ref = TableReference(source_table_uri).to_dict()
         if isinstance(destination_uris, str):
             destination_uris = [destination_uris]
@@ -167,8 +166,7 @@ class BigQueryJobMixin:
         """
         https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
         """
-        destination_table_ref = TableReference(
-            table_uri=destination_table).to_dict()
+        destination_table_ref = TableReference(table_uri=destination_table).to_dict()
         if isinstance(source_uris, str):
             source_uris = [source_uris]
         hive_partitioning_options_ref = (

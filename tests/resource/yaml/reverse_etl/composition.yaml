@@ -25,5 +25,3 @@ extraction_movements:
     destination_type: destination_type_test
     destination_uri: destination_object_path_test
     destination_connection_id: destination_connection_id_test
-
-

@@ -23,12 +23,12 @@ extraction_movements:
       SELECT
       'gcs' as destiny,
       CURRENT_TIMESTAMP as load_ts,
-      '{{ ts_nodash }}' as date, 
-      TIMESTAMP('{{ execution_date }}') as execution_date, 
+      '{{ ts_nodash }}' as date,
+      TIMESTAMP('{{ execution_date }}') as execution_date,
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: execution_date
     extraction_query_from_temp: >
-      SELECT * 
+      SELECT *
       FROM `{reverse_etl_table_uri}`
       WHERE execution_date=TIMESTAMP('{{{{ execution_date }}}}')
       QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
@@ -44,12 +44,12 @@ extraction_movements:
       SELECT
       'sftp' as destiny,
       CURRENT_TIMESTAMP as load_ts,
-      '{{ ts_nodash }}' as date, 
-      TIMESTAMP('{{ execution_date }}') as execution_date, 
+      '{{ ts_nodash }}' as date,
+      TIMESTAMP('{{ execution_date }}') as execution_date,
     reverse_etl_dataset_partition_type: DAY
     reverse_etl_dataset_partition_field: execution_date
     extraction_query_from_temp: >
-      SELECT * 
+      SELECT *
       FROM `{reverse_etl_table_uri}`
       WHERE execution_date=TIMESTAMP('{{{{ execution_date }}}}')
       QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
@@ -60,5 +60,3 @@ extraction_movements:
     destination_type: sftp
     destination_uri: "" #its empty due to a bug in sftp hook on debussy framework that will be fixed later
     destination_connection_id: sftp_default
-
-
