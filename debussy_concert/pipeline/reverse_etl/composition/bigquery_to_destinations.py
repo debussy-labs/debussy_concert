@@ -14,7 +14,7 @@ from debussy_concert.pipeline.reverse_etl.motif.storage_to_rdbms_motif import (
     StorageToRdbmsQueryMotif,
 )
 from debussy_airflow.hooks.storage_hook import GCSHook, SFTPHook
-from debussy_airflow.hooks.db_api_hook import MySqlConnectorHook
+from debussy_airflow.hooks.db_api_hook import MySqlConnectorHook, PostgreSQLConnectorHook
 
 
 class BigQueryToDestinationsComposition(ReverseEtlBigQueryCompositionBase):
@@ -63,6 +63,7 @@ class BigQueryToDestinationsComposition(ReverseEtlBigQueryCompositionBase):
             "gcs": self.storage_to_gcs_motif,
             "sftp": self.storage_to_sftp_motif,
             "mysql": self.storage_to_mysql_motif,
+            "postgresql": self.storage_to_postgresql_motif,
         }
         storage_to_destination_fn = destination_type_motif_map[destination_type]
 
@@ -94,6 +95,14 @@ class BigQueryToDestinationsComposition(ReverseEtlBigQueryCompositionBase):
         return StorageToRdbmsQueryMotif(
             name="storage_to_mysql_motif",
             dbapi_hook=MySqlConnectorHook,
+            storage_hook=origin_gcs_hook,
+            destination_table=destination["uri"]
+        )
+
+    def storage_to_postgresql_motif(self, origin_gcs_hook, destination):
+        return StorageToRdbmsQueryMotif(
+            name="storage_to_postgresql_motif",
+            dbapi_hook=PostgreSQLConnectorHook,
             storage_hook=origin_gcs_hook,
             destination_table=destination["uri"]
         )
