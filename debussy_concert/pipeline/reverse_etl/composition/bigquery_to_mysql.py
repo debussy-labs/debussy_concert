@@ -34,13 +34,13 @@ class BigQueryToMysql(ReverseEtlBigQueryCompositionBase):
         return self.reverse_etl_movement_builder(
             movement_parameters=movement_parameters,
             storage_to_destination_phrases=[
-                self.storage_to_rdbms_phrase(
+                self.storage_to_mysql_phrase(
                     movement_parameters
                 )
             ]
         )
 
-    def storage_to_rdbms_phrase(
+    def storage_to_mysql_phrase(
         self, movement_parameters: ReverseEtlMovementParameters
     ):
         storage_hook = GCSHook(
@@ -49,14 +49,14 @@ class BigQueryToMysql(ReverseEtlBigQueryCompositionBase):
         dbapi_hook = MySqlConnectorHook(
             rdbms_conn_id=movement_parameters.destinations[0]["connection_id"]
         )
-        storage_to_rdbms_destination = StorageToRdbmsQueryMotif(
-            name="file_storage_to_build_insert_query_to_rdbms_motif",
+        storage_to_mysql_destination = StorageToRdbmsQueryMotif(
+            name="storage_to_mysql_motif",
             dbapi_hook=dbapi_hook,
             storage_hook=storage_hook,
             destination_table=movement_parameters.destinations[0]["uri"],
         )
         phrase = StorageToDestinationPhrase(
             name="StorageToRdbmsDestinationPhrase",
-            storage_to_destination_motif=storage_to_rdbms_destination,
+            storage_to_destination_motif=storage_to_mysql_destination,
         )
         return phrase
