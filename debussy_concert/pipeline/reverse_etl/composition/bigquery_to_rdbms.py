@@ -1,19 +1,8 @@
-from debussy_concert.core.composition.composition_base import CompositionBase
-from debussy_concert.core.phrase.utils.start import StartPhrase
-from debussy_concert.core.phrase.utils.end import EndPhrase
-from debussy_concert.core.motif.mixins.bigquery_job import BigQueryTimePartitioning
-
+from debussy_concert.pipeline.reverse_etl.composition.base import ReverseEtlBigQueryCompositionBase
 from debussy_concert.pipeline.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 from debussy_concert.pipeline.reverse_etl.config.reverse_etl import ConfigReverseEtl
 from debussy_concert.pipeline.reverse_etl.config.movement_parameters.reverse_etl import (
-    CsvFile,
-    ReverseEtlMovementParameters,
-)
-from debussy_concert.pipeline.reverse_etl.phrase.dw_to_reverse_etl import (
-    DataWarehouseToReverseEtlPhrase,
-)
-from debussy_concert.pipeline.reverse_etl.phrase.reverse_etl_to_storage import (
-    DataWarehouseReverseEtlToTempToStoragePhrase,
+    ReverseEtlMovementParameters
 )
 from debussy_concert.pipeline.reverse_etl.phrase.storage_to_destination import (
     StorageToDestinationPhrase,
@@ -21,132 +10,59 @@ from debussy_concert.pipeline.reverse_etl.phrase.storage_to_destination import (
 from debussy_concert.pipeline.reverse_etl.motif.storage_to_rdbms_motif import (
     StorageToRdbmsQueryMotif,
 )
-from debussy_concert.pipeline.reverse_etl.motif.bigquery_query_job import (
-    BigQueryQueryJobMotif,
-)
-from debussy_concert.pipeline.reverse_etl.motif.bigquery_extract_job import (
-    BigQueryExtractJobMotif,
-)
-
 from debussy_airflow.hooks.storage_hook import GCSHook
-from debussy_airflow.hooks.db_api_hook import MySqlConnectorHook, PostgreSQLConnectorHook
+from debussy_airflow.hooks.db_api_hook import (
+    MySqlConnectorHook,
+    PostgreSQLConnectorHook
+)
 
 
-class BigQueryToRdbms(CompositionBase):
+class BigQueryToRdbms(ReverseEtlBigQueryCompositionBase):
     config: ConfigReverseEtl
 
-    def bigquery_to_storage_reverse_etl_to_rdbms_movement_builder(
-        self, movement_parameters: ReverseEtlMovementParameters
+    def __init__(
+        self,
     ):
-        return self.reverse_etl_movement_builder(
-            movement_parameters=movement_parameters
-        )
+        super().__init__()
 
-    def reverse_etl_movement_builder(
-        self, movement_parameters: ReverseEtlMovementParameters
+    def auto_play(self):
+        builder_fn = self.bigquery_to_rdbms_reverse_etl_movement_builder
+        dag = self.play(builder_fn)
+        return dag
+
+    def bigquery_to_rdbms_reverse_etl_movement_builder(
+        self,
+        movement_parameters: ReverseEtlMovementParameters,
     ) -> ReverseEtlMovement:
-        start_phrase = StartPhrase()
-        end_phrase = EndPhrase()
-        csv_output_config: CsvFile = movement_parameters.output_config
-
-        data_warehouse_raw_to_reverse_etl_phrase = (
-            self.data_warehouse_raw_to_reverse_etl_phrase(
-                partition_type=movement_parameters.reverse_etl_dataset_partition_type,
-                partition_field=movement_parameters.reverse_etl_dataset_partition_field,
-                gcp_conn_id=self.config.environment.data_lakehouse_connection_id,
+        return self.reverse_etl_movement_builder(
+            movement_parameters=movement_parameters,
+            storage_to_destination_phrases=self.storage_to_rdbms_phrase(
+                movement_parameters
             )
         )
 
-        data_warehouse_reverse_etl_to_storage_phrase = (
-            self.data_warehouse_reverse_etl_to_storage_phrase(
-                destination_config=csv_output_config,
-                gcp_conn_id=self.config.environment.data_lakehouse_connection_id,
-            )
-        )
-
-        data_storage_to_rdbms_phrase = self.data_storage_to_rdbms_phrase(
-            movement_parameters
-        )
-
-        name = f"ReverseEtlMovement_{movement_parameters.name}"
-
-        movement = ReverseEtlMovement(
-            name=name,
-            start_phrase=start_phrase,
-            data_warehouse_to_reverse_etl_phrase=data_warehouse_raw_to_reverse_etl_phrase,
-            data_warehouse_reverse_etl_to_storage_phrase=data_warehouse_reverse_etl_to_storage_phrase,
-            storage_to_destination_phrase=data_storage_to_rdbms_phrase,
-            end_phrase=end_phrase,
-        )
-        movement.setup(movement_parameters)
-        return movement
-
-    def data_warehouse_raw_to_reverse_etl_phrase(
-        self, partition_type, partition_field, gcp_conn_id
-    ):
-        time_partitioning = BigQueryTimePartitioning(
-            type=partition_type, field=partition_field
-        )
-
-        bigquery_job = BigQueryQueryJobMotif(
-            name="bq_to_reverse_etl_motif",
-            write_disposition="WRITE_APPEND",
-            create_disposition="CREATE_IF_NEEDED",
-            time_partitioning=time_partitioning,
-            gcp_conn_id=gcp_conn_id,
-        )
-
-        phrase = DataWarehouseToReverseEtlPhrase(dw_to_reverse_etl_motif=bigquery_job)
-        return phrase
-
-    def data_warehouse_reverse_etl_to_storage_phrase(
-        self, destination_config: CsvFile, gcp_conn_id
-    ):
-        bigquery_job = BigQueryQueryJobMotif(
-            name="bq_reverse_etl_to_temp_table_motif",
-            write_disposition="WRITE_TRUNCATE",
-            create_disposition="CREATE_IF_NEEDED",
-            gcp_conn_id=gcp_conn_id,
-        )
-
-        export_bigquery = BigQueryExtractJobMotif(
-            name="bq_export_table_to_gcs_motif",
-            destination_format=destination_config.format,
-            field_delimiter=destination_config.field_delimiter,
-            gcp_conn_id=gcp_conn_id,
-        )
-
-        phrase = DataWarehouseReverseEtlToTempToStoragePhrase(
-            name="DataWarehouseReverseEtlToTempToStoragePhrase",
-            datawarehouse_reverse_etl_to_temp_table_motif=bigquery_job,
-            export_temp_table_to_storage_motif=export_bigquery,
-        )
-        return phrase
-
-    def data_storage_to_rdbms_phrase(
+    def storage_to_rdbms_phrase(
         self, movement_parameters: ReverseEtlMovementParameters
     ):
-        dest_conn_id = movement_parameters.destination_connection_id
-        data_lakehouse_connection_id = (
-            self.config.environment.data_lakehouse_connection_id
+        origin_gcs_hook = GCSHook(
+            gcp_conn_id=self.config.environment.data_lakehouse_connection_id
         )
 
-        #-------------------------------------
-        destination_type = movement_parameters.destination_type.lower()
+        destination_type = movement_parameters.destinations[0]["type"].lower()
         destination_type_motif_map = {
-            "pgsql": PostgreSQLConnectorHook,
             "mysql": MySqlConnectorHook,
+            "pgsql": PostgreSQLConnectorHook,
         }
-        HookCls = destination_type_motif_map[destination_type]        
-        destination_dbapi_hook = HookCls(movement_parameters.destination_connection_id)
-        #-------------------------------------
+        HookCls = destination_type_motif_map[destination_type]
+        destination_dbapi_hook = HookCls(
+            movement_parameters.destinations[0]["connection_id"]
+        )
 
-        storage_hook = GCSHook(gcp_conn_id=data_lakehouse_connection_id)
         storage_to_rdbms_destination = StorageToRdbmsQueryMotif(
-            name=f"file_storage_to_build_insert_query_to_{destination_type}_motif",
+            name=f"storage_to_{destination_type}_motif",
             dbapi_hook=destination_dbapi_hook,
-            storage_hook=storage_hook,
-            destination_table=movement_parameters.destination_uri,
+            storage_hook=origin_gcs_hook,
+            destination_table=movement_parameters.destinations[0]["uri"],
         )
 
         phrase = StorageToDestinationPhrase(
@@ -154,13 +70,3 @@ class BigQueryToRdbms(CompositionBase):
             storage_to_destination_motif=storage_to_rdbms_destination,
         )
         return phrase
-
-    @classmethod
-    def create_from_yaml(
-        cls, environment_config_yaml_filepath, composition_config_yaml_filepath
-    ):
-        config = ConfigReverseEtl.load_from_file(
-            composition_config_file_path=composition_config_yaml_filepath,
-            env_file_path=environment_config_yaml_filepath,
-        )
-        return cls(config)
