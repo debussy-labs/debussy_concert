@@ -1,0 +1,61 @@
+name: reverse_etl_bigquery_to_rdbms
+description: Reverse ETL example of sample data from BigQuery to MySQL and PostgreSQL databases
+dag_parameters:
+  dag_id: reverse_etl_bigquery_to_rdbms
+  schedule_interval: null
+  max_active_runs: 1
+  start_date:
+    year: 2022
+    month: 1
+    day: 1
+  description: Reverse ETL example of sample data from BigQuery to MySQL and PostgreSQL databases
+  default_args:
+    owner: debussy
+  tags:
+    - framework:debussy_concert
+    - project:example
+    - destiny:mysql
+    - destiny:postgresql
+    - type:reverse_etl
+    - tier:5
+extraction_movements:
+  - name: mysql_retl_synthetic_example
+    reverse_etl_query: >
+      SELECT
+      CURRENT_TIMESTAMP as load_ts,
+      '{{ ts_nodash }}' as date,
+      TIMESTAMP('{{ execution_date }}') as execution_date
+    reverse_etl_dataset_partition_type: DAY
+    reverse_etl_dataset_partition_field: execution_date
+    extraction_query_from_temp: >
+      SELECT * 
+      FROM `{reverse_etl_table_uri}`
+      WHERE execution_date=TIMESTAMP('{{{{ execution_date }}}}')
+      QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
+    output_config:
+      format: CSV
+      file_name: mysql_retl_synthetic_example_{{ execution_date }}.csv
+      field_delimiter: ","
+    destination_type: rdbms
+    destination_uri: test.retl_synthetic_example
+    destination_connection_id: mysql_dev
+  - name: postgresql_retl_synthetic_example
+    reverse_etl_query: >
+      SELECT
+      CURRENT_TIMESTAMP as load_ts,
+      '{{ ts_nodash }}' as date, 
+      TIMESTAMP('{{ execution_date }}') as execution_date
+    reverse_etl_dataset_partition_type: DAY
+    reverse_etl_dataset_partition_field: execution_date
+    extraction_query_from_temp: >
+      SELECT * 
+      FROM `{reverse_etl_table_uri}`
+      WHERE execution_date=TIMESTAMP('{{{{ execution_date }}}}')
+      QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1
+    output_config:
+      format: CSV
+      file_name: postgresql_retl_synthetic_example_{{ execution_date }}.csv
+      field_delimiter: ","
+    destination_type: rdbms
+    destination_uri: test.retl_synthetic_example
+    destination_connection_id: postgresql_dev
