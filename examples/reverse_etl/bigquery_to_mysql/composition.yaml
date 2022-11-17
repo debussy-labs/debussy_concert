@@ -35,6 +35,6 @@ extraction_movements:
       format: CSV
       file_name: retl_data_{{ execution_date }}.csv
       field_delimiter: ","
-    destination_type: gcs
-    destination_uri: gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv
-    destination_connection_id: google_cloud_debussy
+    destination_type: rdbms
+    destination_uri: test.mysql_synthetic_example
+    destination_connection_id: mysql_dev
