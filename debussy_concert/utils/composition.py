@@ -33,11 +33,18 @@ from debussy_concert.pipeline.reverse_etl.composition.bigquery_to_storage import
 def airflow_easy_setup(
     rel_path_env_file,
     rel_path_composition_file,
-    CompositionCls,
-    CompositionConfigCls,
     composition_type=None,
+    composition_cls=None,
+    composition_config_cls=None,
     os_env_prefix=None,
 ):
+    if all(
+        v is None for v in [composition_type, composition_cls, composition_config_cls]
+    ):
+        raise ValueError(
+            "Required `composition_type`, or `composition_cls` and `composition_config_cls` parameters missing!"
+        )
+
     dags_folder = conf.get("core", "dags_folder")
     env_file = f"{dags_folder}/{rel_path_env_file}"
     composition_file = f"{dags_folder}/{rel_path_composition_file}"
@@ -66,8 +73,8 @@ def airflow_easy_setup(
     }
 
     if composition_type:
-        CompositionConfigCls = _cls_map[composition_type]["config"]()
-        CompositionCls = _cls_map[composition_type]["composition"]()
+        composition_config_cls = _cls_map[composition_type]["config"]
+        composition_cls = _cls_map[composition_type]["composition"]
 
     os.environ["DEBUSSY_CONCERT__DAGS_FOLDER"] = dags_folder
     if os_env_prefix:
@@ -79,11 +86,11 @@ def airflow_easy_setup(
         ] = "next_execution_date.strftime('%Y-%m-%d 00:00:00')"
 
     workflow_service = AirflowService()
-    config_composition = CompositionConfigCls["config"].load_from_file(
+    config_composition = composition_config_cls.load_from_file(
         composition_config_file_path=composition_file, env_file_path=env_file
     )
 
     inject_dependencies(workflow_service, config_composition)
 
-    debussy_composition = CompositionCls["composition"]()
+    debussy_composition = composition_cls()
     return debussy_composition
