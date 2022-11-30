@@ -1,19 +1,17 @@
-name: mysql_sakila_ingestion_serverless
+name: mysql_sakila_ingestion_daily_old_setup
 source_name: sakila
 source_type: mysql
 description: mysql ingestion
 secret_manager_uri: projects/modular-aileron-191222/secrets/debussy_mysql_dev
-dataproc_serverless_config:
+dataproc_config:
+  machine_type: n1-standard-2
+  num_workers: 0
   subnet: subnet-cluster-services
+  parallelism: 60
   pip_packages:
     - google-cloud-secret-manager
-  spark_jars_packages:
-    - file:///usr/lib/spark/external/spark-avro.jar
-    - https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar
-    - gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar
-  pyspark_script: gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key_serverless.py
 dag_parameters:
-  dag_id: mysql_sakila_ingestion_serverless
+  dag_id: mysql_sakila_ingestion_daily_old_setup
   description: Mysql ingestion for sakila sample relational database.
   catchup: true
   schedule_interval: "@daily"
@@ -21,11 +19,11 @@ dag_parameters:
   start_date:
     year: 2006
     month: 2
-    day: 16
+    day: 15
   end_date:
     year: 2006
     month: 2
-    day: 17
+    day: 15
   tags:
     - framework:debussy_concert
     - project:example
@@ -33,7 +31,6 @@ dag_parameters:
     - type:ingestion
     - load:incremental
     - tier:5
-    - granularity:daily
   default_args:
     owner: debussy
 ingestion_parameters:
@@ -41,14 +38,14 @@ ingestion_parameters:
     extraction_query: >
       SELECT actor_id, film_id, last_update
       FROM sakila.film_actor
-      WHERE last_update >= '{{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_START} }}'
-        AND last_update <  '{{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_END} }}'
+      WHERE last_update >= '{{ ${MYSQL_SAKILA_DAILY_WINDOW_START} }}'
+        AND last_update <  '{{ ${MYSQL_SAKILA_DAILY_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion_serverless/table_schemas/mysql_sakila_film_actor.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion/table_schemas/mysql_sakila_film_actor.yaml
     data_partitioning:
       gcs_partition_schema: >-
-        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_START}
-        }}/_ts_window_end={{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_END}
+        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_DAILY_WINDOW_START}
+        }}/_ts_window_end={{ ${MYSQL_SAKILA_DAILY_WINDOW_END}
         }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
       destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
@@ -56,14 +53,14 @@ ingestion_parameters:
     extraction_query: >
       SELECT film_id, category_id, last_update
       FROM sakila.film_category
-      WHERE last_update >= '{{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_START} }}'
-        AND last_update <  '{{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_END} }}'
+      WHERE last_update >= '{{ ${MYSQL_SAKILA_DAILY_WINDOW_START} }}'
+        AND last_update <  '{{ ${MYSQL_SAKILA_DAILY_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion_serverless/table_schemas/mysql_sakila_film_category.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion/table_schemas/mysql_sakila_film_category.yaml
     data_partitioning:
       gcs_partition_schema: >-
-        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_START}
-        }}/_ts_window_end={{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_END}
+        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_DAILY_WINDOW_START}
+        }}/_ts_window_end={{ ${MYSQL_SAKILA_DAILY_WINDOW_END}
         }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
       destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
@@ -84,14 +81,14 @@ ingestion_parameters:
         , special_features
         , last_update
       FROM sakila.film
-      WHERE last_update >= '{{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_START} }}'
-        AND last_update <  '{{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_END} }}'
+      WHERE last_update >= '{{ ${MYSQL_SAKILA_DAILY_WINDOW_START} }}'
+        AND last_update <  '{{ ${MYSQL_SAKILA_DAILY_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion_serverless/table_schemas/mysql_sakila_film.yaml
+    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/mysql_sakila_ingestion/table_schemas/mysql_sakila_film.yaml
     data_partitioning:
       gcs_partition_schema: >-
-        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_START}
-        }}/_ts_window_end={{ ${MYSQL_SAKILA_SERVERLESS_DAILY_WINDOW_END}
+        _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_DAILY_WINDOW_START}
+        }}/_ts_window_end={{ ${MYSQL_SAKILA_DAILY_WINDOW_END}
         }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
       destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"

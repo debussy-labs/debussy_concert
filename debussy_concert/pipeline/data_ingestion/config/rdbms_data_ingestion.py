@@ -34,6 +34,7 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
             config["dag_parameters"]
         )
 
+        # config dataproc (serverless or managed)
         if all(
             key in config for key in ("dataproc_config", "dataproc_serverless_config")
         ):
@@ -50,6 +51,13 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
         else:
             raise ValueError(
                 "Required dataproc_config (or dataproc_serverless_config) config parameter missing!"
+            )
+
+        # config dataproc pyspark script
+        if config["dataproc_config"].get("pyspark_script") is None:
+            config["dataproc_config"]["pyspark_script"] = (
+                f"gs://{env_config.artifact_bucket}"
+                "/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
             )
 
         return cls(**config)

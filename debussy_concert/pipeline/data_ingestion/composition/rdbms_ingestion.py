@@ -25,12 +25,9 @@ class RdbmsIngestionComposition(DataIngestionBase):
 
     def __init__(self):
         super().__init__()
-        pyspark_scripts_uri = (
-            f"gs://{self.config.environment.artifact_bucket}/pyspark-scripts"
-        )
-        self.dataproc_main_python_file_uri = (
-            f"{pyspark_scripts_uri}/jdbc-to-gcs/jdbc_to_gcs.py"
-        )
+        self.dataproc_main_python_file_uri = self.config.dataproc_config[
+            "pyspark_script"
+        ]
 
     def auto_play(self):
         rdbms_builder_fn = self.rdbms_builder_fn()
