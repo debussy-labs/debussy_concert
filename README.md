@@ -105,12 +105,12 @@ Debussy works with the tools and systems that you're already using with your dat
 		<tr>
 			<td style="text-align: center; height=40px;"><img height="40" src="https://www.mysql.com/common/logos/powered-by-mysql-167x86.png" /></td>
 			<td style="width: 200px;">MySQL</td>
-			<td>Leading open source database, supported as a data source</td>
+			<td>Leading open source database, supported as a data source or destination</td>
 		</tr>
 		<tr>
 			<td style="text-align: center; height=40px;"><img height="40" src="https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png" /></td>
 			<td style="width: 200px;">PostgreSQL</td>
-			<td>Leading open source database, supported as a data source</td>
+			<td>Leading open source database, supported as a data source or destination</td>
 		</tr>
 		<tr>
 			<td style="text-align: center; height=40px;"><img height="40" src="https://www.oracle.com/a/ocom/img/jdbc.svg" /></td>
