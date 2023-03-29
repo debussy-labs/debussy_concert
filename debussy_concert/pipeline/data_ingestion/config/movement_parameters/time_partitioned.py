@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from debussy_concert.core.config.movement_parameters.base import MovementParametersBase
-from debussy_concert.core.entities.table import BigQueryTable
+from debussy_concert.core.entities.table import Table
 
 
 @dataclass(frozen=True)
@@ -13,7 +13,7 @@ class BigQueryDataPartitioning:
 class TimePartitionedDataIngestionMovementParameters(MovementParametersBase):
     extract_connection_id: str
     data_partitioning: BigQueryDataPartitioning
-    raw_table_definition: str or BigQueryTable
+    raw_table_definition: str or Table
 
     def __post_init__(self):
         if not isinstance(self.data_partitioning, BigQueryDataPartitioning):
@@ -27,11 +27,11 @@ class TimePartitionedDataIngestionMovementParameters(MovementParametersBase):
 
     def load_raw_table_definition_attr(self, raw_table_definition):
         if isinstance(raw_table_definition, str):
-            raw_table_definition = BigQueryTable.load_from_file(
+            raw_table_definition = Table.load_from_file(
                 self.raw_table_definition
             )
         elif isinstance(raw_table_definition, dict):
-            raw_table_definition = BigQueryTable.load_from_dict(
+            raw_table_definition = Table.load_from_dict(
                 self.raw_table_definition
             )
         else:

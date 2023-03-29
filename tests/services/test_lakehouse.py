@@ -1,4 +1,4 @@
-from debussy_concert.core.entities.table import BigQueryTable
+from debussy_concert.core.entities.table import Table
 from debussy_concert.core.service.lakehouse.google_cloud import (
     GoogleCloudLakeHouseService,
 )
@@ -29,9 +29,16 @@ def get_example_table():
                     {"name": "work", "data_type": "STRING"},
                 ],
             },
+            {
+                "name": "_metadata",
+                "description": "metadata column",
+                "data_type": "STRING",
+                "constraint": "REQUIRED",
+                "is_metadata": True
+            },
         ]
     }
-    return BigQueryTable.load_from_dict(table_dict)
+    return Table.load_from_dict(table_dict)
 
 
 def test_get_table_schema():
@@ -78,7 +85,65 @@ def test_get_table_schema():
                 },
             ],
         },
+        {
+            "name": "_metadata",
+            "description": "metadata column",
+            "type": "STRING",
+            "mode": "REQUIRED",
+            "policy_tags": {"names": []},
+            "fields": None,
+        }
     ]
     schema = GoogleCloudLakeHouseService.get_table_schema(table)
+    # print(schema)
+    assert schema == expected_schema
+
+
+def test_get_table_schema_without_metadata_columns():
+    table = get_example_table()
+    expected_schema = [
+        {
+            "name": "user_id",
+            "description": "id of the user",
+            "type": "STRING",
+            "mode": "REQUIRED",
+            "policy_tags": {"names": []},  # defaults to empty list
+            "fields": None,  # defaults do None
+        },
+        {
+            "name": "user_email",
+            "description": "email of the user",
+            "type": "STRING",
+            "mode": "REQUIRED",
+            "policy_tags": {"names": []},
+            "fields": None,
+        },
+        {
+            "name": "user_addresses",
+            "description": "home and work addresses of the user",
+            "type": "RECORD",
+            "mode": "REPEATED",
+            "policy_tags": {"names": []},
+            "fields": [
+                {
+                    "name": "home",
+                    "description": None,  # defaults do None
+                    "type": "STRING",
+                    "mode": None,  # defaults do None
+                    "fields": None,
+                    "policy_tags": {"names": []},
+                },
+                {
+                    "name": "work",
+                    "description": None,
+                    "type": "STRING",
+                    "mode": None,
+                    "fields": None,
+                    "policy_tags": {"names": []},
+                },
+            ],
+        }
+    ]
+    schema = GoogleCloudLakeHouseService.get_table_schema_without_metadata_columns(table)
     # print(schema)
     assert schema == expected_schema
