@@ -1,0 +1,82 @@
+{
+  "catchup": false,
+  "dag_id": "sakila_transformation",
+  "default_args": {
+    "owner": "debussy"
+  },
+  "description": "Sakila transformation example using Dbt",
+  "end_date": null,
+  "max_active_runs": 16,
+  "schedule_interval": "*/30 * * * *",
+  "start_date": "2022-01-01T00:00:00+00:00",
+  "tags": [
+    "framework:debussy_concert",
+    "load:full",
+    "project:example",
+    "source:bigquery",
+    "tier:2",
+    "type:transformation"
+  ],
+  "task_groups": {
+    "TransformationMovement": {
+      "parent_group": null
+    },
+    "TransformationMovement.DataLakehouseTransformationPhrase": {
+      "parent_group": "TransformationMovement"
+    },
+    "TransformationMovement.EndPhrase": {
+      "parent_group": "TransformationMovement"
+    },
+    "TransformationMovement.StartPhrase": {
+      "parent_group": "TransformationMovement"
+    },
+    "TransformationMovement.StartPhrase.StartMotif": {
+      "parent_group": "TransformationMovement.StartPhrase"
+    }
+  },
+  "tasks": {
+    "TransformationMovement.DataLakehouseTransformationPhrase.dbt_run": {
+      "operator": "debussy_concert.pipeline.data_transformation.motif.run_transformation.DebussyDbtRunOperator",
+      "task_group": "TransformationMovement.DataLakehouseTransformationPhrase",
+      "templated_fields": {
+        "vars": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "TransformationMovement.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "TransformationMovement.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "TransformationMovement.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "TransformationMovement.DataLakehouseTransformationPhrase.dbt_run"
+      ]
+    },
+    "TransformationMovement.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "TransformationMovement.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "TransformationMovement.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "TransformationMovement.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigTransformComposition name=sakila_transformation>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "TransformationMovement.StartPhrase.StartMotif.begin_dag"
+      ]
+    }
+  }
+}

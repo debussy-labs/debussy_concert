@@ -1,0 +1,221 @@
+{
+  "catchup": false,
+  "dag_id": "bigquery_ingestion_incr",
+  "default_args": {
+    "owner": "debussy"
+  },
+  "description": "BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage",
+  "end_date": null,
+  "max_active_runs": 16,
+  "schedule_interval": "*/30 * * * *",
+  "start_date": "2022-01-01T00:00:00+00:00",
+  "tags": [
+    "framework:debussy_concert",
+    "load:incremental",
+    "project:example",
+    "source:bigquery",
+    "tier:1",
+    "type:ingestion"
+  ],
+  "task_groups": {
+    "DataIngestionMovement_sintetico_incr": {
+      "parent_group": null
+    },
+    "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase": {
+      "parent_group": "DataIngestionMovement_sintetico_incr"
+    },
+    "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif": {
+      "parent_group": "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase"
+    },
+    "DataIngestionMovement_sintetico_incr.EndPhrase": {
+      "parent_group": "DataIngestionMovement_sintetico_incr"
+    },
+    "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase": {
+      "parent_group": "DataIngestionMovement_sintetico_incr"
+    },
+    "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase": {
+      "parent_group": "DataIngestionMovement_sintetico_incr"
+    },
+    "DataIngestionMovement_sintetico_incr.StartPhrase": {
+      "parent_group": "DataIngestionMovement_sintetico_incr"
+    },
+    "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif": {
+      "parent_group": "DataIngestionMovement_sintetico_incr.StartPhrase"
+    }
+  },
+  "tasks": {
+    "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "task_group": "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "gcs_schema_object": null,
+        "impersonation_chain": null,
+        "labels": null,
+        "materialized_view": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "bigquery_example_sintetico_incr",
+        "view": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryUpdateTableOperator",
+      "task_group": "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "bigquery_example_sintetico_incr"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table"
+      ]
+    },
+    "DataIngestionMovement_sintetico_incr.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "DataIngestionMovement_sintetico_incr.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif"
+      ]
+    },
+    "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase",
+      "templated_fields": {
+        "configuration": {
+          "query": {
+            "createDisposition": null,
+            "destinationTable": null,
+            "query": "\n    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet')\n    AS SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date, '/snapshot/pwd' as pwd_env_var, 'modular-aileron-191222' as debussy_concert_env_project, 'default_value' as env_default_value_example\n\n    ",
+            "timePartitioning": null,
+            "useLegacySql": false,
+            "writeDisposition": null
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources"
+      ]
+    },
+    "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase",
+      "templated_fields": {
+        "configuration": {
+          "load": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "raw",
+              "projectId": "modular-aileron-191222",
+              "tableId": "bigquery_example_sintetico_incr${{ macros.ds_format(execution_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"
+            },
+            "hivePartitioningOptions": {
+              "mode": "AUTO",
+              "sourceUriPrefix": "gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr"
+            },
+            "schema": {
+              "fields": [
+                {
+                  "description": null,
+                  "fields": null,
+                  "mode": null,
+                  "name": "data",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "Airflow logical date timestamp",
+                  "fields": null,
+                  "mode": null,
+                  "name": "airflow_logical_date",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                },
+                {
+                  "description": "Airflow $PWD env variable value",
+                  "fields": null,
+                  "mode": null,
+                  "name": "pwd_env_var",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "Value of the variable set in environment.yaml",
+                  "fields": null,
+                  "mode": null,
+                  "name": "debussy_concert_env_project",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "Example of a default value if variable does not exist in env",
+                  "fields": null,
+                  "mode": null,
+                  "name": "env_default_value_example",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                }
+              ]
+            },
+            "schemaUpdateOptions": null,
+            "sourceFormat": "PARQUET",
+            "sourceUris": [
+              "gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet"
+            ],
+            "timePartitioning": null,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif"
+      ]
+    },
+    "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigBigQueryDataIngestion name=bigquery_ingestion_incr>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.begin_dag"
+      ]
+    }
+  }
+}

@@ -1,0 +1,386 @@
+{
+  "catchup": true,
+  "dag_id": "mysql_sakila_ingestion_quarter_hour",
+  "default_args": {
+    "owner": "debussy"
+  },
+  "description": "Mysql ingestion for sakila sample relational database.",
+  "end_date": "2006-02-24T00:00:00+00:00",
+  "max_active_runs": 1,
+  "schedule_interval": "*/15 * * * *",
+  "start_date": "2006-02-15T00:00:00+00:00",
+  "tags": [
+    "framework:debussy_concert",
+    "load:incremental",
+    "project:example",
+    "source:mysql",
+    "tier:5",
+    "type:ingestion"
+  ],
+  "task_groups": {
+    "DataIngestionMovement_rental": {
+      "parent_group": null
+    },
+    "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase": {
+      "parent_group": "DataIngestionMovement_rental"
+    },
+    "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif": {
+      "parent_group": "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase"
+    },
+    "DataIngestionMovement_rental.EndPhrase": {
+      "parent_group": "DataIngestionMovement_rental"
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase": {
+      "parent_group": "DataIngestionMovement_rental"
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif": {
+      "parent_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase"
+    },
+    "DataIngestionMovement_rental.RawVaultStorageLoadToDataWarehouseRawPhrase": {
+      "parent_group": "DataIngestionMovement_rental"
+    },
+    "DataIngestionMovement_rental.StartPhrase": {
+      "parent_group": "DataIngestionMovement_rental"
+    },
+    "DataIngestionMovement_rental.StartPhrase.StartMotif": {
+      "parent_group": "DataIngestionMovement_rental.StartPhrase"
+    }
+  },
+  "tasks": {
+    "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "task_group": "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "gcs_schema_object": null,
+        "impersonation_chain": null,
+        "labels": null,
+        "materialized_view": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_rental",
+        "view": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryUpdateTableOperator",
+      "task_group": "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_rental"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table"
+      ]
+    },
+    "DataIngestionMovement_rental.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "DataIngestionMovement_rental.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif"
+      ]
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_rental": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources"
+      ]
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "op_args": [
+          "{{ ti.job_id }}"
+        ],
+        "op_kwargs": {},
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_rental"
+      ]
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.create_dataproc_cluster": {
+      "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocCreateClusterOperator",
+      "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "cluster_config": {
+          "autoscaling_config": {
+            "policy_uri": "projects/modular-aileron-191222/regions/us-central1/autoscalingPolicies/ephemeral-clusters"
+          },
+          "endpoint_config": {
+            "enable_http_port_access": true
+          },
+          "gce_cluster_config": {
+            "internal_ip_only": false,
+            "metadata": {
+              "PIP_PACKAGES": "google-cloud-secret-manager",
+              "bigquery-connector-version": "1.2.0",
+              "gcs-connector-version": "2.2.0",
+              "spark-bigquery-connector-version": "0.19.1"
+            },
+            "service_account_scopes": [
+              "https://www.googleapis.com/auth/cloud-platform"
+            ],
+            "subnetwork_uri": "subnet-cluster-services",
+            "tags": [
+              "dataproc"
+            ],
+            "zone_uri": "us-central1-a"
+          },
+          "initialization_actions": [
+            {
+              "executable_file": "gs://goog-dataproc-initialization-actions-us-central1/python/pip-install.sh",
+              "execution_timeout": {
+                "<protobuf google.protobuf.Duration>": "500s"
+              }
+            },
+            {
+              "executable_file": "gs://goog-dataproc-initialization-actions-us-central1/connectors/connectors.sh",
+              "execution_timeout": {
+                "<protobuf google.protobuf.Duration>": "500s"
+              }
+            }
+          ],
+          "lifecycle_config": {
+            "idle_delete_ttl": {
+              "seconds": 480
+            }
+          },
+          "master_config": {
+            "machine_type_uri": "n1-standard-4"
+          },
+          "secondary_worker_config": {
+            "disk_config": {
+              "boot_disk_size_gb": 1000,
+              "boot_disk_type": "pd-standard"
+            },
+            "machine_type_uri": "n1-standard-2",
+            "num_instances": 0
+          },
+          "software_config": {
+            "image_version": "1.4",
+            "properties": {
+              "dataproc:dataproc.conscrypt.provider.enable": "false",
+              "spark:spark.default.parallelism": "60",
+              "spark:spark.jars.excludes": "net.sourceforge.f2j:arpack_combined_all",
+              "spark:spark.jars.packages": "",
+              "spark:spark.sql.legacy.parquet.int96RebaseModeInWrite": "CORRECTED",
+              "spark:spark.sql.shuffle.partitions": "60"
+            }
+          },
+          "temp_bucket": "dotz-datalake-dev-l0-staging",
+          "worker_config": {
+            "disk_config": {
+              "boot_disk_size_gb": 1000,
+              "boot_disk_type": "pd-standard"
+            },
+            "machine_type_uri": "n1-standard-2",
+            "num_instances": 2
+          }
+        },
+        "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_quarter_hour', task_ids='DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "impersonation_chain": null,
+        "labels": null,
+        "project_id": "modular-aileron-191222",
+        "region": "us-central1",
+        "virtual_cluster_config": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id"
+      ]
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster": {
+      "operator": "debussy_concert.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
+      "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_quarter_hour', task_ids='DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "region": "us-central1"
+      },
+      "trigger_rule": "all_done",
+      "upstream": [
+        "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.jdbc_to_raw_vault"
+      ]
+    },
+    "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.jdbc_to_raw_vault": {
+      "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
+      "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "impersonation_chain": null,
+        "job": {
+          "placement": {
+            "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_quarter_hour', task_ids='DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila"
+          },
+          "pyspark_job": {
+            "args": [
+              "com.mysql.cj.jdbc.Driver",
+              "jdbc:mysql://{host}:{port}/sakila",
+              "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
+              "sakila",
+              "SELECT rental_id, rental_date, inventory_id, customer_id, return_date, staff_id, last_update FROM sakila.rental WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "{{ ts_nodash }}",
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/rental/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+            ],
+            "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
+          },
+          "reference": {
+            "project_id": "modular-aileron-191222"
+          }
+        },
+        "project_id": "modular-aileron-191222",
+        "region": "us-central1",
+        "request_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.create_dataproc_cluster"
+      ]
+    },
+    "DataIngestionMovement_rental.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_rental.RawVaultStorageLoadToDataWarehouseRawPhrase",
+      "templated_fields": {
+        "configuration": {
+          "load": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "raw",
+              "projectId": "modular-aileron-191222",
+              "tableId": "mysql_sakila_rental${{ execution_date.strftime('%Y%m%d%H') }}"
+            },
+            "hivePartitioningOptions": {
+              "mode": "AUTO",
+              "sourceUriPrefix": "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/rental"
+            },
+            "schema": {
+              "fields": [
+                {
+                  "description": "A surrogate primary key that uniquely identifies the rental",
+                  "fields": null,
+                  "mode": null,
+                  "name": "rental_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The date and time that the item was rented",
+                  "fields": null,
+                  "mode": null,
+                  "name": "rental_date",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                },
+                {
+                  "description": "The item being rented",
+                  "fields": null,
+                  "mode": null,
+                  "name": "inventory_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The customer renting the item",
+                  "fields": null,
+                  "mode": null,
+                  "name": "customer_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The date and time the item was returned",
+                  "fields": null,
+                  "mode": null,
+                  "name": "return_date",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                },
+                {
+                  "description": "The staff member who processed the rental",
+                  "fields": null,
+                  "mode": null,
+                  "name": "staff_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "When the row was created or most recently updated",
+                  "fields": null,
+                  "mode": null,
+                  "name": "last_update",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                }
+              ]
+            },
+            "schemaUpdateOptions": null,
+            "sourceFormat": "PARQUET",
+            "sourceUris": [
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/rental/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+            ],
+            "timePartitioning": null,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster"
+      ]
+    },
+    "DataIngestionMovement_rental.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_rental.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "DataIngestionMovement_rental.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_rental.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigRdbmsDataIngestion name=mysql_sakila_ingestion_quarter_hour>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_rental.StartPhrase.StartMotif.begin_dag"
+      ]
+    }
+  }
+}

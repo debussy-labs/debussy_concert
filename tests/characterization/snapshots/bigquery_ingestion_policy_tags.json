@@ -1,0 +1,193 @@
+{
+  "catchup": false,
+  "dag_id": "bigquery_ingestion_policy_tags",
+  "default_args": {
+    "owner": "debussy"
+  },
+  "description": "BigQuery policy tags example",
+  "end_date": null,
+  "max_active_runs": 16,
+  "schedule_interval": null,
+  "start_date": "2022-01-01T00:00:00+00:00",
+  "tags": [
+    "framework:debussy_concert",
+    "load:full",
+    "project:example",
+    "source:bigquery",
+    "tier:2",
+    "type:ingestion"
+  ],
+  "task_groups": {
+    "DataIngestionMovement_policy_tags": {
+      "parent_group": null
+    },
+    "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase": {
+      "parent_group": "DataIngestionMovement_policy_tags"
+    },
+    "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif": {
+      "parent_group": "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase"
+    },
+    "DataIngestionMovement_policy_tags.EndPhrase": {
+      "parent_group": "DataIngestionMovement_policy_tags"
+    },
+    "DataIngestionMovement_policy_tags.IngestionSourceToRawVaultStoragePhrase": {
+      "parent_group": "DataIngestionMovement_policy_tags"
+    },
+    "DataIngestionMovement_policy_tags.RawVaultStorageLoadToDataWarehouseRawPhrase": {
+      "parent_group": "DataIngestionMovement_policy_tags"
+    },
+    "DataIngestionMovement_policy_tags.StartPhrase": {
+      "parent_group": "DataIngestionMovement_policy_tags"
+    },
+    "DataIngestionMovement_policy_tags.StartPhrase.StartMotif": {
+      "parent_group": "DataIngestionMovement_policy_tags.StartPhrase"
+    }
+  },
+  "tasks": {
+    "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "task_group": "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "gcs_schema_object": null,
+        "impersonation_chain": null,
+        "labels": null,
+        "materialized_view": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "bigquery_example_policy_tags",
+        "view": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_policy_tags.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryUpdateTableOperator",
+      "task_group": "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "bigquery_example_policy_tags"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table"
+      ]
+    },
+    "DataIngestionMovement_policy_tags.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "DataIngestionMovement_policy_tags.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_policy_tags.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif"
+      ]
+    },
+    "DataIngestionMovement_policy_tags.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_policy_tags.IngestionSourceToRawVaultStoragePhrase",
+      "templated_fields": {
+        "configuration": {
+          "query": {
+            "createDisposition": null,
+            "destinationTable": null,
+            "query": "\n    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/policy_tags/_logical_ts=1970-01-01/_ingestion_ts={{ dag_run.start_date }}/*.parquet')\n    AS SELECT 'visible_data' as visible_data, 'tagged_data' as tagged_data\n    ",
+            "timePartitioning": null,
+            "useLegacySql": false,
+            "writeDisposition": null
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_policy_tags.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources"
+      ]
+    },
+    "DataIngestionMovement_policy_tags.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_policy_tags.RawVaultStorageLoadToDataWarehouseRawPhrase",
+      "templated_fields": {
+        "configuration": {
+          "load": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "raw",
+              "projectId": "modular-aileron-191222",
+              "tableId": "bigquery_example_policy_tags$1970"
+            },
+            "hivePartitioningOptions": {
+              "mode": "AUTO",
+              "sourceUriPrefix": "gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/policy_tags"
+            },
+            "schema": {
+              "fields": [
+                {
+                  "description": "Sample of a visible data column",
+                  "fields": null,
+                  "mode": null,
+                  "name": "visible_data",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "Sample of a tagged data column",
+                  "fields": null,
+                  "mode": null,
+                  "name": "tagged_data",
+                  "policy_tags": {
+                    "names": [
+                      "projects/modular-aileron-191222/locations/us/taxonomies/6490801880292513178/policyTags/1853854002968858960"
+                    ]
+                  },
+                  "type": "STRING"
+                }
+              ]
+            },
+            "schemaUpdateOptions": null,
+            "sourceFormat": "PARQUET",
+            "sourceUris": [
+              "gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/policy_tags/_logical_ts=1970-01-01/_ingestion_ts={{ dag_run.start_date }}/*.parquet"
+            ],
+            "timePartitioning": null,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_policy_tags.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif"
+      ]
+    },
+    "DataIngestionMovement_policy_tags.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_policy_tags.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "DataIngestionMovement_policy_tags.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_policy_tags.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigBigQueryDataIngestion name=bigquery_ingestion_policy_tags>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_policy_tags.StartPhrase.StartMotif.begin_dag"
+      ]
+    }
+  }
+}

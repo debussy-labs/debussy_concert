@@ -1,0 +1,171 @@
+{
+  "catchup": true,
+  "dag_id": "reverse_etl_bigquery_to_storage",
+  "default_args": {
+    "owner": "debussy"
+  },
+  "description": "Reverse ETL example of sample data from BigQuery to a GCS bucket",
+  "end_date": null,
+  "max_active_runs": 1,
+  "schedule_interval": null,
+  "start_date": "2022-01-01T00:00:00+00:00",
+  "tags": [
+    "destiny:gcs",
+    "framework:debussy_concert",
+    "project:example",
+    "tier:5",
+    "type:reverse_etl"
+  ],
+  "task_groups": {
+    "ReverseEtlMovement_synthetic_example": {
+      "parent_group": null
+    },
+    "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase": {
+      "parent_group": "ReverseEtlMovement_synthetic_example"
+    },
+    "ReverseEtlMovement_synthetic_example.DataWarehouseToReverseEtlPhrase": {
+      "parent_group": "ReverseEtlMovement_synthetic_example"
+    },
+    "ReverseEtlMovement_synthetic_example.EndPhrase": {
+      "parent_group": "ReverseEtlMovement_synthetic_example"
+    },
+    "ReverseEtlMovement_synthetic_example.StartPhrase": {
+      "parent_group": "ReverseEtlMovement_synthetic_example"
+    },
+    "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif": {
+      "parent_group": "ReverseEtlMovement_synthetic_example.StartPhrase"
+    },
+    "ReverseEtlMovement_synthetic_example.StorageToDestinationPhrase": {
+      "parent_group": "ReverseEtlMovement_synthetic_example"
+    }
+  },
+  "tasks": {
+    "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase.bq_export_temp_table_to_gcs_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase",
+      "templated_fields": {
+        "configuration": {
+          "extract": {
+            "destinationFormat": "CSV",
+            "destinationUris": [
+              "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_storage/synthetic_example/retl_data_{{ execution_date }}.csv"
+            ],
+            "fieldDelimiter": ",",
+            "printHeader": true,
+            "sourceTable": {
+              "datasetId": "temp",
+              "projectId": "modular-aileron-191222",
+              "tableId": "reverse_etl_bigquery_to_storage_synthetic_example"
+            }
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase.bq_reverse_etl_to_temp_table_motif"
+      ]
+    },
+    "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase.bq_reverse_etl_to_temp_table_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase",
+      "templated_fields": {
+        "configuration": {
+          "query": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "temp",
+              "projectId": "modular-aileron-191222",
+              "tableId": "reverse_etl_bigquery_to_storage_synthetic_example"
+            },
+            "query": "SELECT * FROM `modular-aileron-191222.reverse_etl.reverse_etl_bigquery_to_storage_synthetic_example` WHERE execution_date=TIMESTAMP('{{ execution_date }}') QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1\n",
+            "timePartitioning": null,
+            "useLegacySql": false,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "ReverseEtlMovement_synthetic_example.DataWarehouseToReverseEtlPhrase.bq_to_reverse_etl_motif"
+      ]
+    },
+    "ReverseEtlMovement_synthetic_example.DataWarehouseToReverseEtlPhrase.bq_to_reverse_etl_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "ReverseEtlMovement_synthetic_example.DataWarehouseToReverseEtlPhrase",
+      "templated_fields": {
+        "configuration": {
+          "query": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "reverse_etl",
+              "projectId": "modular-aileron-191222",
+              "tableId": "reverse_etl_bigquery_to_storage_synthetic_example"
+            },
+            "query": "SELECT CURRENT_TIMESTAMP as load_ts, '{{ ts_nodash }}' as date, TIMESTAMP('{{ execution_date }}') as execution_date\n",
+            "timePartitioning": {
+              "expirationMs": null,
+              "field": "execution_date",
+              "type": "DAY"
+            },
+            "useLegacySql": false,
+            "writeDisposition": "WRITE_APPEND"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "ReverseEtlMovement_synthetic_example.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "ReverseEtlMovement_synthetic_example.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "ReverseEtlMovement_synthetic_example.StorageToDestinationPhrase.gcs_to_gcs_motif"
+      ]
+    },
+    "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigReverseEtl name=reverse_etl_bigquery_to_storage>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.begin_dag"
+      ]
+    },
+    "ReverseEtlMovement_synthetic_example.StorageToDestinationPhrase.gcs_to_gcs_motif": {
+      "operator": "debussy_airflow.operators.storage_to_storage_operator.StorageToStorageOperator",
+      "task_group": "ReverseEtlMovement_synthetic_example.StorageToDestinationPhrase",
+      "templated_fields": {
+        "destination_file_uri": "gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv",
+        "origin_file_uri": "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_storage/synthetic_example/retl_data_{{ execution_date }}.csv"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToStoragePhrase.bq_export_temp_table_to_gcs_motif"
+      ]
+    }
+  }
+}
