@@ -53,13 +53,38 @@ jobs:
           AIRFLOW__CORE__LOAD_EXAMPLES: "False"
         run: pytest -v
 
+  core-without-airflow:
+    name: Core without Airflow
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install the core only
+        run: |
+          uv venv --python 3.11 .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          uv pip install -e . pytest
+
+      - name: Check that Airflow is not installed
+        run: |
+          python -c "import importlib.util, sys; sys.exit(importlib.util.find_spec('airflow') is not None)"
+
+      - name: Test
+        run: pytest -v
+
   # Keep this job's name stable: the main branch ruleset requires it as a status
-  # check. It passes only when every job of the test matrix passed.
+  # check. It passes only when every job above passed.
   lint-and-test:
     name: Lint and test
     if: always()
-    needs: test
+    needs: [test, core-without-airflow]
     runs-on: ubuntu-24.04
     steps:
-      - name: Check test matrix result
-        run: test "${{ needs.test.result }}" = "success"
+      - name: Check job results
+        run: |
+          test "${{ needs.test.result }}" = "success"
+          test "${{ needs.core-without-airflow.result }}" = "success"

@@ -230,7 +230,7 @@
       ]
     },
     "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_rental": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -347,7 +347,7 @@
       ]
     },
     "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster": {
-      "operator": "debussy.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
+      "operator": "debussy.backends.airflow.dataproc.DebussyDataprocDeleteClusterOperator",
       "task_group": "DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_quarter_hour', task_ids='DataIngestionMovement_rental.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
@@ -397,7 +397,7 @@
       ]
     },
     "DataIngestionMovement_rental.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_rental.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -506,7 +506,7 @@
       ]
     },
     "DataIngestionMovement_rental.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_rental.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -514,7 +514,7 @@
     },
     "DataIngestionMovement_rental.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_rental.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

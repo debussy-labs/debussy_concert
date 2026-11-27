@@ -3,7 +3,7 @@ from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryCreateTableOperator,
     BigQueryUpdateTableOperator,
 )
-from debussy.core.motif.mixins.bigquery_job import TableReference
+from debussy.backends.airflow.bigquery_job import TableReference
 from debussy.core.motif.motif_base import MotifBase
 from debussy.core.service.lakehouse.google_cloud import (
     GoogleCloudLakeHouseService,

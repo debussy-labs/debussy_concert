@@ -177,7 +177,7 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase",
       "templated_fields": {
         "configuration": {
@@ -201,7 +201,7 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -290,7 +290,7 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -298,7 +298,7 @@
     },
     "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

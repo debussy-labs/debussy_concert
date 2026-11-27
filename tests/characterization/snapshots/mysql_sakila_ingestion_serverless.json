@@ -361,7 +361,7 @@
       ]
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -408,7 +408,7 @@
       ]
     },
     "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -577,7 +577,7 @@
       ]
     },
     "DataIngestionMovement_film.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -585,7 +585,7 @@
     },
     "DataIngestionMovement_film.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -758,7 +758,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film_actor": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -805,7 +805,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -874,7 +874,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -882,7 +882,7 @@
     },
     "DataIngestionMovement_film_actor.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -1055,7 +1055,7 @@
       ]
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film_category": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1102,7 +1102,7 @@
       ]
     },
     "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -1171,7 +1171,7 @@
       ]
     },
     "DataIngestionMovement_film_category.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1179,7 +1179,7 @@
     },
     "DataIngestionMovement_film_category.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

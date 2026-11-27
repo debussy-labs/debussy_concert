@@ -1,6 +1,6 @@
 from typing import Optional, Union, List
 from debussy.core.motif.motif_base import MotifBase
-from debussy.core.motif.mixins.bigquery_job import BigQueryJobMixin
+from debussy.backends.airflow.bigquery_job import BigQueryJobMixin
 
 
 class BigQueryExtractJobMotif(MotifBase, BigQueryJobMixin):

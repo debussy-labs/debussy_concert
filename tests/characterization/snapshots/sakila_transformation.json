@@ -36,7 +36,7 @@
   },
   "tasks": {
     "TransformationMovement.DataLakehouseTransformationPhrase.dbt_run": {
-      "operator": "debussy.pipeline.data_transformation.motif.run_transformation.DebussyDbtRunOperator",
+      "operator": "debussy.backends.airflow.dbt.DebussyDbtRunOperator",
       "task_group": "TransformationMovement.DataLakehouseTransformationPhrase",
       "templated_fields": {
         "vars": null
@@ -56,7 +56,7 @@
       ]
     },
     "TransformationMovement.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "TransformationMovement.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -64,7 +64,7 @@
     },
     "TransformationMovement.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "TransformationMovement.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

@@ -1,7 +1,7 @@
 import os
 
 from airflow.configuration import conf
-from debussy.core.service.workflow.airflow import AirflowService
+from debussy.backends.airflow.service import AirflowService
 from debussy.core.service.injection import inject_dependencies
 from debussy.pipeline.data_ingestion.config.bigquery_data_ingestion import (
     ConfigBigQueryDataIngestion,

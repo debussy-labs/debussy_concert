@@ -62,8 +62,24 @@ In order to use Debussy, you first need to go through the following steps:
 1. [Select or create a Google Cloud Platform project](https://console.cloud.google.com/cloud-resource-manager).
 2. [Enable billing for your project](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project).
 3. [Create a Cloud Composer 3 environment](https://cloud.google.com/composer/docs/composer-3/create-environments) running Airflow 3.
-4. Install Debussy on your Cloud Composer instance: just upload the project to your `plugins/` folder.
+4. Install Debussy on your Cloud Composer instance, with the extras your pipelines need (see [Installation](#installation)).
 5. Check our [User's Guide](https://github.com/debussy-labs/debussy/wiki/User's-Guide) and [examples](https://github.com/debussy-labs/debussy/tree/main/examples) to learn how to use it!
+
+### Installation
+
+The base package (`pip install debussy`) only contains the engine-neutral core and depends on `Inject` and `yaml_env_var_parser`. Everything else is an extra:
+
+| Extra | Adds |
+| --- | --- |
+| `airflow` | The Airflow backend (`debussy.backends.airflow`): Apache Airflow 3.4+ and the standard provider |
+| `gcp` | BigQuery, Dataproc and Cloud Storage motifs (the Airflow Google provider) |
+| `dbt` | `dbt-bigquery`, for the data transformation pipelines |
+| `mysql` | `mysqlclient` and `pandas`, for reverse ETL to MySQL |
+| `sftp` | `paramiko`, for reverse ETL to SFTP |
+
+All the pipelines that ship with Debussy run on Airflow today, so a typical installation is `pip install "debussy[airflow,gcp,dbt]"`, plus `mysql` and `sftp` for the reverse ETL destinations you use.
+
+**Migrating from `debussy_concert` 1.x:** the package is now `debussy` and Airflow is no longer a mandatory dependency. Change the imports from `debussy_concert` to `debussy`, and `debussy_concert.utils.composition.airflow_easy_setup` to `debussy.backends.airflow.easy_setup.airflow_easy_setup`. The `debussy_airflow` package is no longer needed. Airflow 2 users stay on `debussy_concert<2`.
 
 Integrations
 -------------------------------------------------------------------------------

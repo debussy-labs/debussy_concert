@@ -41,7 +41,7 @@
   },
   "tasks": {
     "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToTempToStoragePhrase.bq_export_table_to_gcs_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToTempToStoragePhrase",
       "templated_fields": {
         "configuration": {
@@ -70,7 +70,7 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToTempToStoragePhrase.bq_reverse_etl_to_temp_table_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.DataWarehouseReverseEtlToTempToStoragePhrase",
       "templated_fields": {
         "configuration": {
@@ -98,7 +98,7 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.DataWarehouseToReverseEtlPhrase.bq_to_reverse_etl_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.DataWarehouseToReverseEtlPhrase",
       "templated_fields": {
         "configuration": {
@@ -139,7 +139,7 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -147,7 +147,7 @@
     },
     "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -162,7 +162,7 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.StorageToRdbmsDestinationPhrase.file_storage_to_build_insert_query_to_rdbms_motif": {
-      "operator": "debussy.pipeline.reverse_etl.operators.StorageToRdbmsOperator",
+      "operator": "debussy.backends.airflow.operators.StorageToRdbmsOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.StorageToRdbmsDestinationPhrase",
       "templated_fields": {
         "storage_file_uri": "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_mysql/synthetic_example/retl_data_{{ logical_date }}.csv",

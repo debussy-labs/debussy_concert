@@ -1,8 +1,11 @@
+"""Airflow implementations of the motifs every pipeline starts and ends with."""
+
 import logging
 from datetime import datetime, timezone
 
-from airflow.sdk import BaseOperator, TaskGroup
+from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.standard.operators.python import PythonOperator
+from airflow.sdk import BaseOperator, TaskGroup
 
 from debussy.core.motif.motif_base import MotifBase
 
@@ -42,5 +45,28 @@ class StartMotif(MotifBase):
             dag=dag,
             task_group=task_group,
         )
-        start_dag >> log_input
+        self.workflow_service.chain_tasks(start_dag, log_input)
         return task_group
+
+
+class EndMotif(MotifBase):
+    def __init__(self, name=None) -> None:
+        super().__init__(name=name)
+
+    def build(self, dag, phrase_group):
+        operator = EmptyOperator(task_id=self.name, dag=dag, task_group=phrase_group)
+        return operator
+
+
+class DummyMotif(MotifBase):
+    def __init__(self, name=None) -> None:
+        super().__init__(name=name)
+
+    def build(self, workflow_dag, phrase_group):
+        operator = EmptyOperator(
+            task_id=self.name, dag=workflow_dag, task_group=phrase_group
+        )
+        return operator
+
+    def setup(self, *args, **kwargs):
+        pass

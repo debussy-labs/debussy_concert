@@ -1,5 +1,5 @@
-from debussy.pipeline.reverse_etl.hooks import DbApiHookInterface, StorageHookInterface
-from debussy.pipeline.reverse_etl.operators import StorageToRdbmsOperator
+from debussy.backends.airflow.hooks import DbApiHookInterface, StorageHookInterface
+from debussy.backends.airflow.operators import StorageToRdbmsOperator
 
 from debussy.core.motif.motif_base import MotifBase
 

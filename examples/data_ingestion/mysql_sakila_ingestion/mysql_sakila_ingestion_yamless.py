@@ -3,7 +3,7 @@ import datetime as dt
 from debussy.core.config.config_dag_parameters import ConfigDagParameters
 from debussy.core.config.config_environment import ConfigEnvironment
 from debussy.core.service.injection import inject_dependencies
-from debussy.core.service.workflow.airflow import AirflowService
+from debussy.backends.airflow.service import AirflowService
 from debussy.pipeline.data_ingestion.composition.rdbms_ingestion import (
     RdbmsIngestionComposition,
 )

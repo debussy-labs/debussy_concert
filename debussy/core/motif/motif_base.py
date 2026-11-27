@@ -64,19 +64,3 @@ class MotifBase(PMotif, ABC):
     @abstractmethod
     def build(self, workflow_dag, phrase_group) -> PMotifGroup:
         pass
-
-
-class DummyMotif(MotifBase):
-    def __init__(self, name=None) -> None:
-        super().__init__(name=name)
-
-    def build(self, workflow_dag, phrase_group):
-        from airflow.providers.standard.operators.empty import EmptyOperator
-
-        operator = EmptyOperator(
-            task_id=self.name, dag=workflow_dag, task_group=phrase_group
-        )
-        return operator
-
-    def setup(self, *args, **kwargs):
-        pass
