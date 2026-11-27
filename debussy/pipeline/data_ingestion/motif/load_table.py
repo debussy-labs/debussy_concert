@@ -4,7 +4,7 @@ from debussy.core.service.lakehouse.google_cloud import (
 )
 from debussy.core.entities.table import BigQueryTable
 from debussy.core.motif.motif_base import MotifBase
-from debussy.core.motif.mixins.bigquery_job import (
+from debussy.backends.airflow.bigquery_job import (
     BigQueryJobMixin,
     HivePartitioningOptions,
 )

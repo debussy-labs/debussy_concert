@@ -44,6 +44,6 @@ class MovementBase(PMovement):
 
         for phrase in self.phrases[1:]:
             phrase_task_group = phrase.build(workflow_dag, movement_group)
-            current_task_group >> phrase_task_group
+            self.workflow_service.chain_tasks(current_task_group, phrase_task_group)
             current_task_group = phrase_task_group
         return movement_group

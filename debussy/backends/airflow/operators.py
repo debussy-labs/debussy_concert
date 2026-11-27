@@ -8,10 +8,9 @@ import os
 from typing import Callable, Optional
 from uuid import uuid4
 
-import pandas as pd
 from airflow.sdk import BaseOperator
 
-from debussy.pipeline.reverse_etl.hooks import DbApiHookInterface, StorageHookInterface
+from debussy.backends.airflow.hooks import DbApiHookInterface, StorageHookInterface
 
 
 class StorageToStorageOperator(BaseOperator):
@@ -99,6 +98,8 @@ class StorageToRdbmsOperator(BaseOperator):
             self.temp_folder, self.storage_hook.basename(self.storage_file_uri)
         )
         self.storage_hook.download_file(self.storage_file_uri, tmp_filepath)
+
+        import pandas as pd
 
         self.log.info("Reading %s", tmp_filepath)
         dataset_table = pd.read_csv(

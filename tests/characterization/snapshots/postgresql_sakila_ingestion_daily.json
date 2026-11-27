@@ -254,7 +254,7 @@
       ]
     },
     "DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_actor": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -371,7 +371,7 @@
       ]
     },
     "DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster": {
-      "operator": "debussy.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
+      "operator": "debussy.backends.airflow.dataproc.DebussyDataprocDeleteClusterOperator",
       "task_group": "DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
@@ -421,7 +421,7 @@
       ]
     },
     "DataIngestionMovement_actor.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_actor.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -500,7 +500,7 @@
       ]
     },
     "DataIngestionMovement_actor.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_actor.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -508,7 +508,7 @@
     },
     "DataIngestionMovement_actor.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_actor.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -665,7 +665,7 @@
       ]
     },
     "DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_category": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -782,7 +782,7 @@
       ]
     },
     "DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster": {
-      "operator": "debussy.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
+      "operator": "debussy.backends.airflow.dataproc.DebussyDataprocDeleteClusterOperator",
       "task_group": "DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
@@ -832,7 +832,7 @@
       ]
     },
     "DataIngestionMovement_category.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_category.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -901,7 +901,7 @@
       ]
     },
     "DataIngestionMovement_category.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_category.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -909,7 +909,7 @@
     },
     "DataIngestionMovement_category.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_category.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -1066,7 +1066,7 @@
       ]
     },
     "DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_language": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1183,7 +1183,7 @@
       ]
     },
     "DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster": {
-      "operator": "debussy.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
+      "operator": "debussy.backends.airflow.dataproc.DebussyDataprocDeleteClusterOperator",
       "task_group": "DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
@@ -1233,7 +1233,7 @@
       ]
     },
     "DataIngestionMovement_language.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.backends.airflow.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_language.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -1302,7 +1302,7 @@
       ]
     },
     "DataIngestionMovement_language.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy.core.motif.start.StartOperator",
+      "operator": "debussy.backends.airflow.motifs.StartOperator",
       "task_group": "DataIngestionMovement_language.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1310,7 +1310,7 @@
     },
     "DataIngestionMovement_language.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_language.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

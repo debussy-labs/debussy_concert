@@ -9,16 +9,17 @@ import os
 import stat
 from contextlib import contextmanager
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, Union
 from uuid import uuid4
 
-import MySQLdb
-import paramiko
 from airflow.providers.common.sql.hooks.sql import DbApiHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook as AirflowGCSHook
 from airflow.providers.google.cloud.hooks.gcs import _parse_gcs_url
 from airflow.sdk import BaseHook
-from pandas import DataFrame
+
+if TYPE_CHECKING:
+    import paramiko
+    from pandas import DataFrame
 
 
 def parse_blob_list_to_ls_behavior(full_path_blobs, prefix):
@@ -120,7 +121,9 @@ class SFTPHook(StorageHookInterface):
         self.sftp_conn_id = sftp_conn_id
         self.temp_folder = temp_folder
 
-    def get_conn(self) -> paramiko.SSHClient:
+    def get_conn(self) -> "paramiko.SSHClient":
+        import paramiko
+
         if self.sftp_conn_id is None:
             raise ValueError("sftp_conn_id is None")
         conn = self.get_connection(self.sftp_conn_id)
@@ -200,7 +203,7 @@ class DbApiHookInterface(DbApiHook):
         pass
 
     @abstractmethod
-    def build_upsert_query(self, table_name: str, dataset_table: DataFrame):
+    def build_upsert_query(self, table_name: str, dataset_table: "DataFrame"):
         pass
 
 
@@ -218,12 +221,14 @@ class MySqlConnectorHook(DbApiHookInterface):
         }
 
     def get_conn(self):
+        import MySQLdb
+
         if self.rdbms_conn_id is None:
             raise ValueError("rdbms_conn_id is None")
         conn = self.get_connection(self.rdbms_conn_id)
         return MySQLdb.connect(**self._get_conn_config_mysql_client(conn))
 
-    def build_upsert_query(self, table_name: str, dataset_table: DataFrame):
+    def build_upsert_query(self, table_name: str, dataset_table: "DataFrame"):
         if dataset_table.empty:
             return None
 

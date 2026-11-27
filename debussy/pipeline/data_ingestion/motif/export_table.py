@@ -10,8 +10,8 @@ from airflow.providers.google.cloud.operators.dataproc import (
 
 from debussy.core.phrase.protocols import PExportDataToStorageMotif
 from debussy.core.motif.motif_base import MotifBase, PClusterMotifMixin
-from debussy.core.motif.mixins.dataproc import DataprocClusterHandlerMixin
-from debussy.core.motif.bigquery_query_job import BigQueryQueryJobMotif
+from debussy.backends.airflow.dataproc import DataprocClusterHandlerMixin
+from debussy.backends.airflow.bigquery_query_job import BigQueryQueryJobMotif
 from debussy.pipeline.data_ingestion.config.rdbms_data_ingestion import (
     ConfigRdbmsDataIngestion,
 )
@@ -19,7 +19,7 @@ from debussy.pipeline.data_ingestion.config.movement_parameters.rdbms_data_inges
     RdbmsDataIngestionMovementParameters,
 )
 
-from debussy.core.motif.start import StartOperator
+from debussy.backends.airflow.motifs import StartOperator
 
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):

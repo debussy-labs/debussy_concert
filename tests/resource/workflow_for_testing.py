@@ -23,3 +23,7 @@ class WorkflowServiceForTesting(PWorkflowService):
 
     def workflow_dag(self, dag_id, **kwargs) -> DummyDag:
         return DummyDag(dag_id=dag_id, **kwargs)
+
+    def chain_tasks(self, *tasks):
+        for upstream, downstream in zip(tasks, tasks[1:]):
+            upstream >> downstream

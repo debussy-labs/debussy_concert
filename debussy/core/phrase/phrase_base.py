@@ -41,6 +41,6 @@ class PhraseBase(PPhrase):
         current_task = self.motifs[0].build(workflow_dag, phrase_group)
         for motif in self.motifs[1:]:
             motif_task = motif.build(workflow_dag, phrase_group)
-            current_task >> motif_task
+            self.workflow_service.chain_tasks(current_task, motif_task)
             current_task = motif_task
         return phrase_group

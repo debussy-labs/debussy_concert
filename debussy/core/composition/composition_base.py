@@ -1,8 +1,7 @@
 from typing import Callable, List, Protocol, Sequence
 import inject
 
-from airflow.sdk import DAG
-
+from debussy.core.entities.protocols import PWorkflowDag
 from debussy.core.movement.movement_base import PMovement
 from debussy.core.config.config_composition import ConfigComposition
 from debussy.core.config.movement_parameters.base import MovementParametersType
@@ -13,20 +12,20 @@ class PComposition(Protocol):
     config: ConfigComposition
     workflow_service: PWorkflowService
 
-    def play(self, *args, **kwargs) -> DAG:
+    def play(self, *args, **kwargs) -> PWorkflowDag:
         pass
 
-    def multi_play(self, *args, **kwargs) -> Sequence[DAG]:
+    def multi_play(self, *args, **kwargs) -> Sequence[PWorkflowDag]:
         pass
 
     def build_multi_dag(
         self, movement_builder: Callable[[MovementParametersType], PMovement]
-    ) -> Sequence[DAG]:
+    ) -> Sequence[PWorkflowDag]:
         pass
 
     def build(
         self, movement_builder: Callable[[MovementParametersType], PMovement]
-    ) -> DAG:
+    ) -> PWorkflowDag:
         pass
 
 
@@ -46,7 +45,7 @@ class CompositionBase(PComposition):
 
     def build_multi_dag(
         self, movement_builder: Callable[[MovementParametersType], PMovement]
-    ) -> List[DAG]:
+    ) -> List[PWorkflowDag]:
         dags = list()
         for movement_parameter in self.config.movements_parameters:
             name = self.config.dag_parameters.dag_id + "." + movement_parameter.name
@@ -59,7 +58,7 @@ class CompositionBase(PComposition):
 
     def build(
         self, movement_builder: Callable[[MovementParametersType], PMovement]
-    ) -> DAG:
+    ) -> PWorkflowDag:
         name = self.config.dag_parameters.dag_id
         kwargs = {**self.config.dag_parameters}
         del kwargs["dag_id"]

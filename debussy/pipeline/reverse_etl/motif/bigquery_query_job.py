@@ -1,3 +1,3 @@
-from debussy.core.motif.bigquery_query_job import BigQueryQueryJobMotif
+from debussy.backends.airflow.bigquery_query_job import BigQueryQueryJobMotif
 
 __all__ = ["BigQueryQueryJobMotif"]

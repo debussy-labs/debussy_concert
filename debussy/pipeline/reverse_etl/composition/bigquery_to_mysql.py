@@ -1,7 +1,7 @@
 from debussy.core.composition.composition_base import CompositionBase
 from debussy.core.phrase.utils.start import StartPhrase
 from debussy.core.phrase.utils.end import EndPhrase
-from debussy.core.motif.mixins.bigquery_job import BigQueryTimePartitioning
+from debussy.backends.airflow.bigquery_job import BigQueryTimePartitioning
 
 from debussy.pipeline.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 from debussy.pipeline.reverse_etl.config.reverse_etl import ConfigReverseEtl
@@ -28,7 +28,7 @@ from debussy.pipeline.reverse_etl.motif.bigquery_extract_job import (
     BigQueryExtractJobMotif,
 )
 
-from debussy.pipeline.reverse_etl.hooks import GCSHook, MySqlConnectorHook
+from debussy.backends.airflow.hooks import GCSHook, MySqlConnectorHook
 
 
 class BigQueryToMysql(CompositionBase):
