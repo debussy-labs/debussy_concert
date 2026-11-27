@@ -6,6 +6,7 @@ upstream edges) and the raw value of every templated field. Values that are
 not plain data are reduced to a stable name, so the snapshot never depends on
 memory addresses, hash seeds or the machine it runs on.
 """
+
 import dataclasses
 import datetime as dt
 import enum
@@ -75,7 +76,7 @@ def normalize(value, replacements):
 
 
 def _schedule(dag):
-    schedule = getattr(dag, "schedule_interval", None)
+    schedule = getattr(dag, "schedule", None)
     return None if schedule is None else str(schedule)
 
 
@@ -114,7 +115,7 @@ def dag_to_snapshot(dag, replacements=()) -> dict:
     return {
         "dag_id": dag.dag_id,
         "description": norm(dag.description),
-        "schedule_interval": _schedule(dag),
+        "schedule": _schedule(dag),
         "start_date": norm(dag.start_date),
         "end_date": norm(dag.end_date),
         "catchup": dag.catchup,

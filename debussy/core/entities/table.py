@@ -63,7 +63,7 @@ class BigQueryTableField:
     mode: str = "NULLABLE"
     fields: Optional[List["BigQueryTableField"]] = None
     policy_tags: Optional[BigQueryPolicyTags] = dataclass_field(
-        default=BigQueryPolicyTags([])
+        default_factory=lambda: BigQueryPolicyTags([])
     )
 
     def __post_init__(self):

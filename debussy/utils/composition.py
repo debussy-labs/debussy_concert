@@ -78,12 +78,12 @@ def airflow_easy_setup(
 
     os.environ["DEBUSSY__DAGS_FOLDER"] = dags_folder
     if os_env_prefix:
-        os.environ[
-            f"{os_env_prefix}_WINDOW_START"
-        ] = "execution_date.strftime('%Y-%m-%d 00:00:00')"
-        os.environ[
-            f"{os_env_prefix}_WINDOW_END"
-        ] = "next_execution_date.strftime('%Y-%m-%d 00:00:00')"
+        os.environ[f"{os_env_prefix}_WINDOW_START"] = (
+            "logical_date.strftime('%Y-%m-%d 00:00:00')"
+        )
+        os.environ[f"{os_env_prefix}_WINDOW_END"] = (
+            "data_interval_end.strftime('%Y-%m-%d 00:00:00')"
+        )
 
     workflow_service = AirflowService()
     config_composition = composition_config_cls.load_from_file(

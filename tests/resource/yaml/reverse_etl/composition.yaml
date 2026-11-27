@@ -2,7 +2,7 @@ name: composition_name_test
 description: description_test
 dag_parameters:
     dag_id: dag_id_test
-    schedule_interval: null
+    schedule: null
     start_date:
       year: 1970
       month: 1

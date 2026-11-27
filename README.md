@@ -55,13 +55,13 @@ With that in mind, we created Debussy! It's a code generation engine for orchest
 
 ## Quick Start
 
-Debussy works on any installation of Apache Airflow 2.0, but since we currently support only GCP based data platforms as the target Data Lakehouse, we recommend a deployment to [Cloud Composer](https://cloud.google.com/composer).
+Debussy requires Python 3.11+ and Apache Airflow 3.4+. Since we currently support only GCP based data platforms as the target Data Lakehouse, we recommend a deployment to [Cloud Composer](https://cloud.google.com/composer).
 
 In order to use Debussy, you first need to go through the following steps:
 
 1. [Select or create a Google Cloud Platform project](https://console.cloud.google.com/cloud-resource-manager).
 2. [Enable billing for your project](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project).
-3. [Create a Cloud Composer 2 environment](https://cloud.google.com/composer/docs/composer-2/create-environments).
+3. [Create a Cloud Composer 3 environment](https://cloud.google.com/composer/docs/composer-3/create-environments) running Airflow 3.
 4. Install Debussy on your Cloud Composer instance: just upload the project to your `plugins/` folder.
 5. Check our [User's Guide](https://github.com/debussy-labs/debussy/wiki/User's-Guide) and [examples](https://github.com/debussy-labs/debussy/tree/main/examples) to learn how to use it!
 

@@ -6,7 +6,7 @@ dag_parameters:
   dag_id: bigquery_ingestion_incr
   description: BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage
   catchup: false
-  schedule_interval: "*/30 * * * *" # At every minute.
+  schedule: "*/30 * * * *" # At every minute.
   start_date:
     year: 2022
     month: 1
@@ -25,11 +25,11 @@ ingestion_parameters:
     raw_table_definition: ${DEBUSSY__DAGS_FOLDER}/examples/data_ingestion/bigquery_ingestion_incr/table_def_sintetico_incr.yaml
     extraction_query: >
       SELECT 'dado' as data,
-      TIMESTAMP '{{ execution_date }}' as airflow_logical_date,
+      TIMESTAMP '{{ logical_date }}' as airflow_logical_date,
       '${PWD}' as pwd_env_var,
       '${DEBUSSY__PROJECT}' as debussy_env_project,
       '${NOT_DEFINED_ENV|default_value}' as env_default_value_example
     extract_connection_id: google_cloud_debussy
     data_partitioning:
-      gcs_partition_schema: _load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}
-      destination_partition: "{{ macros.ds_format(execution_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"
+      gcs_partition_schema: _load_flag=incr/_logical_ts={{ logical_date }}/_ingestion_ts={{ dag_run.start_date }}
+      destination_partition: "{{ macros.ds_format(logical_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"

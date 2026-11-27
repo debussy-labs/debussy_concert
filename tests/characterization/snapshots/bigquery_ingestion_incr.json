@@ -7,7 +7,7 @@
   "description": "BigQuery incremental ingestion. Overwriting logical partitions and versioning on storage",
   "end_date": null,
   "max_active_runs": 16,
-  "schedule_interval": "*/30 * * * *",
+  "schedule": "*/30 * * * *",
   "start_date": "2022-01-01T00:00:00+00:00",
   "tags": [
     "framework:debussy",
@@ -45,17 +45,107 @@
   },
   "tasks": {
     "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "bigquery_example_sintetico_incr",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": null,
+                "fields": null,
+                "mode": null,
+                "name": "data",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Airflow logical date timestamp",
+                "fields": null,
+                "mode": null,
+                "name": "airflow_logical_date",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow $PWD env variable value",
+                "fields": null,
+                "mode": null,
+                "name": "pwd_env_var",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Value of the variable set in environment.yaml",
+                "fields": null,
+                "mode": null,
+                "name": "debussy_env_project",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Example of a default value if variable does not exist in env",
+                "fields": null,
+                "mode": null,
+                "name": "env_default_value_example",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_logical_ts",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ingestion_ts",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_logical_ts",
+            "type": "HOUR"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -67,6 +157,7 @@
       "task_group": "DataIngestionMovement_sintetico_incr.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "bigquery_example_sintetico_incr"
@@ -77,7 +168,7 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -93,14 +184,16 @@
           "query": {
             "createDisposition": null,
             "destinationTable": null,
-            "query": "\n    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet')\n    AS SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date, '/snapshot/pwd' as pwd_env_var, 'modular-aileron-191222' as debussy_env_project, 'default_value' as env_default_value_example\n\n    ",
+            "query": "\n    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ logical_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet')\n    AS SELECT 'dado' as data, TIMESTAMP '{{ logical_date }}' as airflow_logical_date, '/snapshot/pwd' as pwd_env_var, 'modular-aileron-191222' as debussy_env_project, 'default_value' as env_default_value_example\n\n    ",
             "timePartitioning": null,
             "useLegacySql": false,
             "writeDisposition": null
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -117,7 +210,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "bigquery_example_sintetico_incr${{ macros.ds_format(execution_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"
+              "tableId": "bigquery_example_sintetico_incr${{ macros.ds_format(logical_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -180,14 +273,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ logical_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -195,14 +290,14 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
       "templated_fields": {

@@ -10,7 +10,7 @@ country as (
 ),
 denormalized as (
 select city.city_id, city.city, country.country,
-    TIMESTAMP("{{ var('execution_date') }}") as _airflow_execution_date,
+    TIMESTAMP("{{ var('logical_date') }}") as _airflow_execution_date,
     "{{ env_var('DEBUSSY__PROJECT') }}" as _project
 from city
 join country on city.country_id = country.country_id

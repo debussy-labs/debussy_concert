@@ -4,7 +4,7 @@ dag_parameters:
     dag_id: sakila_transformation
     description: Sakila transformation example using Dbt
     catchup: false
-    schedule_interval: '*/30 * * * *' # At every minute.
+    schedule: '*/30 * * * *' # At every minute.
     start_date: !!timestamp 2022-01-01 00:00:00
     tags:
       - framework:debussy

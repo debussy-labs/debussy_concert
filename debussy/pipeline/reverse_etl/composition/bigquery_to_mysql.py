@@ -28,8 +28,7 @@ from debussy.pipeline.reverse_etl.motif.bigquery_extract_job import (
     BigQueryExtractJobMotif,
 )
 
-from debussy_airflow.hooks.storage_hook import GCSHook
-from debussy_airflow.hooks.db_api_hook import MySqlConnectorHook
+from debussy.pipeline.reverse_etl.hooks import GCSHook, MySqlConnectorHook
 
 
 class BigQueryToMysql(CompositionBase):

@@ -41,7 +41,7 @@ config_dag_parameters = ConfigDagParameters(
     start_date=dt.datetime(2006, 2, 15),
     end_date=dt.datetime(2006, 2, 15),
     catchup=True,
-    schedule_interval="@daily",
+    schedule="@daily",
     max_active_runs=1,
     tags=[
         "framework:debussy",
@@ -74,12 +74,12 @@ config_composition = ConfigRdbmsDataIngestion(
             extract_connection_id="google_cloud_debussy",
             data_partitioning=BigQueryDataPartitioning(
                 gcs_partition_schema=(
-                    "_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') "
-                    "}}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') "
-                    "}}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') "
+                    "_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') "
+                    "}}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') "
+                    "}}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') "
                     "}}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
                 ),
-                destination_partition="{{ execution_date.strftime('%Y%m%d') }}",
+                destination_partition="{{ logical_date.strftime('%Y%m%d') }}",
             ),
             raw_table_definition={
                 "fields": [
@@ -138,8 +138,8 @@ config_composition = ConfigRdbmsDataIngestion(
             extraction_query=(
                 "SELECT category_id, name, last_update "
                 "FROM sakila.category "
-                "WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}' "
-                "AND last_update   <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}' "
+                "WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}' "
+                "AND last_update   <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}' "
             ),
         )
     ],

@@ -1,5 +1,5 @@
 {
-  "catchup": true,
+  "catchup": false,
   "dag_id": "reverse_etl_bigquery_to_storage",
   "default_args": {
     "owner": "debussy"
@@ -7,7 +7,7 @@
   "description": "Reverse ETL example of sample data from BigQuery to a GCS bucket",
   "end_date": null,
   "max_active_runs": 1,
-  "schedule_interval": null,
+  "schedule": null,
   "start_date": "2022-01-01T00:00:00+00:00",
   "tags": [
     "destiny:gcs",
@@ -48,7 +48,7 @@
           "extract": {
             "destinationFormat": "CSV",
             "destinationUris": [
-              "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_storage/synthetic_example/retl_data_{{ execution_date }}.csv"
+              "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_storage/synthetic_example/retl_data_{{ logical_date }}.csv"
             ],
             "fieldDelimiter": ",",
             "printHeader": true,
@@ -59,8 +59,10 @@
             }
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -79,14 +81,16 @@
               "projectId": "modular-aileron-191222",
               "tableId": "reverse_etl_bigquery_to_storage_synthetic_example"
             },
-            "query": "SELECT * FROM `modular-aileron-191222.reverse_etl.reverse_etl_bigquery_to_storage_synthetic_example` WHERE execution_date=TIMESTAMP('{{ execution_date }}') QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1\n",
+            "query": "SELECT * FROM `modular-aileron-191222.reverse_etl.reverse_etl_bigquery_to_storage_synthetic_example` WHERE execution_date=TIMESTAMP('{{ logical_date }}') QUALIFY ROW_NUMBER() OVER (PARTITION BY execution_date ORDER BY load_ts DESC) = 1\n",
             "timePartitioning": null,
             "useLegacySql": false,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -105,7 +109,7 @@
               "projectId": "modular-aileron-191222",
               "tableId": "reverse_etl_bigquery_to_storage_synthetic_example"
             },
-            "query": "SELECT CURRENT_TIMESTAMP as load_ts, '{{ ts_nodash }}' as date, TIMESTAMP('{{ execution_date }}') as execution_date\n",
+            "query": "SELECT CURRENT_TIMESTAMP as load_ts, '{{ ts_nodash }}' as date, TIMESTAMP('{{ logical_date }}') as execution_date\n",
             "timePartitioning": {
               "expirationMs": null,
               "field": "execution_date",
@@ -115,8 +119,10 @@
             "writeDisposition": "WRITE_APPEND"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -124,7 +130,7 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -133,14 +139,14 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "ReverseEtlMovement_synthetic_example.StartPhrase.StartMotif",
       "templated_fields": {
@@ -156,11 +162,11 @@
       ]
     },
     "ReverseEtlMovement_synthetic_example.StorageToDestinationPhrase.gcs_to_gcs_motif": {
-      "operator": "debussy_airflow.operators.storage_to_storage_operator.StorageToStorageOperator",
+      "operator": "debussy.pipeline.reverse_etl.operators.StorageToStorageOperator",
       "task_group": "ReverseEtlMovement_synthetic_example.StorageToDestinationPhrase",
       "templated_fields": {
-        "destination_file_uri": "gs://autodelete_dev_bucket/retl_example_path/example_{{ execution_date }}.csv",
-        "origin_file_uri": "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_storage/synthetic_example/retl_data_{{ execution_date }}.csv"
+        "destination_file_uri": "gs://autodelete_dev_bucket/retl_example_path/example_{{ logical_date }}.csv",
+        "origin_file_uri": "gs://autodelete_dev_bucket/reverse_etl_bigquery_to_storage/synthetic_example/retl_data_{{ logical_date }}.csv"
       },
       "trigger_rule": "all_success",
       "upstream": [

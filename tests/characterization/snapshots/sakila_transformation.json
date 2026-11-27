@@ -7,7 +7,7 @@
   "description": "Sakila transformation example using Dbt",
   "end_date": null,
   "max_active_runs": 16,
-  "schedule_interval": "*/30 * * * *",
+  "schedule": "*/30 * * * *",
   "start_date": "2022-01-01T00:00:00+00:00",
   "tags": [
     "framework:debussy",
@@ -47,7 +47,7 @@
       ]
     },
     "TransformationMovement.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "TransformationMovement.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -56,14 +56,14 @@
       ]
     },
     "TransformationMovement.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "TransformationMovement.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "TransformationMovement.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "TransformationMovement.StartPhrase.StartMotif",
       "templated_fields": {

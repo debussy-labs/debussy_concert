@@ -14,7 +14,7 @@ dag_parameters:
   dag_id: mysql_sakila_ingestion_quarter_hour
   description: Mysql ingestion for sakila sample relational database.
   catchup: true
-  schedule_interval: "*/15 * * * *" # every 15 minutes (quarter-hour)
+  schedule: "*/15 * * * *" # every 15 minutes (quarter-hour)
   max_active_runs: 1
   start_date:
     year: 2006
@@ -46,6 +46,6 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_START}
         }}/_ts_window_end={{ ${MYSQL_SAKILA_QUARTER_HOUR_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d%H') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d%H') }}"

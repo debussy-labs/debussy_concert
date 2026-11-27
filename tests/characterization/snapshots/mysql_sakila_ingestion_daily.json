@@ -7,7 +7,7 @@
   "description": "Mysql ingestion for sakila sample relational database.",
   "end_date": "2006-02-15T00:00:00+00:00",
   "max_active_runs": 1,
-  "schedule_interval": "@daily",
+  "schedule": "@daily",
   "start_date": "2006-02-15T00:00:00+00:00",
   "tags": [
     "framework:debussy",
@@ -102,17 +102,217 @@
   },
   "tasks": {
     "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mysql_sakila_film",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A surrogate primary key used to uniquely identify each film in the table.",
+                "fields": null,
+                "mode": null,
+                "name": "film_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "The title of the film.",
+                "fields": null,
+                "mode": null,
+                "name": "title",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "A short description or plot summary of the film.",
+                "fields": null,
+                "mode": null,
+                "name": "description",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "The year in which the movie was released.",
+                "fields": null,
+                "mode": null,
+                "name": "release_year",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "DATE"
+              },
+              {
+                "description": "A foreign key pointing at the language table; identifies the language of the film.",
+                "fields": null,
+                "mode": null,
+                "name": "language_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "A foreign key pointing at the language table; identifies the original language of the film. Used when a film has been dubbed into a new language.",
+                "fields": null,
+                "mode": null,
+                "name": "original_language_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "The length of the rental period, in days.",
+                "fields": null,
+                "mode": null,
+                "name": "rental_duration",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "The cost to rent the film for the period specified in the rental_duration column",
+                "fields": null,
+                "mode": null,
+                "name": "rental_rate",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "NUMERIC"
+              },
+              {
+                "description": "The duration of the film, in minutes",
+                "fields": null,
+                "mode": null,
+                "name": "length",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "The amount charged to the customer if the film is not returned or is returned in a damaged state",
+                "fields": null,
+                "mode": null,
+                "name": "replacement_cost",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "NUMERIC"
+              },
+              {
+                "description": "The rating assigned to the film. Can be one of: G, PG, PG-13, R, or NC-17",
+                "fields": null,
+                "mode": null,
+                "name": "rating",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Lists which common special features are included on the DVD. Can be zero or more of: Trailers, Commentaries, Deleted Scenes, Behind the Scenes",
+                "fields": null,
+                "mode": null,
+                "name": "special_features",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "BYTES"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -124,6 +324,7 @@
       "task_group": "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mysql_sakila_film"
@@ -134,7 +335,7 @@
       ]
     },
     "DataIngestionMovement_film.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_film.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -143,7 +344,7 @@
       ]
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_film": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -152,12 +353,12 @@
       ]
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -247,6 +448,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_daily', task_ids='DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -263,6 +465,7 @@
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_daily', task_ids='DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -276,6 +479,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -287,9 +491,9 @@
               "jdbc:mysql://{host}:{port}/sakila",
               "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
               "sakila",
-              "SELECT\n    film_id\n  , title\n  , description\n  , release_year\n  , language_id\n  , original_language_id\n  , rental_duration\n  , rental_rate\n  , `length`\n  , replacement_cost\n  , rating\n  , special_features\n  , last_update\nFROM sakila.film WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT\n    film_id\n  , title\n  , description\n  , release_year\n  , language_id\n  , original_language_id\n  , rental_duration\n  , rental_rate\n  , `length`\n  , replacement_cost\n  , rating\n  , special_features\n  , last_update\nFROM sakila.film WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -316,7 +520,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mysql_sakila_film${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mysql_sakila_film${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -459,14 +663,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -474,14 +680,14 @@
       ]
     },
     "DataIngestionMovement_film.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_film.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
       "templated_fields": {
@@ -497,17 +703,117 @@
       ]
     },
     "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mysql_sakila_film_actor",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A foreign key identifying the actor",
+                "fields": null,
+                "mode": null,
+                "name": "actor_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "A foreign key identifying the film",
+                "fields": null,
+                "mode": null,
+                "name": "film_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -519,6 +825,7 @@
       "task_group": "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mysql_sakila_film_actor"
@@ -529,7 +836,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_film_actor.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -538,7 +845,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_film_actor": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -547,12 +854,12 @@
       ]
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -642,6 +949,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_daily', task_ids='DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -658,6 +966,7 @@
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_daily', task_ids='DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -671,6 +980,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -682,9 +992,9 @@
               "jdbc:mysql://{host}:{port}/sakila",
               "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
               "sakila",
-              "SELECT actor_id, film_id, last_update FROM sakila.film_actor WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT actor_id, film_id, last_update FROM sakila.film_actor WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -711,7 +1021,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mysql_sakila_film_actor${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mysql_sakila_film_actor${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -754,14 +1064,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -769,14 +1081,14 @@
       ]
     },
     "DataIngestionMovement_film_actor.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_film_actor.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
       "templated_fields": {
@@ -792,17 +1104,117 @@
       ]
     },
     "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mysql_sakila_film_category",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A foreign key identifying the film",
+                "fields": null,
+                "mode": null,
+                "name": "film_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "A foreign key identifying the category",
+                "fields": null,
+                "mode": null,
+                "name": "category_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INT64"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -814,6 +1226,7 @@
       "task_group": "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mysql_sakila_film_category"
@@ -824,7 +1237,7 @@
       ]
     },
     "DataIngestionMovement_film_category.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_film_category.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -833,7 +1246,7 @@
       ]
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_film_category": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -842,12 +1255,12 @@
       ]
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -937,6 +1350,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_daily', task_ids='DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -953,6 +1367,7 @@
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_daily', task_ids='DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -966,6 +1381,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -977,9 +1393,9 @@
               "jdbc:mysql://{host}:{port}/sakila",
               "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
               "sakila",
-              "SELECT film_id, category_id, last_update FROM sakila.film_category WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT film_id, category_id, last_update FROM sakila.film_category WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -1006,7 +1422,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mysql_sakila_film_category${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mysql_sakila_film_category${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -1049,14 +1465,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -1064,14 +1482,14 @@
       ]
     },
     "DataIngestionMovement_film_category.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_film_category.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
       "templated_fields": {

@@ -1,7 +1,7 @@
 from typing import Callable, List, Protocol, Sequence
 import inject
 
-from airflow import DAG
+from airflow.sdk import DAG
 
 from debussy.core.movement.movement_base import PMovement
 from debussy.core.config.config_composition import ConfigComposition
