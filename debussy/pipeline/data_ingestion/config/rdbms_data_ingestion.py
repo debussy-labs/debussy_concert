@@ -3,6 +3,7 @@ from yaml_env_var_parser import load as yaml_load
 
 
 from debussy.core.config.config_environment import ConfigEnvironment
+from debussy.core.config.loader_keys import drop_loader_keys
 from debussy.core.config.config_dag_parameters import ConfigDagParameters
 from debussy.pipeline.data_ingestion.config.base import ConfigDataIngestionBase
 from debussy.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import (
@@ -15,6 +16,19 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
     secret_manager_uri: str
     dataproc_config: dict
 
+    def __post_init__(self):
+        # Fill in the default PySpark script here and not in load_from_file, so a
+        # config built in Python is complete too.
+        if self.dataproc_config.get("pyspark_script") is None:
+            dataproc_config = {
+                **self.dataproc_config,
+                "pyspark_script": (
+                    f"gs://{self.environment.artifact_bucket}"
+                    "/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
+                ),
+            }
+            object.__setattr__(self, "dataproc_config", dataproc_config)
+
     @classmethod
     def load_from_file(cls, composition_config_file_path, env_file_path):
 
@@ -22,6 +36,7 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
 
         with open(composition_config_file_path) as file:
             config = yaml_load(file)
+        drop_loader_keys(config)
         config["environment"] = env_config
 
         extract_movements = [
@@ -51,13 +66,6 @@ class ConfigRdbmsDataIngestion(ConfigDataIngestionBase):
         else:
             raise ValueError(
                 "Required dataproc_config (or dataproc_serverless_config) config parameter missing!"
-            )
-
-        # config dataproc pyspark script
-        if config["dataproc_config"].get("pyspark_script") is None:
-            config["dataproc_config"]["pyspark_script"] = (
-                f"gs://{env_config.artifact_bucket}"
-                "/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
             )
 
         return cls(**config)

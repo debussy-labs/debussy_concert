@@ -1,12 +1,10 @@
+"""The Python API: a pipeline built from config objects instead of YAML."""
+
 import datetime as dt
 
 from debussy.core.config.config_dag_parameters import ConfigDagParameters
 from debussy.core.config.config_environment import ConfigEnvironment
-from debussy.core.service.injection import inject_dependencies
-from debussy.backends.airflow.service import AirflowService
-from debussy.pipeline.data_ingestion.composition.rdbms_ingestion import (
-    RdbmsIngestionComposition,
-)
+from debussy.backends.airflow import load_dags
 from debussy.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import (
     RdbmsDataIngestionMovementParameters,
 )
@@ -145,14 +143,4 @@ config_composition = ConfigRdbmsDataIngestion(
     ],
 )
 
-workflow_service = AirflowService()
-
-inject_dependencies(workflow_service, config_composition)
-
-debussy_composition = RdbmsIngestionComposition()
-debussy_composition.dataproc_main_python_file_uri = (
-    f"gs://{config_composition.environment.artifact_bucket}/pyspark-scripts"
-    "/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
-)
-
-dag = debussy_composition.auto_play()
+load_dags(globals(), pipelines=[config_composition])

@@ -1,3 +1,4 @@
+composition_type: dbt_transformation
 name: sakila_transformation
 description: BigQuery transformation
 dag_parameters:

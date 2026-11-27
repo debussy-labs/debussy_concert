@@ -79,7 +79,21 @@ The base package (`pip install debussy`) only contains the engine-neutral core a
 
 All the pipelines that ship with Debussy run on Airflow today, so a typical installation is `pip install "debussy[airflow,gcp,dbt]"`, plus `mysql` and `sftp` for the reverse ETL destinations you use.
 
-**Migrating from `debussy_concert` 1.x:** the package is now `debussy` and Airflow is no longer a mandatory dependency. Change the imports from `debussy_concert` to `debussy`, and `debussy_concert.utils.composition.airflow_easy_setup` to `debussy.backends.airflow.easy_setup.airflow_easy_setup`. The `debussy_airflow` package is no longer needed. Airflow 2 users stay on `debussy_concert<2`.
+### Defining pipelines
+
+One file in the Airflow DAGs folder builds a DAG for every pipeline:
+
+```python
+from debussy.backends.airflow import load_dags
+
+load_dags(globals(), pipelines_dir="pipelines", environment_file="environment.yaml")
+```
+
+A YAML file under `pipelines_dir` is a pipeline when it has a top-level `composition_type` key: `bigquery_ingestion`, `rdbms_ingestion`, `dbt_transformation`, `reverse_etl_bigquery_to_mysql` or `reverse_etl_bigquery_to_storage`. Other YAML files, such as table schemas, are ignored. Add `os_env_prefix: MY_PIPELINE` if the YAML references `${MY_PIPELINE_WINDOW_START}` and `${MY_PIPELINE_WINDOW_END}`. Relative paths are relative to Airflow's `dags_folder`. See [`examples/dags.py`](examples/dags.py).
+
+The Python API works the same way: build the config objects and pass them with `load_dags(globals(), pipelines=[config])`. See [`mysql_sakila_ingestion_yamless.py`](examples/data_ingestion/mysql_sakila_ingestion/mysql_sakila_ingestion_yamless.py).
+
+**Migrating from `debussy_concert` 1.x:** the package is now `debussy` and Airflow is no longer a mandatory dependency. Change the imports from `debussy_concert` to `debussy`. `airflow_easy_setup` is gone: delete the per-pipeline setup `.py` files, add `composition_type` (and `os_env_prefix`, if you had one) to each composition YAML, and add the `load_dags` file above. The `debussy_airflow` package is no longer needed. Airflow 2 users stay on `debussy_concert<2`.
 
 Integrations
 -------------------------------------------------------------------------------

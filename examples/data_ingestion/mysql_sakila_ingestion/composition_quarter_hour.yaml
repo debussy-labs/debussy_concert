@@ -1,3 +1,5 @@
+composition_type: rdbms_ingestion
+os_env_prefix: MYSQL_SAKILA_QUARTER_HOUR
 name: mysql_sakila_ingestion_quarter_hour
 source_name: sakila
 source_type: mysql

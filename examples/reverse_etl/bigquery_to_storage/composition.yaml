@@ -1,3 +1,4 @@
+composition_type: reverse_etl_bigquery_to_storage
 name: reverse_etl_bigquery_to_storage
 description: Reverse ETL example of sample data from BigQuery to a GCS bucket
 dag_parameters:

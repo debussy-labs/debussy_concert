@@ -17,6 +17,9 @@ from debussy.pipeline.data_transformation.phrase.data_lakehouse_transformation i
 
 
 class DbtTransformationComposition(CompositionBase):
+    def auto_play(self):
+        return self.build(self.dbt_transformation_builder)
+
     def dbt_transformation_builder(
         self, movement_parameters: DbtMovementParameters
     ) -> TransformationMovement:

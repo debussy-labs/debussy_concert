@@ -34,6 +34,9 @@ from debussy.backends.airflow.hooks import GCSHook, SFTPHook
 class ReverseEtlBigQueryToStorageComposition(CompositionBase):
     config: ConfigReverseEtl
 
+    def auto_play(self):
+        return self.play(self.bigquery_to_storage_reverse_etl_movement_builder)
+
     def bigquery_to_storage_reverse_etl_movement_builder(
         self, movement_parameters: ReverseEtlMovementParameters
     ):
