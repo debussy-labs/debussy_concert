@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "1.x"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.9"
+  # Installed without dependencies: ci/requirements-ci.txt pins them to the
+  # versions the frozen line was built on.
+  DEBUSSY_AIRFLOW_VERSION: "0.0.7.post1"
+
+jobs:
+  test:
+    name: Lint and test (Airflow 2.3, Python 3.9)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system libraries for mysqlclient
+        run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev pkg-config
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Create virtual environment
+        run: |
+          uv venv --python "$PYTHON_VERSION" .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: Install dependencies
+        run: |
+          uv pip install -r ci/requirements-ci.txt
+          uv pip install --no-deps \
+            "debussy-airflow==${DEBUSSY_AIRFLOW_VERSION}" \
+            -e .
+
+      - name: Lint
+        run: |
+          black --check .
+          flake8 .
+
+      - name: Test
+        env:
+          AIRFLOW_HOME: ${{ runner.temp }}/airflow
+          AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+        run: pytest -v

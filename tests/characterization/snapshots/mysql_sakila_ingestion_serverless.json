@@ -1,0 +1,788 @@
+{
+  "catchup": true,
+  "dag_id": "mysql_sakila_ingestion_serverless",
+  "default_args": {
+    "owner": "debussy"
+  },
+  "description": "Mysql ingestion for sakila sample relational database.",
+  "end_date": "2006-02-17T00:00:00+00:00",
+  "max_active_runs": 1,
+  "schedule_interval": "@daily",
+  "start_date": "2006-02-16T00:00:00+00:00",
+  "tags": [
+    "framework:debussy_concert",
+    "granularity:daily",
+    "load:incremental",
+    "project:example",
+    "source:mysql",
+    "tier:5",
+    "type:ingestion"
+  ],
+  "task_groups": {
+    "DataIngestionMovement_film": {
+      "parent_group": null
+    },
+    "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase": {
+      "parent_group": "DataIngestionMovement_film"
+    },
+    "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif": {
+      "parent_group": "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase"
+    },
+    "DataIngestionMovement_film.EndPhrase": {
+      "parent_group": "DataIngestionMovement_film"
+    },
+    "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase": {
+      "parent_group": "DataIngestionMovement_film"
+    },
+    "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif": {
+      "parent_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase"
+    },
+    "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase": {
+      "parent_group": "DataIngestionMovement_film"
+    },
+    "DataIngestionMovement_film.StartPhrase": {
+      "parent_group": "DataIngestionMovement_film"
+    },
+    "DataIngestionMovement_film.StartPhrase.StartMotif": {
+      "parent_group": "DataIngestionMovement_film.StartPhrase"
+    },
+    "DataIngestionMovement_film_actor": {
+      "parent_group": null
+    },
+    "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase": {
+      "parent_group": "DataIngestionMovement_film_actor"
+    },
+    "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif": {
+      "parent_group": "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase"
+    },
+    "DataIngestionMovement_film_actor.EndPhrase": {
+      "parent_group": "DataIngestionMovement_film_actor"
+    },
+    "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase": {
+      "parent_group": "DataIngestionMovement_film_actor"
+    },
+    "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif": {
+      "parent_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase"
+    },
+    "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase": {
+      "parent_group": "DataIngestionMovement_film_actor"
+    },
+    "DataIngestionMovement_film_actor.StartPhrase": {
+      "parent_group": "DataIngestionMovement_film_actor"
+    },
+    "DataIngestionMovement_film_actor.StartPhrase.StartMotif": {
+      "parent_group": "DataIngestionMovement_film_actor.StartPhrase"
+    },
+    "DataIngestionMovement_film_category": {
+      "parent_group": null
+    },
+    "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase": {
+      "parent_group": "DataIngestionMovement_film_category"
+    },
+    "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif": {
+      "parent_group": "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase"
+    },
+    "DataIngestionMovement_film_category.EndPhrase": {
+      "parent_group": "DataIngestionMovement_film_category"
+    },
+    "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase": {
+      "parent_group": "DataIngestionMovement_film_category"
+    },
+    "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif": {
+      "parent_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase"
+    },
+    "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase": {
+      "parent_group": "DataIngestionMovement_film_category"
+    },
+    "DataIngestionMovement_film_category.StartPhrase": {
+      "parent_group": "DataIngestionMovement_film_category"
+    },
+    "DataIngestionMovement_film_category.StartPhrase.StartMotif": {
+      "parent_group": "DataIngestionMovement_film_category.StartPhrase"
+    }
+  },
+  "tasks": {
+    "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "task_group": "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "gcs_schema_object": null,
+        "impersonation_chain": null,
+        "labels": null,
+        "materialized_view": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_film",
+        "view": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryUpdateTableOperator",
+      "task_group": "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_film"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table"
+      ]
+    },
+    "DataIngestionMovement_film.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "DataIngestionMovement_film.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif"
+      ]
+    },
+    "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "op_args": [
+          "{{ ti.job_id }}"
+        ],
+        "op_kwargs": {},
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film"
+      ]
+    },
+    "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources"
+      ]
+    },
+    "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
+      "operator": "debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "batch": {
+          "environment_config": {
+            "execution_config": {
+              "subnetwork_uri": "subnet-cluster-services"
+            }
+          },
+          "pyspark_batch": {
+            "args": [
+              "com.mysql.cj.jdbc.Driver",
+              "jdbc:mysql://{host}:{port}/sakila",
+              "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
+              "sakila",
+              "SELECT\n    film_id\n  , title\n  , description\n  , release_year\n  , language_id\n  , original_language_id\n  , rental_duration\n  , rental_rate\n  , `length`\n  , replacement_cost\n  , rating\n  , special_features\n  , last_update\nFROM sakila.film WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "{{ ts_nodash }}",
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+            ],
+            "jar_file_uris": [
+              "file:///usr/lib/spark/external/spark-avro.jar",
+              "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar",
+              "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"
+            ],
+            "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key_serverless.py"
+          }
+        },
+        "batch_id": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_serverless', task_ids='DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id') }}-sakila-film",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "region": "us-central1"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id"
+      ]
+    },
+    "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase",
+      "templated_fields": {
+        "configuration": {
+          "load": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "raw",
+              "projectId": "modular-aileron-191222",
+              "tableId": "mysql_sakila_film${{ execution_date.strftime('%Y%m%d') }}"
+            },
+            "hivePartitioningOptions": {
+              "mode": "AUTO",
+              "sourceUriPrefix": "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film"
+            },
+            "schema": {
+              "fields": [
+                {
+                  "description": "A surrogate primary key used to uniquely identify each film in the table.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "film_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The title of the film.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "title",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "A short description or plot summary of the film.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "description",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "The year in which the movie was released.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "release_year",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "DATE"
+                },
+                {
+                  "description": "A foreign key pointing at the language table; identifies the language of the film.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "language_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "A foreign key pointing at the language table; identifies the original language of the film. Used when a film has been dubbed into a new language.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "original_language_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The length of the rental period, in days.",
+                  "fields": null,
+                  "mode": null,
+                  "name": "rental_duration",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The cost to rent the film for the period specified in the rental_duration column",
+                  "fields": null,
+                  "mode": null,
+                  "name": "rental_rate",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "NUMERIC"
+                },
+                {
+                  "description": "The duration of the film, in minutes",
+                  "fields": null,
+                  "mode": null,
+                  "name": "length",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "The amount charged to the customer if the film is not returned or is returned in a damaged state",
+                  "fields": null,
+                  "mode": null,
+                  "name": "replacement_cost",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "NUMERIC"
+                },
+                {
+                  "description": "The rating assigned to the film. Can be one of: G, PG, PG-13, R, or NC-17",
+                  "fields": null,
+                  "mode": null,
+                  "name": "rating",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "STRING"
+                },
+                {
+                  "description": "Lists which common special features are included on the DVD. Can be zero or more of: Trailers, Commentaries, Deleted Scenes, Behind the Scenes",
+                  "fields": null,
+                  "mode": null,
+                  "name": "special_features",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "BYTES"
+                },
+                {
+                  "description": "When the row was created or most recently updated",
+                  "fields": null,
+                  "mode": null,
+                  "name": "last_update",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                }
+              ]
+            },
+            "schemaUpdateOptions": null,
+            "sourceFormat": "PARQUET",
+            "sourceUris": [
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+            ],
+            "timePartitioning": null,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless"
+      ]
+    },
+    "DataIngestionMovement_film.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "DataIngestionMovement_film.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigRdbmsDataIngestion name=mysql_sakila_ingestion_serverless>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film.StartPhrase.StartMotif.begin_dag"
+      ]
+    },
+    "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "task_group": "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "gcs_schema_object": null,
+        "impersonation_chain": null,
+        "labels": null,
+        "materialized_view": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_film_actor",
+        "view": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryUpdateTableOperator",
+      "task_group": "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_film_actor"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table"
+      ]
+    },
+    "DataIngestionMovement_film_actor.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "DataIngestionMovement_film_actor.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif"
+      ]
+    },
+    "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "op_args": [
+          "{{ ti.job_id }}"
+        ],
+        "op_kwargs": {},
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film_actor"
+      ]
+    },
+    "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film_actor": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources"
+      ]
+    },
+    "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
+      "operator": "debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "batch": {
+          "environment_config": {
+            "execution_config": {
+              "subnetwork_uri": "subnet-cluster-services"
+            }
+          },
+          "pyspark_batch": {
+            "args": [
+              "com.mysql.cj.jdbc.Driver",
+              "jdbc:mysql://{host}:{port}/sakila",
+              "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
+              "sakila",
+              "SELECT actor_id, film_id, last_update FROM sakila.film_actor WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "{{ ts_nodash }}",
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+            ],
+            "jar_file_uris": [
+              "file:///usr/lib/spark/external/spark-avro.jar",
+              "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar",
+              "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"
+            ],
+            "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key_serverless.py"
+          }
+        },
+        "batch_id": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_serverless', task_ids='DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id') }}-sakila-filmactor",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "region": "us-central1"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id"
+      ]
+    },
+    "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase",
+      "templated_fields": {
+        "configuration": {
+          "load": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "raw",
+              "projectId": "modular-aileron-191222",
+              "tableId": "mysql_sakila_film_actor${{ execution_date.strftime('%Y%m%d') }}"
+            },
+            "hivePartitioningOptions": {
+              "mode": "AUTO",
+              "sourceUriPrefix": "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor"
+            },
+            "schema": {
+              "fields": [
+                {
+                  "description": "A foreign key identifying the actor",
+                  "fields": null,
+                  "mode": null,
+                  "name": "actor_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "A foreign key identifying the film",
+                  "fields": null,
+                  "mode": null,
+                  "name": "film_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "When the row was created or most recently updated",
+                  "fields": null,
+                  "mode": null,
+                  "name": "last_update",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                }
+              ]
+            },
+            "schemaUpdateOptions": null,
+            "sourceFormat": "PARQUET",
+            "sourceUris": [
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_actor/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+            ],
+            "timePartitioning": null,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless"
+      ]
+    },
+    "DataIngestionMovement_film_actor.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "DataIngestionMovement_film_actor.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigRdbmsDataIngestion name=mysql_sakila_ingestion_serverless>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_actor.StartPhrase.StartMotif.begin_dag"
+      ]
+    },
+    "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "task_group": "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "gcs_schema_object": null,
+        "impersonation_chain": null,
+        "labels": null,
+        "materialized_view": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_film_category",
+        "view": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.StartPhrase.StartMotif.log_input"
+      ]
+    },
+    "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources": {
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryUpdateTableOperator",
+      "task_group": "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
+      "templated_fields": {
+        "dataset_id": "raw",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "table_id": "mysql_sakila_film_category"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table"
+      ]
+    },
+    "DataIngestionMovement_film_category.EndPhrase.EndMotif": {
+      "operator": "airflow.operators.dummy.DummyOperator",
+      "task_group": "DataIngestionMovement_film_category.EndPhrase",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif"
+      ]
+    },
+    "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "op_args": [
+          "{{ ti.job_id }}"
+        ],
+        "op_kwargs": {},
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film_category"
+      ]
+    },
+    "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.begin_film_category": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.update_table_resources"
+      ]
+    },
+    "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
+      "operator": "debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
+      "templated_fields": {
+        "batch": {
+          "environment_config": {
+            "execution_config": {
+              "subnetwork_uri": "subnet-cluster-services"
+            }
+          },
+          "pyspark_batch": {
+            "args": [
+              "com.mysql.cj.jdbc.Driver",
+              "jdbc:mysql://{host}:{port}/sakila",
+              "projects/modular-aileron-191222/secrets/debussy_mysql_dev/versions/latest",
+              "sakila",
+              "SELECT film_id, category_id, last_update FROM sakila.film_category WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n  AND last_update <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "{{ ts_nodash }}",
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+            ],
+            "jar_file_uris": [
+              "file:///usr/lib/spark/external/spark-avro.jar",
+              "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar",
+              "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"
+            ],
+            "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key_serverless.py"
+          }
+        },
+        "batch_id": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_serverless', task_ids='DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id') }}-sakila-filmcategory",
+        "impersonation_chain": null,
+        "project_id": "modular-aileron-191222",
+        "region": "us-central1"
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id"
+      ]
+    },
+    "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
+      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "task_group": "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase",
+      "templated_fields": {
+        "configuration": {
+          "load": {
+            "createDisposition": "CREATE_IF_NEEDED",
+            "destinationTable": {
+              "datasetId": "raw",
+              "projectId": "modular-aileron-191222",
+              "tableId": "mysql_sakila_film_category${{ execution_date.strftime('%Y%m%d') }}"
+            },
+            "hivePartitioningOptions": {
+              "mode": "AUTO",
+              "sourceUriPrefix": "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category"
+            },
+            "schema": {
+              "fields": [
+                {
+                  "description": "A foreign key identifying the film",
+                  "fields": null,
+                  "mode": null,
+                  "name": "film_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "A foreign key identifying the category",
+                  "fields": null,
+                  "mode": null,
+                  "name": "category_id",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "INT64"
+                },
+                {
+                  "description": "When the row was created or most recently updated",
+                  "fields": null,
+                  "mode": null,
+                  "name": "last_update",
+                  "policy_tags": {
+                    "names": []
+                  },
+                  "type": "TIMESTAMP"
+                }
+              ]
+            },
+            "schemaUpdateOptions": null,
+            "sourceFormat": "PARQUET",
+            "sourceUris": [
+              "gs://dotz-datalake-dev-l2-raw-vault/mysql/sakila/film_category/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+            ],
+            "timePartitioning": null,
+            "writeDisposition": "WRITE_TRUNCATE"
+          }
+        },
+        "impersonation_chain": null,
+        "job_id": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless"
+      ]
+    },
+    "DataIngestionMovement_film_category.StartPhrase.StartMotif.begin_dag": {
+      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
+      "templated_fields": {},
+      "trigger_rule": "all_success",
+      "upstream": []
+    },
+    "DataIngestionMovement_film_category.StartPhrase.StartMotif.log_input": {
+      "operator": "airflow.operators.python.PythonOperator",
+      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
+      "templated_fields": {
+        "op_args": [],
+        "op_kwargs": {
+          "config": "<config ConfigRdbmsDataIngestion name=mysql_sakila_ingestion_serverless>"
+        },
+        "templates_dict": null
+      },
+      "trigger_rule": "all_success",
+      "upstream": [
+        "DataIngestionMovement_film_category.StartPhrase.StartMotif.begin_dag"
+      ]
+    }
+  }
+}

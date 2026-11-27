@@ -17,8 +17,7 @@ class TimePartitionedDataIngestionMovementParameters(MovementParametersBase):
 
     def __post_init__(self):
         if not isinstance(self.data_partitioning, BigQueryDataPartitioning):
-            data_partitioning = BigQueryDataPartitioning(
-                **self.data_partitioning)
+            data_partitioning = BigQueryDataPartitioning(**self.data_partitioning)
             # hack for frozen dataclass https://stackoverflow.com/a/54119384
             # overwriting data_partitioning with BigQueryDataPartitioning instance
             object.__setattr__(self, "data_partitioning", data_partitioning)

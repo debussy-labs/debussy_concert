@@ -1,0 +1,27 @@
+# Test environment for the frozen 1.x line: Airflow 2.3 on Python 3.9.
+# Compiled into requirements-ci.txt by ci/compile.sh. Do not install this file directly.
+apache-airflow==2.3.4
+
+# debussy_airflow 0.0.7 runtime dependencies (pinned to the versions the 0.0.x line was built on).
+apache-airflow-providers-google==8.0.0
+apache-airflow-providers-amazon
+facebook-business==13.0.0
+mysqlclient
+paramiko==2.8.1
+pg8000==1.29.2
+pysftp
+
+# debussy_concert runtime dependencies. dbt-bigquery is left out on purpose:
+# it is only needed to run dbt, not to build DAGs, and does not resolve
+# against the Airflow 2.3 constraints.
+Inject
+yaml_env_var_parser
+airflow-dbt
+
+# Airflow 2.3 imports pkg_resources, which setuptools 70+ no longer ships by default.
+setuptools<70
+
+# Tooling
+pytest
+black  # version comes from the Airflow constraints
+flake8
