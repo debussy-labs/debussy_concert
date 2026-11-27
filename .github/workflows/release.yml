@@ -1,0 +1,68 @@
+name: Release
+
+# Publishes to PyPI with Trusted Publishing (OIDC): there is no API token.
+# PyPI trusted publisher settings: owner debussy-labs, repository debussy,
+# workflow release.yml, environment pypi.
+#
+# To release: set __version__ in debussy/__init__.py, merge it, then push a tag
+# that matches it (version 2.0.0 is tag v2.0.0).
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Build sdist and wheel
+        run: uvx --from build pyproject-build --installer uv --outdir dist .
+
+      - name: Check the distributions
+        run: uvx twine check --strict dist/*
+
+      - name: Check that the tag matches the package version
+        run: |
+          uv run --no-project --with packaging python - <<'PY'
+          import glob, os
+          from packaging.utils import parse_wheel_filename
+          from packaging.version import Version
+
+          wheel = glob.glob("dist/*.whl")[0]
+          built = parse_wheel_filename(os.path.basename(wheel))[1]
+          tag = Version(os.environ["GITHUB_REF_NAME"].removeprefix("v"))
+          assert built == tag, f"tag {os.environ['GITHUB_REF_NAME']} != built version {built}"
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/project/debussy/
+    permissions:
+      id-token: write # Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
