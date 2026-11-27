@@ -9,7 +9,7 @@ dag_parameters:
   schedule_interval: null
   start_date: !!timestamp 2022-01-01 00:00:00
   tags:
-    - framework:debussy_concert
+    - framework:debussy
     - project:example
     - source:bigquery
     - type:ingestion
@@ -19,7 +19,7 @@ dag_parameters:
     owner: debussy
 ingestion_parameters:
   - name: policy_tags
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/bigquery_ingestion_policy_tags/table_def_policy_tags.yaml
+    raw_table_definition: ${DEBUSSY__DAGS_FOLDER}/examples/data_ingestion/bigquery_ingestion_policy_tags/table_def_policy_tags.yaml
     extraction_query: SELECT 'visible_data' as visible_data, 'tagged_data' as tagged_data
     extract_connection_id: google_cloud_debussy
     data_partitioning:

@@ -10,7 +10,7 @@
   "schedule_interval": null,
   "start_date": "2022-01-01T00:00:00+00:00",
   "tags": [
-    "framework:debussy_concert",
+    "framework:debussy",
     "load:full",
     "project:example",
     "source:bigquery",
@@ -86,7 +86,7 @@
       ]
     },
     "DataIngestionMovement_policy_tags.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_policy_tags.IngestionSourceToRawVaultStoragePhrase",
       "templated_fields": {
         "configuration": {
@@ -108,7 +108,7 @@
       ]
     },
     "DataIngestionMovement_policy_tags.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_policy_tags.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -175,7 +175,7 @@
     },
     "DataIngestionMovement_policy_tags.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_policy_tags.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

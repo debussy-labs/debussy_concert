@@ -1,9 +1,9 @@
 from pytest import fixture
 import inject
 
-from debussy_concert.pipeline.reverse_etl.config.reverse_etl import ConfigReverseEtl
-from debussy_concert.core.service.workflow.protocol import PWorkflowService
-from debussy_concert.core.config.config_composition import ConfigComposition
+from debussy.pipeline.reverse_etl.config.reverse_etl import ConfigReverseEtl
+from debussy.core.service.workflow.protocol import PWorkflowService
+from debussy.core.config.config_composition import ConfigComposition
 from tests.resource.workflow_for_testing import WorkflowServiceForTesting
 
 

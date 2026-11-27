@@ -31,7 +31,7 @@ UPDATE = os.environ.get("DEBUSSY_UPDATE_SNAPSHOTS", "").lower() in ("1", "true",
 # Environment variables read by the example YAML files. Fixed values keep the
 # snapshots independent of the machine running the tests.
 FIXED_ENV = {
-    "DEBUSSY_CONCERT__PROJECT": "snapshot-project",
+    "DEBUSSY__PROJECT": "snapshot-project",
     "PWD": "/snapshot/pwd",
     # Some compositions instantiate hooks while the DAG is parsed, which looks
     # up the connection. These dummy connections never reach a real system.

@@ -1,18 +1,18 @@
 import os
 
 from airflow.configuration import conf
-from debussy_concert.core.service.injection import inject_dependencies
-from debussy_concert.core.service.workflow.airflow import AirflowService
-from debussy_concert.pipeline.data_ingestion.composition.rdbms_ingestion import (
+from debussy.core.service.injection import inject_dependencies
+from debussy.core.service.workflow.airflow import AirflowService
+from debussy.pipeline.data_ingestion.composition.rdbms_ingestion import (
     RdbmsIngestionComposition,
 )
-from debussy_concert.pipeline.data_ingestion.config.rdbms_data_ingestion import (
+from debussy.pipeline.data_ingestion.config.rdbms_data_ingestion import (
     ConfigRdbmsDataIngestion,
 )
 
 dags_folder = conf.get("core", "dags_folder")
 
-os.environ["DEBUSSY_CONCERT__DAGS_FOLDER"] = dags_folder
+os.environ["DEBUSSY__DAGS_FOLDER"] = dags_folder
 os.environ[
     "MYSQL_SAKILA_DAILY_WINDOW_START"
 ] = "execution_date.strftime('%Y-%m-%d 00:00:00')"

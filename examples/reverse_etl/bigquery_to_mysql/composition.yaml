@@ -12,7 +12,7 @@ dag_parameters:
   default_args:
     owner: debussy
   tags:
-    - framework:debussy_concert
+    - framework:debussy
     - project:example
     - destiny:mysql
     - type:reverse_etl

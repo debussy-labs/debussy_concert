@@ -10,7 +10,7 @@
   "schedule_interval": "*/30 * * * *",
   "start_date": "2022-01-01T00:00:00+00:00",
   "tags": [
-    "framework:debussy_concert",
+    "framework:debussy",
     "load:incremental",
     "project:example",
     "source:bigquery",
@@ -86,14 +86,14 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase.ExportBigQueryQueryToGcsMotif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.IngestionSourceToRawVaultStoragePhrase",
       "templated_fields": {
         "configuration": {
           "query": {
             "createDisposition": null,
             "destinationTable": null,
-            "query": "\n    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet')\n    AS SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date, '/snapshot/pwd' as pwd_env_var, 'modular-aileron-191222' as debussy_concert_env_project, 'default_value' as env_default_value_example\n\n    ",
+            "query": "\n    EXPORT DATA OPTIONS(overwrite=false,format='PARQUET',uri='gs://dotz-datalake-dev-l2-raw-vault/bigquery/example/sintetico_incr/_load_flag=incr/_logical_ts={{ execution_date }}/_ingestion_ts={{ dag_run.start_date }}/*.parquet')\n    AS SELECT 'dado' as data, TIMESTAMP '{{ execution_date }}' as airflow_logical_date, '/snapshot/pwd' as pwd_env_var, 'modular-aileron-191222' as debussy_env_project, 'default_value' as env_default_value_example\n\n    ",
             "timePartitioning": null,
             "useLegacySql": false,
             "writeDisposition": null
@@ -108,7 +108,7 @@
       ]
     },
     "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_sintetico_incr.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -159,7 +159,7 @@
                   "description": "Value of the variable set in environment.yaml",
                   "fields": null,
                   "mode": null,
-                  "name": "debussy_concert_env_project",
+                  "name": "debussy_env_project",
                   "policy_tags": {
                     "names": []
                   },
@@ -203,7 +203,7 @@
     },
     "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_sintetico_incr.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

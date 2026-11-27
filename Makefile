@@ -24,7 +24,7 @@ clean-mypy:
 	find . -name '.mypy_cache' -exec rm -fr {} +
 
 mypy:
-	mypy --namespace-packages --explicit-package-bases debussy_concert
+	mypy --namespace-packages --explicit-package-bases debussy
 
 install:
 	pip install -e .

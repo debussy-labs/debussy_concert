@@ -11,7 +11,7 @@ paramiko==2.8.1
 pg8000==1.29.2
 pysftp
 
-# debussy_concert runtime dependencies. dbt-bigquery is left out on purpose:
+# debussy runtime dependencies. dbt-bigquery is left out on purpose:
 # it is only needed to run dbt, not to build DAGs, and does not resolve
 # against the Airflow 2.3 constraints.
 Inject

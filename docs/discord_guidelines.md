@@ -1,7 +1,7 @@
 # Discord Guidelines:
 
 ## Be Nice. Be Respectful.
-We cannot stress enough that we want this to be a safe, comfortable and inclusive environment. Please read our [code of conduct](https://github.com/DotzInc/debussy_concert/wiki/Code-of-Conduct) if you need more information on this guideline.
+We cannot stress enough that we want this to be a safe, comfortable and inclusive environment. Please read our [code of conduct](https://github.com/DotzInc/debussy/wiki/Code-of-Conduct) if you need more information on this guideline.
 
 ## Keep timezones in mind and be respectful of people's time.
 
@@ -12,8 +12,8 @@ If you post in off hours be patient, someone will get back to you once the sun c
 ## Asking for help
 
 - Do your best to try and solve the problem first as your efforts will help us more easily answer the question.
-- Head over to our [Wiki](https://github.com/DotzInc/debussy_concert/wiki)
-- Checkout [GitHub Discussions](https://github.com/DotzInc/debussy_concert/discussions) this is where we want most of our problem solving, discussion, and updates to go because it helps keep a more visible record for Debussy users.
+- Head over to our [Wiki](https://github.com/DotzInc/debussy/wiki)
+- Checkout [GitHub Discussions](https://github.com/DotzInc/debussy/discussions) this is where we want most of our problem solving, discussion, and updates to go because it helps keep a more visible record for Debussy users.
 
 #### Asking your question in Discord
 

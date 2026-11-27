@@ -10,7 +10,7 @@
   "schedule_interval": "@daily",
   "start_date": "2006-02-16T00:00:00+00:00",
   "tags": [
-    "framework:debussy_concert",
+    "framework:debussy",
     "granularity:daily",
     "load:incremental",
     "project:example",
@@ -145,7 +145,7 @@
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
@@ -169,7 +169,7 @@
       ]
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
-      "operator": "debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "operator": "debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "batch": {
@@ -207,7 +207,7 @@
       ]
     },
     "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_film.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -382,7 +382,7 @@
     },
     "DataIngestionMovement_film.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -439,7 +439,7 @@
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
@@ -463,7 +463,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
-      "operator": "debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "operator": "debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "batch": {
@@ -501,7 +501,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_film_actor.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -576,7 +576,7 @@
     },
     "DataIngestionMovement_film_actor.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_actor.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -633,7 +633,7 @@
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
@@ -657,7 +657,7 @@
       ]
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
-      "operator": "debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "operator": "debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "batch": {
@@ -695,7 +695,7 @@
       ]
     },
     "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_film_category.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -770,7 +770,7 @@
     },
     "DataIngestionMovement_film_category.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_film_category.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

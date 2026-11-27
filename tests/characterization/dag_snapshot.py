@@ -15,7 +15,7 @@ from pathlib import Path
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.message import Message
 
-from debussy_concert.core.config.config_composition import ConfigComposition
+from debussy.core.config.config_composition import ConfigComposition
 
 
 def _qualified_name(obj) -> str:

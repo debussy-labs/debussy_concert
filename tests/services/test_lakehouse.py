@@ -1,5 +1,5 @@
-from debussy_concert.core.entities.table import BigQueryTable
-from debussy_concert.core.service.lakehouse.google_cloud import (
+from debussy.core.entities.table import BigQueryTable
+from debussy.core.service.lakehouse.google_cloud import (
     GoogleCloudLakeHouseService,
 )
 
