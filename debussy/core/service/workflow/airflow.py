@@ -1,9 +1,6 @@
 from enum import Enum
 
-from airflow.models.dag import DAG
-from airflow.models.baseoperator import chain
-from airflow.utils.task_group import TaskGroup
-from airflow.configuration import conf
+from airflow.sdk import DAG, TaskGroup, chain
 
 from debussy.core.service.workflow.protocol import PWorkflowService
 

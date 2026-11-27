@@ -14,7 +14,7 @@ dag_parameters:
   dag_id: mssql_sakila_ingestion_daily
   description: Mssql ingestion for sakila sample relational database.
   catchup: true
-  schedule_interval: "0 5 * * *"
+  schedule: "0 5 * * *"
   start_date:
     year: 2006
     month: 2
@@ -45,9 +45,9 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"
   - name: city
     extraction_query: >
       SELECT city_id, city, country_id, last_update
@@ -60,9 +60,9 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"
   - name: store
     extraction_query: >
       SELECT store_id, manager_staff_id, address_id, last_update
@@ -75,9 +75,9 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"
   - name: inventory
     extraction_query: >
       SELECT inventory_id, film_id, store_id, last_update
@@ -90,9 +90,9 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"
   - name: staff
     extraction_query: >
       SELECT staff_id, first_name, last_name, address_id, picture, email, store_id, active, username, password, last_update
@@ -105,6 +105,6 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${MSSQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${MSSQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"

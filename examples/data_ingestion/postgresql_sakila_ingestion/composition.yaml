@@ -16,7 +16,7 @@ dag_parameters:
   dag_id: postgresql_sakila_ingestion_daily
   description: Postgresql ingestion for sakila sample relational database.
   catchup: true
-  schedule_interval: "0 5 * * *"
+  schedule: "0 5 * * *"
   max_active_runs: 1
   start_date:
     year: 2006
@@ -48,9 +48,9 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${POSTGRESQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"
   - name: category
     extraction_query: >
       SELECT category_id, "name", last_update
@@ -63,9 +63,9 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${POSTGRESQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"
   - name: language
     extraction_query: >
       SELECT language_id, "name", last_update
@@ -78,6 +78,6 @@ ingestion_parameters:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
         }}/_ts_window_end={{ ${POSTGRESQL_SAKILA_WINDOW_END}
-        }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z')
+        }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z')
         }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}
-      destination_partition: "{{ execution_date.strftime('%Y%m%d') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d') }}"

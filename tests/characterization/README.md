@@ -35,6 +35,7 @@ fixed, the test fails until its entry is removed and a snapshot is created.
 
 ## Environment
 
-The snapshots describe the frozen 1.x line on Airflow 2.3 and Python 3.9. The
-CI environment is pinned in `ci/requirements-ci.txt`; regenerate it with
+The snapshots describe the DAGs built on Airflow 3.4, and must be identical on
+every Python version tested in CI (3.11 and 3.13). The CI environments are
+pinned in `ci/requirements-ci-<python>.txt`; regenerate them with
 `ci/compile.sh` after changing `ci/requirements-ci.in`.

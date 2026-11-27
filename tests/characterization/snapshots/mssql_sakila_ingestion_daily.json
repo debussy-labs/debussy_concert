@@ -7,7 +7,7 @@
   "description": "Mssql ingestion for sakila sample relational database.",
   "end_date": "2006-02-16T00:00:00+00:00",
   "max_active_runs": 16,
-  "schedule_interval": "0 5 * * *",
+  "schedule": "0 5 * * *",
   "start_date": "2006-02-15T00:00:00+00:00",
   "tags": [
     "framework:debussy",
@@ -156,17 +156,127 @@
   },
   "tasks": {
     "DataIngestionMovement_city.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_city.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_city",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A surrogate primary key used to uniquely identify each city in the table",
+                "fields": null,
+                "mode": null,
+                "name": "city_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "The name of the city",
+                "fields": null,
+                "mode": null,
+                "name": "city",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "A foreign key identifying the country that the city belongs to",
+                "fields": null,
+                "mode": null,
+                "name": "country_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -178,6 +288,7 @@
       "task_group": "DataIngestionMovement_city.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_city"
@@ -188,7 +299,7 @@
       ]
     },
     "DataIngestionMovement_city.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_city.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -197,7 +308,7 @@
       ]
     },
     "DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_city": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -206,12 +317,12 @@
       ]
     },
     "DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -301,6 +412,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -317,6 +429,7 @@
       "task_group": "DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -330,6 +443,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_city.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -341,9 +455,9 @@
               "jdbc:sqlserver://{host}:{port};databaseName=sakila",
               "projects/modular-aileron-191222/secrets/debussy_mssql_dev/versions/latest",
               "sakila",
-              "SELECT city_id, city, country_id, last_update FROM sakila.dbo.city WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT city_id, city, country_id, last_update FROM sakila.dbo.city WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/city/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/city/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -370,7 +484,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mssql_sakila_city${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mssql_sakila_city${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -423,14 +537,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/city/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/city/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -438,14 +554,14 @@
       ]
     },
     "DataIngestionMovement_city.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_city.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_city.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_city.StartPhrase.StartMotif",
       "templated_fields": {
@@ -461,17 +577,117 @@
       ]
     },
     "DataIngestionMovement_country.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_country.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_country",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A surrogate primary key used to uniquely identify each country in the table",
+                "fields": null,
+                "mode": null,
+                "name": "country_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "The name of the country",
+                "fields": null,
+                "mode": null,
+                "name": "country",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -483,6 +699,7 @@
       "task_group": "DataIngestionMovement_country.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_country"
@@ -493,7 +710,7 @@
       ]
     },
     "DataIngestionMovement_country.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_country.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -502,7 +719,7 @@
       ]
     },
     "DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_country": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -511,12 +728,12 @@
       ]
     },
     "DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -606,6 +823,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -622,6 +840,7 @@
       "task_group": "DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -635,6 +854,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_country.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -646,9 +866,9 @@
               "jdbc:sqlserver://{host}:{port};databaseName=sakila",
               "projects/modular-aileron-191222/secrets/debussy_mssql_dev/versions/latest",
               "sakila",
-              "SELECT country_id, country, last_update FROM sakila.dbo.country WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT country_id, country, last_update FROM sakila.dbo.country WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/country/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/country/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -675,7 +895,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mssql_sakila_country${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mssql_sakila_country${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -718,14 +938,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/country/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/country/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -733,14 +955,14 @@
       ]
     },
     "DataIngestionMovement_country.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_country.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_country.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_country.StartPhrase.StartMotif",
       "templated_fields": {
@@ -756,17 +978,127 @@
       ]
     },
     "DataIngestionMovement_inventory.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_inventory.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_inventory",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A surrogate primary key used to uniquely identify each item in inventory",
+                "fields": null,
+                "mode": null,
+                "name": "inventory_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "A foreign key pointing to the film this item represents",
+                "fields": null,
+                "mode": null,
+                "name": "film_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "A foreign key pointing to the store stocking this item",
+                "fields": null,
+                "mode": null,
+                "name": "store_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -778,6 +1110,7 @@
       "task_group": "DataIngestionMovement_inventory.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_inventory"
@@ -788,7 +1121,7 @@
       ]
     },
     "DataIngestionMovement_inventory.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_inventory.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -797,7 +1130,7 @@
       ]
     },
     "DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_inventory": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -806,12 +1139,12 @@
       ]
     },
     "DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -901,6 +1234,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -917,6 +1251,7 @@
       "task_group": "DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -930,6 +1265,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_inventory.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -941,9 +1277,9 @@
               "jdbc:sqlserver://{host}:{port};databaseName=sakila",
               "projects/modular-aileron-191222/secrets/debussy_mssql_dev/versions/latest",
               "sakila",
-              "SELECT inventory_id, film_id, store_id, last_update FROM sakila.dbo.inventory WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT inventory_id, film_id, store_id, last_update FROM sakila.dbo.inventory WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/inventory/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/inventory/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -970,7 +1306,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mssql_sakila_inventory${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mssql_sakila_inventory${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -1023,14 +1359,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/inventory/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/inventory/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -1038,14 +1376,14 @@
       ]
     },
     "DataIngestionMovement_inventory.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_inventory.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_inventory.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_inventory.StartPhrase.StartMotif",
       "templated_fields": {
@@ -1061,17 +1399,197 @@
       ]
     },
     "DataIngestionMovement_staff.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_staff.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_staff",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A surrogate primary key that uniquely identifies the staff member",
+                "fields": null,
+                "mode": null,
+                "name": "staff_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "The first name of the staff member",
+                "fields": null,
+                "mode": null,
+                "name": "first_name",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "The last name of the staff member",
+                "fields": null,
+                "mode": null,
+                "name": "last_name",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "A foreign key to the staff member address in the address table",
+                "fields": null,
+                "mode": null,
+                "name": "address_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "A BLOB containing a photograph of the employee",
+                "fields": null,
+                "mode": null,
+                "name": "picture",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "BYTES"
+              },
+              {
+                "description": "The staff member email address",
+                "fields": null,
+                "mode": null,
+                "name": "email",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "The staff member “home store.” The employee can work at other stores but is generally assigned to the store listed",
+                "fields": null,
+                "mode": null,
+                "name": "store_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "Whether this is an active employee. If employees leave, their rows are not deleted from this table; instead, this column is set to FALSE",
+                "fields": null,
+                "mode": null,
+                "name": "active",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "BOOLEAN"
+              },
+              {
+                "description": "The user name used by the staff member to access the rental system",
+                "fields": null,
+                "mode": null,
+                "name": "username",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "The password used by the staff member to access the rental system. The password should be stored as a hash using the SHA2() function",
+                "fields": null,
+                "mode": null,
+                "name": "password",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -1083,6 +1601,7 @@
       "task_group": "DataIngestionMovement_staff.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_staff"
@@ -1093,7 +1612,7 @@
       ]
     },
     "DataIngestionMovement_staff.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_staff.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1102,7 +1621,7 @@
       ]
     },
     "DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_staff": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1111,12 +1630,12 @@
       ]
     },
     "DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -1206,6 +1725,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -1222,6 +1742,7 @@
       "task_group": "DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -1235,6 +1756,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_staff.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -1246,9 +1768,9 @@
               "jdbc:sqlserver://{host}:{port};databaseName=sakila",
               "projects/modular-aileron-191222/secrets/debussy_mssql_dev/versions/latest",
               "sakila",
-              "SELECT staff_id, first_name, last_name, address_id, picture, email, store_id, active, username, password, last_update FROM sakila.dbo.staff WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT staff_id, first_name, last_name, address_id, picture, email, store_id, active, username, password, last_update FROM sakila.dbo.staff WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/staff/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/staff/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -1275,7 +1797,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mssql_sakila_staff${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mssql_sakila_staff${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -1398,14 +1920,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/staff/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/staff/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -1413,14 +1937,14 @@
       ]
     },
     "DataIngestionMovement_staff.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_staff.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_staff.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_staff.StartPhrase.StartMotif",
       "templated_fields": {
@@ -1436,17 +1960,127 @@
       ]
     },
     "DataIngestionMovement_store.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif.create_empty_table": {
-      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateEmptyTableOperator",
+      "operator": "airflow.providers.google.cloud.operators.bigquery.BigQueryCreateTableOperator",
       "task_group": "DataIngestionMovement_store.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "gcs_schema_object": null,
+        "google_cloud_storage_conn_id": "google_cloud_default",
         "impersonation_chain": null,
-        "labels": null,
-        "materialized_view": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_store",
-        "view": null
+        "table_resource": {
+          "schema": {
+            "fields": [
+              {
+                "description": "A surrogate primary key that uniquely identifies the store",
+                "fields": null,
+                "mode": null,
+                "name": "store_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "A foreign key identifying the manager of this store",
+                "fields": null,
+                "mode": null,
+                "name": "manager_staff_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "A foreign key identifying the address of this store",
+                "fields": null,
+                "mode": null,
+                "name": "address_id",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "INTEGER"
+              },
+              {
+                "description": "When the row was created or most recently updated",
+                "fields": null,
+                "mode": null,
+                "name": "last_update",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "incr = incremental data ingestion; full = full data ingestion",
+                "fields": null,
+                "mode": null,
+                "name": "_load_flag",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              },
+              {
+                "description": "Ingestion window start at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_start",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Ingestion window end at source timezone",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_window_end",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Airflow logical date",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_logical",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "Clock time at Airflow when the ingestion was executed",
+                "fields": null,
+                "mode": null,
+                "name": "_ts_ingestion",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "TIMESTAMP"
+              },
+              {
+                "description": "An MD5 surrogate hash key used to uniquely identify each record of the source",
+                "fields": null,
+                "mode": null,
+                "name": "_hash_key",
+                "policy_tags": {
+                  "names": []
+                },
+                "type": "STRING"
+              }
+            ]
+          },
+          "timePartitioning": {
+            "expirationMs": null,
+            "field": "_ts_window_start",
+            "type": "DAY"
+          }
+        }
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -1458,6 +2092,7 @@
       "task_group": "DataIngestionMovement_store.CreateOrUpdateRawTablePhrase.CreateBigQueryTableMotif",
       "templated_fields": {
         "dataset_id": "raw",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "table_id": "mssql_sakila_store"
@@ -1468,7 +2103,7 @@
       ]
     },
     "DataIngestionMovement_store.EndPhrase.EndMotif": {
-      "operator": "airflow.operators.dummy.DummyOperator",
+      "operator": "airflow.providers.standard.operators.empty.EmptyOperator",
       "task_group": "DataIngestionMovement_store.EndPhrase",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1477,7 +2112,7 @@
       ]
     },
     "DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.begin_store": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
@@ -1486,12 +2121,12 @@
       ]
     },
     "DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
-          "{{ ti.job_id }}"
+          "{{ ti.id.hex[:8] }}"
         ],
         "op_kwargs": {},
         "templates_dict": null
@@ -1581,6 +2216,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -1597,6 +2233,7 @@
       "task_group": "DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mssql_sakila_ingestion_daily', task_ids='DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -1610,6 +2247,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_store.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
+        "gcp_conn_id": "google_cloud_default",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -1621,9 +2259,9 @@
               "jdbc:sqlserver://{host}:{port};databaseName=sakila",
               "projects/modular-aileron-191222/secrets/debussy_mssql_dev/versions/latest",
               "sakila",
-              "SELECT store_id, manager_staff_id, address_id, last_update FROM sakila.dbo.store WHERE last_update >= '{{ execution_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}'\n",
+              "SELECT store_id, manager_staff_id, address_id, last_update FROM sakila.dbo.store WHERE last_update >= '{{ logical_date.strftime('%Y-%m-%d 00:00:00') }}' AND last_update   <  '{{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}'\n",
               "{{ ts_nodash }}",
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/store/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/store/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}"
             ],
             "main_python_file_uri": "gs://dotz-datalake-dev-artifacts/pyspark-scripts/jdbc-to-gcs/jdbc_to_gcs_hash_key.py"
           },
@@ -1650,7 +2288,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "mssql_sakila_store${{ execution_date.strftime('%Y%m%d') }}"
+              "tableId": "mssql_sakila_store${{ logical_date.strftime('%Y%m%d') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
@@ -1703,14 +2341,16 @@
             "schemaUpdateOptions": null,
             "sourceFormat": "PARQUET",
             "sourceUris": [
-              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/store/_load_flag=incr/_ts_window_start={{ execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ next_execution_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ execution_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
+              "gs://dotz-datalake-dev-l2-raw-vault/mssql/sakila/store/_load_flag=incr/_ts_window_start={{ logical_date.strftime('%Y-%m-%d 00:00:00') }}/_ts_window_end={{ data_interval_end.strftime('%Y-%m-%d 00:00:00') }}/_ts_logical={{ logical_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/_ts_ingestion={{ dag_run.start_date.strftime('%Y-%m-%d %H:%M:%S%z') }}/*.parquet"
             ],
             "timePartitioning": null,
             "writeDisposition": "WRITE_TRUNCATE"
           }
         },
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
-        "job_id": null
+        "job_id": null,
+        "project_id": null
       },
       "trigger_rule": "all_success",
       "upstream": [
@@ -1718,14 +2358,14 @@
       ]
     },
     "DataIngestionMovement_store.StartPhrase.StartMotif.begin_dag": {
-      "operator": "debussy_airflow.operators.basic_operator.StartOperator",
+      "operator": "debussy.core.motif.start.StartOperator",
       "task_group": "DataIngestionMovement_store.StartPhrase.StartMotif",
       "templated_fields": {},
       "trigger_rule": "all_success",
       "upstream": []
     },
     "DataIngestionMovement_store.StartPhrase.StartMotif.log_input": {
-      "operator": "airflow.operators.python.PythonOperator",
+      "operator": "airflow.providers.standard.operators.python.PythonOperator",
       "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_store.StartPhrase.StartMotif",
       "templated_fields": {

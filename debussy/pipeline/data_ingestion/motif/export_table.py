@@ -1,8 +1,8 @@
-from airflow import DAG
-from airflow.utils.task_group import TaskGroup
+from airflow.sdk import DAG
+from airflow.sdk import TaskGroup
 from typing import Any, Optional, Sequence, Dict
 from google.protobuf.duration_pb2 import Duration
-from airflow.operators.python_operator import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocSubmitJobOperator,
     DataprocCreateBatchOperator,
@@ -19,7 +19,7 @@ from debussy.pipeline.data_ingestion.config.movement_parameters.rdbms_data_inges
     RdbmsDataIngestionMovementParameters,
 )
 
-from debussy_airflow.operators.basic_operator import StartOperator
+from debussy.core.motif.start import StartOperator
 
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
@@ -281,7 +281,7 @@ class DataprocExportRdbmsTableToGcsMotif(
         cluster_name_id = PythonOperator(
             task_id="cluster_name_id",
             python_callable=lambda x: x,
-            op_args=["{{ ti.job_id }}"],
+            op_args=["{{ ti.id.hex[:8] }}"],
             dag=dag,
             task_group=task_group,
         )
@@ -419,7 +419,7 @@ class DataprocServerlessExportRdbmsTableToGcsMotif(
         batch_id = PythonOperator(
             task_id="batch_job_id",
             python_callable=lambda x: x,
-            op_args=["{{ ti.job_id }}"],
+            op_args=["{{ ti.id.hex[:8] }}"],
             dag=dag,
             task_group=task_group,
         )

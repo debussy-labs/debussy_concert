@@ -13,12 +13,12 @@ from debussy.pipeline.data_ingestion.config.rdbms_data_ingestion import (
 dags_folder = conf.get("core", "dags_folder")
 
 os.environ["DEBUSSY__DAGS_FOLDER"] = dags_folder
-os.environ[
-    "MYSQL_SAKILA_DAILY_WINDOW_START"
-] = "execution_date.strftime('%Y-%m-%d 00:00:00')"
-os.environ[
-    "MYSQL_SAKILA_DAILY_WINDOW_END"
-] = "next_execution_date.strftime('%Y-%m-%d 00:00:00')"
+os.environ["MYSQL_SAKILA_DAILY_WINDOW_START"] = (
+    "logical_date.strftime('%Y-%m-%d 00:00:00')"
+)
+os.environ["MYSQL_SAKILA_DAILY_WINDOW_END"] = (
+    "data_interval_end.strftime('%Y-%m-%d 00:00:00')"
+)
 
 env_file = f"{dags_folder}/examples/environment.yaml"
 composition_file = f"{dags_folder}/examples/data_ingestion/mysql_sakila_ingestion/composition_daily_old_setup.yaml"

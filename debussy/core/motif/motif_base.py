@@ -71,9 +71,9 @@ class DummyMotif(MotifBase):
         super().__init__(name=name)
 
     def build(self, workflow_dag, phrase_group):
-        from airflow.operators.dummy import DummyOperator
+        from airflow.providers.standard.operators.empty import EmptyOperator
 
-        operator = DummyOperator(
+        operator = EmptyOperator(
             task_id=self.name, dag=workflow_dag, task_group=phrase_group
         )
         return operator

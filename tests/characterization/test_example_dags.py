@@ -9,6 +9,7 @@ review the diff like any other code change::
 
     DEBUSSY_UPDATE_SNAPSHOTS=1 pytest tests/characterization
 """
+
 import os
 import runpy
 from pathlib import Path
@@ -19,7 +20,7 @@ import pytest
 pytest.importorskip("airflow")
 
 from airflow.configuration import conf  # noqa: E402
-from airflow.models.dag import DAG  # noqa: E402
+from airflow.sdk import DAG  # noqa: E402
 
 from tests.characterization.dag_snapshot import dag_to_snapshot, dump  # noqa: E402
 

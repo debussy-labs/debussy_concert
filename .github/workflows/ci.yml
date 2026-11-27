@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, "1.x"]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -13,38 +13,34 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PYTHON_VERSION: "3.9"
-  # Installed without dependencies: ci/requirements-ci.txt pins them to the
-  # versions the frozen line was built on.
-  DEBUSSY_AIRFLOW_VERSION: "0.0.7.post1"
-
 jobs:
   test:
-    # Keep this name stable: branch rulesets require it as a status check.
-    name: Lint and test
+    name: Test (Python ${{ matrix.python-version }}, Airflow 3.4)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install system libraries for mysqlclient
         run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev pkg-config
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
 
       - name: Create virtual environment
         run: |
-          uv venv --python "$PYTHON_VERSION" .venv
+          uv venv --python "${{ matrix.python-version }}" .venv
           echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
           echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Install dependencies
+        # Dependencies are pinned in ci/requirements-ci-<python>.txt.
         run: |
-          uv pip install -r ci/requirements-ci.txt
-          uv pip install --no-deps \
-            "debussy-airflow==${DEBUSSY_AIRFLOW_VERSION}" \
-            -e .
+          uv pip install -r "ci/requirements-ci-${{ matrix.python-version }}.txt"
+          uv pip install --no-deps -e .
 
       - name: Lint
         run: |
@@ -56,3 +52,14 @@ jobs:
           AIRFLOW_HOME: ${{ runner.temp }}/airflow
           AIRFLOW__CORE__LOAD_EXAMPLES: "False"
         run: pytest -v
+
+  # Keep this job's name stable: the main branch ruleset requires it as a status
+  # check. It passes only when every job of the test matrix passed.
+  lint-and-test:
+    name: Lint and test
+    if: always()
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check test matrix result
+        run: test "${{ needs.test.result }}" = "success"

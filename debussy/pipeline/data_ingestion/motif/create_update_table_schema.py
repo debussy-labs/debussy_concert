@@ -1,6 +1,6 @@
-from airflow.utils.task_group import TaskGroup
+from airflow.sdk import TaskGroup
 from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryCreateEmptyTableOperator,
+    BigQueryCreateTableOperator,
     BigQueryUpdateTableOperator,
 )
 from debussy.core.motif.mixins.bigquery_job import TableReference
@@ -26,14 +26,17 @@ class CreateBigQueryTableMotif(MotifBase):
         task_group = TaskGroup(
             group_id=self.name, dag=workflow_dag, parent_group=phrase_group
         )
-        create_table = BigQueryCreateEmptyTableOperator(
+        table_resource = {"schema": {"fields": self.bq_schema}}
+        if self.bq_partitioning:
+            table_resource["timePartitioning"] = self.bq_partitioning
+        create_table = BigQueryCreateTableOperator(
             task_id="create_empty_table",
-            bigquery_conn_id=self.gcp_conn_id,
+            gcp_conn_id=self.gcp_conn_id,
             project_id=self.table_ref.project_id,
             dataset_id=self.table_ref.dataset_id,
             table_id=self.table_ref.table_id,
-            schema_fields=self.bq_schema,
-            time_partitioning=self.bq_partitioning,
+            table_resource=table_resource,
+            if_exists="log",
             dag=workflow_dag,
             task_group=task_group,
         )

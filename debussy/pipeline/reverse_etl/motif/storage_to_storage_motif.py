@@ -1,9 +1,7 @@
-from airflow.utils.task_group import TaskGroup
+from airflow.sdk import TaskGroup
 
-from debussy_airflow.operators.storage_to_storage_operator import (
-    StorageToStorageOperator,
-    StorageHookInterface,
-)
+from debussy.pipeline.reverse_etl.hooks import StorageHookInterface
+from debussy.pipeline.reverse_etl.operators import StorageToStorageOperator
 
 from debussy.core.motif.motif_base import MotifBase
 

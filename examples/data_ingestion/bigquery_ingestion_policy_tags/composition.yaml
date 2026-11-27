@@ -6,7 +6,7 @@ dag_parameters:
   dag_id: bigquery_ingestion_policy_tags
   description: BigQuery policy tags example
   catchup: false
-  schedule_interval: null
+  schedule: null
   start_date: !!timestamp 2022-01-01 00:00:00
   tags:
     - framework:debussy

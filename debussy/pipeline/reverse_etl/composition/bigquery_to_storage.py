@@ -28,7 +28,7 @@ from debussy.pipeline.reverse_etl.motif.storage_to_storage_motif import (
     StorageToStorageMotif,
 )
 
-from debussy_airflow.hooks.storage_hook import GCSHook, SFTPHook
+from debussy.pipeline.reverse_etl.hooks import GCSHook, SFTPHook
 
 
 class ReverseEtlBigQueryToStorageComposition(CompositionBase):

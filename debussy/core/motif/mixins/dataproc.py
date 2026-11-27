@@ -1,4 +1,4 @@
-from airflow.utils.trigger_rule import TriggerRule
+from airflow.sdk import TriggerRule
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator,
     DataprocDeleteClusterOperator,
