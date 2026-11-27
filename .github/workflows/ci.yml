@@ -21,7 +21,8 @@ env:
 
 jobs:
   test:
-    name: Lint and test (Airflow 2.3, Python 3.9)
+    # Keep this name stable: branch rulesets require it as a status check.
+    name: Lint and test
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
