@@ -6,7 +6,7 @@ bigquery_lakehouse:
   outputs:
     dev:
       dataset: temp_poc_dbt
-      database: ${DEBUSSY_CONCERT__PROJECT}
+      database: ${DEBUSSY__PROJECT}
       job_execution_timeout_seconds: 300
       job_retries: 1
       location: US
@@ -20,7 +20,7 @@ bigquery_default:
   outputs:
     dev:
       dataset: temp_poc_dbt
-      database: ${DEBUSSY_CONCERT__PROJECT}
+      database: ${DEBUSSY__PROJECT}
       job_execution_timeout_seconds: 300
       job_retries: 1
       location: US

@@ -1,4 +1,4 @@
-from debussy_concert.pipeline.reverse_etl.config.movement_parameters.reverse_etl import (
+from debussy.pipeline.reverse_etl.config.movement_parameters.reverse_etl import (
     CsvFile,
     ReverseEtlMovementParameters,
 )

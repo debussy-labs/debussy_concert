@@ -1,0 +1,25 @@
+from typing import Protocol
+
+from debussy.core.entities.protocols import (
+    PMotifGroup,
+    PPhraseGroup,
+    PMovementGroup,
+    PWorkflowDag,
+)
+
+
+class PWorkflowService(Protocol):
+    def motif_group(self, group_id, workflow_dag, phrase_group) -> PMotifGroup:
+        pass
+
+    def phrase_group(self, group_id, workflow_dag, movement_group) -> PPhraseGroup:
+        pass
+
+    def movement_group(self, group_id, workflow_dag) -> PMovementGroup:
+        pass
+
+    def workflow_dag(self, dag_id, **kwargs) -> PWorkflowDag:
+        pass
+
+    def chain_tasks(self, *tasks):
+        pass

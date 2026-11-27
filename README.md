@@ -1,14 +1,14 @@
-[![GitHub issues](https://img.shields.io/github/issues/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/issues)
-[![GitHub forks](https://img.shields.io/github/forks/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/network)
-[![GitHub stars](https://img.shields.io/github/stars/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/stargazers)
-[![GitHub license](https://img.shields.io/github/license/DotzInc/debussy_concert)](https://github.com/DotzInc/debussy_concert/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/debussy-labs/debussy)](https://github.com/debussy-labs/debussy/issues)
+[![GitHub forks](https://img.shields.io/github/forks/debussy-labs/debussy)](https://github.com/debussy-labs/debussy/network)
+[![GitHub stars](https://img.shields.io/github/stars/debussy-labs/debussy)](https://github.com/debussy-labs/debussy/stargazers)
+[![GitHub license](https://img.shields.io/github/license/debussy-labs/debussy)](https://github.com/debussy-labs/debussy/blob/main/LICENSE)
 
 
-<img align="right" src="https://github.com/DotzInc/debussy_concert/blob/master/docs/images/debussy_logo.png" width="250" height="250">
+<img align="right" src="https://github.com/debussy-labs/debussy/blob/main/docs/images/debussy_logo.png" width="250" height="250">
 
-# Debussy Concert
+# Debussy
 
-[Debussy](https://github.com/DotzInc/debussy_concert/wiki) is a free, open-source, opinionated Data Architecture and Engineering framework. It enables data analysts and engineers to build better data platforms through first class data pipelines, following a low-code and self-service approach.
+[Debussy](https://github.com/debussy-labs/debussy/wiki) is a free, open-source, opinionated Data Architecture and Engineering framework. It enables data analysts and engineers to build better data platforms through first class data pipelines, following a low-code and self-service approach.
 
 <p align="center">
   <a href="#description">Description</a>
@@ -40,7 +40,7 @@ What's even worse, although sharing key concepts, these data orchestration tools
 
 While lots of companies have faced these same issues, most of them have decided to develop their own in-house solutions, missing the opportunity for colaboration and wider adoption of data architecture and sofware engineering best practices.
 
-With that in mind, we created Debussy! Debussy Concert is the core component of Debussy. It's a code generation engine for orchestration tools, currently supporting only Airflow, but with others on the Roadmap. It provides abstraction layers in the form of a musical themed semantic model, decoupling the pipeline logic to the underlying orchestration tool, and enabling a low-code approach to data engineering. We also provides pipelines templates (e.g. data ingestion, data transformation and reverse ETL) built with our engine, while always striving to offer the aforementioned best practices.
+With that in mind, we created Debussy! It's a code generation engine for orchestration tools, currently supporting only Airflow, but with others on the Roadmap. It provides abstraction layers in the form of a musical themed semantic model, decoupling the pipeline logic to the underlying orchestration tool, and enabling a low-code approach to data engineering. We also provides pipelines templates (e.g. data ingestion, data transformation and reverse ETL) built with our engine, while always striving to offer the aforementioned best practices.
 
 ## Key Features
 - Dynamic data pipeline generation from YAML configuration files or directly through Python
@@ -63,7 +63,7 @@ In order to use Debussy, you first need to go through the following steps:
 2. [Enable billing for your project](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project).
 3. [Create a Cloud Composer 2 environment](https://cloud.google.com/composer/docs/composer-2/create-environments).
 4. Install Debussy on your Cloud Composer instance: just upload the project to your `plugins/` folder.
-5. Check our [User's Guide](https://github.com/DotzInc/debussy_concert/wiki/User's-Guide) and [examples](https://github.com/DotzInc/debussy_concert/tree/master/examples) to learn how to use it!
+5. Check our [User's Guide](https://github.com/debussy-labs/debussy/wiki/User's-Guide) and [examples](https://github.com/debussy-labs/debussy/tree/main/examples) to learn how to use it!
 
 Integrations
 -------------------------------------------------------------------------------
@@ -127,19 +127,19 @@ Debussy works with the tools and systems that you're already using with your dat
 
 
 ## Full Documentation
-See the [Wiki](https://github.com/DotzInc/debussy_concert/wiki) for full documentation, examples, operational details and other information.
+See the [Wiki](https://github.com/debussy-labs/debussy/wiki) for full documentation, examples, operational details and other information.
 
 ## Communication
-[GitHub Issues](https://github.com/DotzInc/debussy_concert/issues)
+[GitHub Issues](https://github.com/debussy-labs/debussy/issues)
 
 [Discord Server](https://discord.gg/FpNX79pY)
 
 ## Contributions
 We welcome all community contributions!
 
-In order to have a more open and welcoming community, Debussy adheres to a [code of conduct](https://github.com/DotzInc/debussy_concert/wiki/Code-of-Conduct) adapted from Contributor Covenant.
+In order to have a more open and welcoming community, Debussy adheres to a [code of conduct](https://github.com/debussy-labs/debussy/wiki/Code-of-Conduct) adapted from Contributor Covenant.
 
-Please read through our [contributing guidelines](https://github.com/DotzInc/debussy_concert/wiki/Contributing-Guide). Included are directions for opening issues, coding standards, and notes on development.
+Please read through our [contributing guidelines](https://github.com/debussy-labs/debussy/wiki/Contributing-Guide). Included are directions for opening issues, coding standards, and notes on development.
 
 ## License
 Copyright 2022 Dotz, Inc.

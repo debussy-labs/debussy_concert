@@ -1,19 +1,19 @@
 import datetime as dt
 
-from debussy_concert.core.config.config_dag_parameters import ConfigDagParameters
-from debussy_concert.core.config.config_environment import ConfigEnvironment
-from debussy_concert.core.service.injection import inject_dependencies
-from debussy_concert.core.service.workflow.airflow import AirflowService
-from debussy_concert.pipeline.data_ingestion.composition.rdbms_ingestion import (
+from debussy.core.config.config_dag_parameters import ConfigDagParameters
+from debussy.core.config.config_environment import ConfigEnvironment
+from debussy.core.service.injection import inject_dependencies
+from debussy.core.service.workflow.airflow import AirflowService
+from debussy.pipeline.data_ingestion.composition.rdbms_ingestion import (
     RdbmsIngestionComposition,
 )
-from debussy_concert.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import (
+from debussy.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import (
     RdbmsDataIngestionMovementParameters,
 )
-from debussy_concert.pipeline.data_ingestion.config.movement_parameters.time_partitioned import (
+from debussy.pipeline.data_ingestion.config.movement_parameters.time_partitioned import (
     BigQueryDataPartitioning,
 )
-from debussy_concert.pipeline.data_ingestion.config.rdbms_data_ingestion import (
+from debussy.pipeline.data_ingestion.config.rdbms_data_ingestion import (
     ConfigRdbmsDataIngestion,
 )
 
@@ -44,7 +44,7 @@ config_dag_parameters = ConfigDagParameters(
     schedule_interval="@daily",
     max_active_runs=1,
     tags=[
-        "framework:debussy_concert",
+        "framework:debussy",
         "project:example",
         "tier:5",
         "source:mysql",

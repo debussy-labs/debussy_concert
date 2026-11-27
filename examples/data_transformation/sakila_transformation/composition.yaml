@@ -7,7 +7,7 @@ dag_parameters:
     schedule_interval: '*/30 * * * *' # At every minute.
     start_date: !!timestamp 2022-01-01 00:00:00
     tags:
-      - framework:debussy_concert
+      - framework:debussy
       - project:example
       - source:bigquery
       - type:transformation
@@ -18,5 +18,5 @@ dag_parameters:
 transformation_parameters:
   - name: sakila
     dbt_run_parameters:
-      dir: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
-      profiles_dir: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
+      dir: ${DEBUSSY__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
+      profiles_dir: ${DEBUSSY__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt

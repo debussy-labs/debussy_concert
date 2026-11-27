@@ -2,7 +2,7 @@ name: postgresql_sakila_ingestion_daily
 source_name: sakila
 source_type: postgresql
 description: PostgreSQL ingestion
-secret_manager_uri: projects/${DEBUSSY_CONCERT__PROJECT}/secrets/debussy_postgresql_dev
+secret_manager_uri: projects/${DEBUSSY__PROJECT}/secrets/debussy_postgresql_dev
 dataproc_config:
   machine_type: n1-standard-2
   num_workers: 0
@@ -27,7 +27,7 @@ dag_parameters:
     month: 2
     day: 16
   tags:
-    - framework:debussy_concert
+    - framework:debussy
     - project:example
     - source:postgresql
     - type:ingestion
@@ -43,7 +43,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${POSTGRESQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${POSTGRESQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_actor.yaml
+    raw_table_definition: ${DEBUSSY__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_actor.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
@@ -58,7 +58,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${POSTGRESQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${POSTGRESQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_category.yaml
+    raw_table_definition: ${DEBUSSY__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_category.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}
@@ -73,7 +73,7 @@ ingestion_parameters:
       WHERE last_update >= '{{ ${POSTGRESQL_SAKILA_WINDOW_START} }}'
       AND last_update   <  '{{ ${POSTGRESQL_SAKILA_WINDOW_END} }}'
     extract_connection_id: google_cloud_debussy
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_language.yaml
+    raw_table_definition: ${DEBUSSY__DAGS_FOLDER}/examples/data_ingestion/postgresql_sakila_ingestion/table_schemas/postgresql_sakila_language.yaml
     data_partitioning:
       gcs_partition_schema: >-
         _load_flag=incr/_ts_window_start={{ ${POSTGRESQL_SAKILA_WINDOW_START}

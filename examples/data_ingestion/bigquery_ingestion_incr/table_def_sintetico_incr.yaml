@@ -11,7 +11,7 @@ fields:
   - name: pwd_env_var
     description: Airflow $PWD env variable value
     data_type: string
-  - name: debussy_concert_env_project
+  - name: debussy_env_project
     description: Value of the variable set in environment.yaml
     data_type: string
   - name: env_default_value_example

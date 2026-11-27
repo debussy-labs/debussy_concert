@@ -1,4 +1,4 @@
-from debussy_concert.core.service.workflow.protocol import PWorkflowService
+from debussy.core.service.workflow.protocol import PWorkflowService
 from .core_for_testing import (
     DummyDag,
     DummyMovementGroup,

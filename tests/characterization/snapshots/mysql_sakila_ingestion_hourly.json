@@ -10,7 +10,7 @@
   "schedule_interval": "@hourly",
   "start_date": "2014-09-25T22:00:00+00:00",
   "tags": [
-    "framework:debussy_concert",
+    "framework:debussy",
     "load:incremental",
     "project:example",
     "source:mysql",
@@ -99,7 +99,7 @@
     },
     "DataIngestionMovement_address.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_address.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "op_args": [
@@ -205,7 +205,7 @@
       ]
     },
     "DataIngestionMovement_address.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.delete_dataproc_cluster": {
-      "operator": "debussy_concert.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
+      "operator": "debussy.core.motif.mixins.dataproc.DebussyDataprocDeleteClusterOperator",
       "task_group": "DataIngestionMovement_address.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='mysql_sakila_ingestion_hourly', task_ids='DataIngestionMovement_address.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
@@ -253,7 +253,7 @@
       ]
     },
     "DataIngestionMovement_address.RawVaultStorageLoadToDataWarehouseRawPhrase.load_bigquery_from_gcs_hive_partition_motif": {
-      "operator": "debussy_concert.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
+      "operator": "debussy.core.motif.mixins.bigquery_job.BigQueryInsertJobOperator",
       "task_group": "DataIngestionMovement_address.RawVaultStorageLoadToDataWarehouseRawPhrase",
       "templated_fields": {
         "configuration": {
@@ -388,7 +388,7 @@
     },
     "DataIngestionMovement_address.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.operators.python.PythonOperator",
-      "python_callable": "<callable debussy_concert.core.motif.start.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.start.StartMotif.build.<locals>.<lambda>>",
       "task_group": "DataIngestionMovement_address.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],

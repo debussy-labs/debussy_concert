@@ -12,7 +12,7 @@ dag_parameters:
     month: 1
     day: 1
   tags:
-    - framework:debussy_concert
+    - framework:debussy
     - project:example
     - source:bigquery
     - type:ingestion
@@ -22,12 +22,12 @@ dag_parameters:
     owner: debussy
 ingestion_parameters:
   - name: sintetico_incr
-    raw_table_definition: ${DEBUSSY_CONCERT__DAGS_FOLDER}/examples/data_ingestion/bigquery_ingestion_incr/table_def_sintetico_incr.yaml
+    raw_table_definition: ${DEBUSSY__DAGS_FOLDER}/examples/data_ingestion/bigquery_ingestion_incr/table_def_sintetico_incr.yaml
     extraction_query: >
       SELECT 'dado' as data,
       TIMESTAMP '{{ execution_date }}' as airflow_logical_date,
       '${PWD}' as pwd_env_var,
-      '${DEBUSSY_CONCERT__PROJECT}' as debussy_concert_env_project,
+      '${DEBUSSY__PROJECT}' as debussy_env_project,
       '${NOT_DEFINED_ENV|default_value}' as env_default_value_example
     extract_connection_id: google_cloud_debussy
     data_partitioning:

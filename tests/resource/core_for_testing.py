@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from debussy_concert.core.phrase.phrase_base import PhraseBase
-from debussy_concert.core.motif.motif_base import MotifBase
-from debussy_concert.core.service.workflow.protocol import (
+from debussy.core.phrase.phrase_base import PhraseBase
+from debussy.core.motif.motif_base import MotifBase
+from debussy.core.service.workflow.protocol import (
     PMotifGroup,
     PPhraseGroup,
     PMovementGroup,

@@ -1,4 +1,4 @@
-from debussy_concert.pipeline.reverse_etl.movement.reverse_etl import ReverseEtlMovement
+from debussy.pipeline.reverse_etl.movement.reverse_etl import ReverseEtlMovement
 
 from tests.resource.core_for_testing import DummyDag, DummyMotif, create_empty_phrase
 
@@ -29,13 +29,13 @@ def csv_reverse_etl_movement_dummy_phrases():
 
 
 def csv_reverse_etl_movement():
-    from debussy_concert.pipeline.reverse_etl.phrase.dw_to_reverse_etl import (
+    from debussy.pipeline.reverse_etl.phrase.dw_to_reverse_etl import (
         DataWarehouseToReverseEtlPhrase,
     )
-    from debussy_concert.pipeline.reverse_etl.phrase.reverse_etl_to_storage import (
+    from debussy.pipeline.reverse_etl.phrase.reverse_etl_to_storage import (
         DataWarehouseReverseEtlToTempToStoragePhrase,
     )
-    from debussy_concert.pipeline.reverse_etl.phrase.storage_to_destination import (
+    from debussy.pipeline.reverse_etl.phrase.storage_to_destination import (
         StorageToDestinationPhrase,
     )
 
