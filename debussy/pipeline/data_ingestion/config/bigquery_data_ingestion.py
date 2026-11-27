@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from yaml_env_var_parser import load as yaml_load
 
 from debussy.core.config.config_environment import ConfigEnvironment
+from debussy.core.config.loader_keys import drop_loader_keys
 from debussy.pipeline.data_ingestion.config.base import ConfigDataIngestionBase
 from debussy.core.config.config_dag_parameters import ConfigDagParameters
 from debussy.pipeline.data_ingestion.config.movement_parameters.bigquery import (
@@ -18,6 +19,7 @@ class ConfigBigQueryDataIngestion(ConfigDataIngestionBase):
 
         with open(composition_config_file_path) as file:
             config = yaml_load(file)
+        drop_loader_keys(config)
         config["environment"] = env_config
         extract_movements = [
             BigQueryDataIngestionMovementParameters(**parameters)

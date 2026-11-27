@@ -1,3 +1,4 @@
+composition_type: bigquery_ingestion
 name: bigquery_ingestion_policy_tags
 source_name: example
 source_type: bigquery

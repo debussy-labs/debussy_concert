@@ -1,6 +1,7 @@
 from yaml_env_var_parser import load as yaml_load
 
 from debussy.core.config.config_environment import ConfigEnvironment
+from debussy.core.config.loader_keys import drop_loader_keys
 from debussy.core.config.config_composition import ConfigComposition
 from debussy.core.config.config_dag_parameters import ConfigDagParameters
 from debussy.pipeline.data_transformation.config.movement_parameters.dbt import (
@@ -17,6 +18,7 @@ class ConfigTransformComposition(ConfigComposition):
 
         with open(composition_config_file_path) as file:
             config = yaml_load(file)
+        drop_loader_keys(config)
         config["environment"] = env_config
         movements_parameters = []
         for movement_parameters_dict in config["transformation_parameters"]:

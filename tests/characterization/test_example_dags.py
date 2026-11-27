@@ -1,6 +1,6 @@
 """Characterization tests: every example DAG must keep generating the same graph.
 
-Each file under ``examples/`` is executed the way the Airflow scheduler would
+The DAGs-folder files under ``examples/`` are executed the way the Airflow scheduler would
 parse it (with ``AirflowService``), and the resulting DAG is compared with a
 committed JSON snapshot in ``tests/characterization/snapshots/``.
 
@@ -11,6 +11,7 @@ review the diff like any other code change::
 """
 
 import os
+import re
 import runpy
 from pathlib import Path
 
@@ -40,24 +41,13 @@ FIXED_ENV = {
     "AIRFLOW_CONN_MYSQL_DEV": "mysql://user:password@localhost:3306/sakila",
 }
 
-# Examples that do not build on the current code line. They are recorded as
-# strict expected failures, so fixing one makes the test fail until its entry
-# is removed here and a snapshot is created.
-KNOWN_BROKEN = {
-    "data_ingestion/mysql_sakila_ingestion/mysql_sakila_ingestion_yamless.py": (
-        "RdbmsIngestionComposition reads dataproc_config['pyspark_script'], "
-        "which only ConfigRdbmsDataIngestion.load_from_file fills in"
-    ),
-}
 DAGS_FOLDER_PLACEHOLDER = "<DAGS_FOLDER>"
 
 
 def _example_files():
-    return sorted(
-        path
-        for path in EXAMPLES_DIR.rglob("*.py")
-        if "scripts" not in path.relative_to(EXAMPLES_DIR).parts
-    )
+    """The files an Airflow scheduler would parse: the loader entry points."""
+    yamless = EXAMPLES_DIR / "data_ingestion/mysql_sakila_ingestion"
+    return [EXAMPLES_DIR / "dags.py", yamless / "mysql_sakila_ingestion_yamless.py"]
 
 
 EXAMPLE_FILES = _example_files()
@@ -69,9 +59,7 @@ def _relative(example_file: Path) -> str:
 
 def _example_params():
     for path in EXAMPLE_FILES:
-        reason = KNOWN_BROKEN.get(_relative(path))
-        marks = [pytest.mark.xfail(reason=reason, strict=True)] if reason else []
-        yield pytest.param(path, id=_relative(path), marks=marks)
+        yield pytest.param(path, id=_relative(path))
 
 
 @pytest.fixture
@@ -96,13 +84,14 @@ def _build_dags(example_file: Path):
     return dags
 
 
-def test_every_example_is_covered():
-    assert EXAMPLE_FILES, "no example DAG files found"
-
-
-def test_known_broken_entries_exist():
-    known = {_relative(p) for p in EXAMPLE_FILES}
-    assert set(KNOWN_BROKEN) <= known, sorted(set(KNOWN_BROKEN) - known)
+def test_every_example_yaml_is_loaded():
+    """Each example composition YAML must end up as a DAG."""
+    pipelines = [
+        path
+        for path in EXAMPLES_DIR.rglob("*.yaml")
+        if re.search(r"^composition_type\s*:", path.read_text(), re.MULTILINE)
+    ]
+    assert len(pipelines) == 12, sorted(pipelines)
 
 
 @pytest.mark.parametrize("example_file", list(_example_params()))
@@ -134,8 +123,6 @@ def test_no_orphan_snapshots(example_environment):
     """A snapshot whose example was removed or renamed must be deleted too."""
     expected = set()
     for example_file in EXAMPLE_FILES:
-        if _relative(example_file) in KNOWN_BROKEN:
-            continue
         inject.clear()
         expected.update(f"{dag_id}.json" for dag_id in _build_dags(example_file))
     existing = {p.name for p in SNAPSHOTS_DIR.glob("*.json")}

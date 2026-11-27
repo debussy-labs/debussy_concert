@@ -3,7 +3,7 @@
 These tests pin down what Debussy generates today, so refactoring cannot
 silently change it.
 
-`test_example_dags.py` runs every DAG file under `examples/` with
+`test_example_dags.py` runs the DAGs-folder files under `examples/` (`dags.py`, which loads every example YAML, and the Python-API example) with
 `AirflowService`, the same way the Airflow scheduler parses it, and compares
 the result with a JSON snapshot in `snapshots/`. A snapshot records:
 
@@ -26,12 +26,6 @@ regenerate the snapshots and review the diff in the pull request:
 DEBUSSY_UPDATE_SNAPSHOTS=1 pytest tests/characterization
 git diff tests/characterization/snapshots
 ```
-
-## Known broken examples
-
-Examples that do not build on the current code are listed in `KNOWN_BROKEN`
-in `test_example_dags.py`. They run as strict expected failures: once one is
-fixed, the test fails until its entry is removed and a snapshot is created.
 
 ## Environment
 
