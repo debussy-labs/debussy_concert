@@ -1,4 +1,4 @@
-debussy-airflow
+debussy-airflow>=0.0.7,<1
 Inject
 yaml_env_var_parser
 dbt-bigquery
