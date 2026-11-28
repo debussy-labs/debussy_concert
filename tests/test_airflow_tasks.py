@@ -13,13 +13,17 @@ from airflow.sdk import DAG, TaskGroup  # noqa: E402
 
 from debussy.backends.airflow import tasks as airflow_tasks  # noqa: E402
 from debussy.backends.airflow.service import AirflowService  # noqa: E402
-from debussy.backends.airflow.tasks import build_task  # noqa: E402
+from debussy.backends.airflow.tasks import (  # noqa: E402
+    build_task,
+    resolve_task_results,
+)
 from debussy.core.motif.motif_base import MotifBase  # noqa: E402
 from debussy.core.tasks import (  # noqa: E402
     ActionRegistry,
     Capability,
     TaskSpec,
     UnknownActionError,
+    result_of,
     UnsupportedCapabilityError,
 )
 
@@ -170,3 +174,63 @@ def test_duplicate_task_names(dag):
     specs = [TaskSpec(name="a", action=greet), TaskSpec(name="a", action=greet)]
     with pytest.raises(ValueError, match="Duplicate task name"):
         AirflowService.build_tasks("M", specs, dag, None)
+
+
+def test_always_run_tasks_run_after_failures(dag):
+    spec = TaskSpec(name="cleanup", action=greet, always_run=True)
+    assert build_task(spec, dag=dag).trigger_rule == "all_done"
+    assert build_task(TaskSpec(name="t", action=greet), dag=dag).trigger_rule == (
+        "all_success"
+    )
+
+
+def test_result_of_becomes_an_xcom_pull():
+    spec = TaskSpec(
+        name="use",
+        action=greet,
+        params={
+            "name": f"dby{result_of('make_id')}-x",
+            "day": [{"nested": result_of("make_id")}],
+            "raw": result_of("make_id"),
+        },
+        templated={"name", "day"},
+    )
+    resolved = resolve_task_results(spec, {"make_id": "Group.make_id"}, "my_dag")
+    pull = "{{ ti.xcom_pull(dag_id='my_dag', task_ids='Group.make_id') }}"
+    assert resolved.params["name"] == f"dby{pull}-x"
+    assert resolved.params["day"] == [{"nested": pull}]
+    # Only templated params are rendered, so only they are resolved.
+    assert resolved.params["raw"] == result_of("make_id")
+
+
+def test_result_of_needs_an_earlier_task():
+    spec = TaskSpec(
+        name="use",
+        action=greet,
+        params={"name": result_of("later")},
+        templated={"name"},
+    )
+    with pytest.raises(ValueError, match="'later', which is not an earlier task"):
+        resolve_task_results(spec, {}, "my_dag")
+
+
+class ResultMotif(MotifBase):
+    def tasks(self):
+        return [
+            TaskSpec(name="make_id", action=greet, params={"name": "a", "day": "1"}),
+            TaskSpec(
+                name="use",
+                action=greet,
+                params={"name": result_of("make_id"), "day": "2"},
+                templated={"name"},
+            ),
+        ]
+
+
+def test_motif_resolves_results_with_full_task_ids(dag):
+    phrase = AirflowService.phrase_group("Phrase", dag, None)
+    _motif(ResultMotif, name="M").build(dag, phrase)
+    use = dag.get_task("Phrase.M.use")
+    assert use.op_kwargs["name"] == (
+        "{{ ti.xcom_pull(dag_id='tasks_test', task_ids='Phrase.M.make_id') }}"
+    )

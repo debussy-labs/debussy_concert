@@ -1,9 +1,10 @@
 """Turns engine-neutral ``TaskSpec`` objects into Airflow operators."""
 
-from typing import Any, Callable
+import dataclasses
+from typing import Any, Callable, Mapping
 
 from airflow.providers.standard.operators.python import PythonOperator
-from airflow.sdk import BaseOperator, literal
+from airflow.sdk import BaseOperator, TriggerRule, literal
 
 from debussy.core.tasks import (
     ActionRegistry,
@@ -11,6 +12,7 @@ from debussy.core.tasks import (
     TaskSpec,
     check_capabilities,
 )
+from debussy.core.tasks.spec import TASK_RESULT_PATTERN
 
 #: Airflow supports every capability of the task contract.
 AIRFLOW_CAPABILITIES = frozenset(Capability)
@@ -52,6 +54,8 @@ def build_task(
     operator_kwargs = {}
     if spec.retries is not None:
         operator_kwargs["retries"] = spec.retries
+    if spec.always_run:
+        operator_kwargs["trigger_rule"] = TriggerRule.ALL_DONE
 
     if spec.is_named_action:
         factory: OperatorFactory = registry.resolve(spec.action)
@@ -67,6 +71,44 @@ def build_task(
         task_group=task_group,
         **operator_kwargs,
     )
+
+
+def resolve_task_results(
+    spec: TaskSpec, task_ids: Mapping[str, str], dag_id: str
+) -> TaskSpec:
+    """``spec`` with each ``result_of(name)`` in its templated params turned
+    into an XCom pull of that task.
+
+    ``task_ids`` maps the names of the tasks already built in the motif to
+    their Airflow task ids. A reference to any other task raises
+    ``ValueError``.
+    """
+    if not spec.templated:
+        return spec
+
+    def replace(match):
+        name = match.group(1)
+        if name not in task_ids:
+            raise ValueError(
+                f"Task {spec.name!r} uses the result of {name!r}, which is not"
+                " an earlier task of its motif"
+            )
+        return f"ti.xcom_pull(dag_id='{dag_id}', task_ids='{task_ids[name]}')"
+
+    def resolve(value):
+        if isinstance(value, str):
+            return TASK_RESULT_PATTERN.sub(replace, value)
+        if isinstance(value, (list, tuple)):
+            return type(value)(resolve(item) for item in value)
+        if isinstance(value, Mapping):
+            return {key: resolve(item) for key, item in value.items()}
+        return value
+
+    params = {
+        key: resolve(value) if key in spec.templated else value
+        for key, value in spec.params.items()
+    }
+    return dataclasses.replace(spec, params=params)
 
 
 def _param_value(spec: TaskSpec, key: str, value: Any) -> Any:
