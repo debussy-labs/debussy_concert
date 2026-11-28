@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Callable, Protocol, TypeVar
 import inject
 
@@ -30,13 +30,26 @@ class PClusterMotifMixin(PMotif, Protocol):
 
 
 class MotifBase(PMotif, ABC):
+    """Base class of every motif.
+
+    A motif either describes its work as engine-neutral tasks, by defining
+    ``tasks()`` (see ``debussy.core.tasks.PTaskMotif``), or overrides
+    ``build()`` to build engine-specific tasks itself. Only motifs with
+    ``tasks()`` can run on any backend.
+    """
+
+    #: Whether ``build()`` puts the tasks from ``tasks()`` in a group named
+    #: after the motif. A motif with a single task can set it to False to build
+    #: that task directly in the phrase.
+    group_tasks = True
+
     @inject.params(config=ConfigComposition, workflow_service=PWorkflowService)
     def __init__(
         self,
         *,
         workflow_service: PWorkflowService,
         config: ConfigComposition,
-        name=None
+        name=None,
     ) -> None:
         self.workflow_service = workflow_service
         self._config = config
@@ -61,6 +74,16 @@ class MotifBase(PMotif, ABC):
         task_builder(workflow_dag, motif_group)
         return motif_group
 
-    @abstractmethod
     def build(self, workflow_dag, phrase_group) -> PMotifGroup:
-        pass
+        tasks = getattr(self, "tasks", None)
+        if tasks is None:
+            raise NotImplementedError(
+                f"{type(self).__name__} must define tasks() or override build()"
+            )
+        return self.workflow_service.build_tasks(
+            group_id=self.name,
+            specs=tasks(),
+            workflow_dag=workflow_dag,
+            phrase_group=phrase_group,
+            grouped=self.group_tasks,
+        )
