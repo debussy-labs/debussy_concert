@@ -1,12 +1,11 @@
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryCreateExternalTableOperator,
-)
-
 from debussy.core.motif.motif_base import MotifBase
 from debussy.core.phrase.protocols import PCreateExternalTableMotif
+from debussy.core.tasks import TaskSpec
 
 
 class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
+    group_tasks = False
+
     def __init__(self, gcp_conn_id="google_cloud_default", name=None) -> None:
         super().__init__(name=name)
         self.gcp_conn_id = gcp_conn_id
@@ -32,19 +31,21 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
         self.destination_table_uri = destination_project_dataset_table
         return self
 
-    def create_raw_vault_external_table(
-        self, dag, task_group
-    ) -> BigQueryCreateExternalTableOperator:
-        create_raw_vault_external_table = BigQueryCreateExternalTableOperator(
-            task_id=self.name,
-            bucket=self.source_storage_uri_prefix,
-            destination_project_dataset_table=self.destination_table_uri,
-            table_resource=self.table_resource,
-            dag=dag,
-            task_group=task_group,
-            bigquery_conn_id=self.gcp_conn_id,
-        )
-        return create_raw_vault_external_table
-
-    def build(self, dag, phrase_group):
-        return self.create_raw_vault_external_table(dag, phrase_group)
+    def tasks(self):
+        return [
+            TaskSpec(
+                name=self.name,
+                action="bigquery.create_external_table",
+                params={
+                    "bucket": self.source_storage_uri_prefix,
+                    "destination_project_dataset_table": self.destination_table_uri,
+                    "table_resource": self.table_resource,
+                    "bigquery_conn_id": self.gcp_conn_id,
+                },
+                templated={
+                    "bucket",
+                    "destination_project_dataset_table",
+                    "table_resource",
+                },
+            )
+        ]

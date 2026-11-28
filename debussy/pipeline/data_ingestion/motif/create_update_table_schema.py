@@ -1,14 +1,10 @@
-from airflow.sdk import TaskGroup
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryCreateTableOperator,
-    BigQueryUpdateTableOperator,
-)
-from debussy.backends.airflow.bigquery_job import TableReference
 from debussy.core.motif.motif_base import MotifBase
+from debussy.core.service.lakehouse.bigquery_job import TableReference
 from debussy.core.service.lakehouse.google_cloud import (
-    GoogleCloudLakeHouseService,
     BigQueryTable,
+    GoogleCloudLakeHouseService,
 )
+from debussy.core.tasks import TaskSpec
 
 
 class CreateBigQueryTableMotif(MotifBase):
@@ -22,33 +18,25 @@ class CreateBigQueryTableMotif(MotifBase):
     def setup(self, table_uri):
         self.table_ref = TableReference(table_uri=table_uri)
 
-    def build(self, workflow_dag, phrase_group):
-        task_group = TaskGroup(
-            group_id=self.name, dag=workflow_dag, parent_group=phrase_group
-        )
+    def tasks(self):
+        table = {
+            "gcp_conn_id": self.gcp_conn_id,
+            "project_id": self.table_ref.project_id,
+            "dataset_id": self.table_ref.dataset_id,
+            "table_id": self.table_ref.table_id,
+        }
         table_resource = {"schema": {"fields": self.bq_schema}}
         if self.bq_partitioning:
             table_resource["timePartitioning"] = self.bq_partitioning
-        create_table = BigQueryCreateTableOperator(
-            task_id="create_empty_table",
-            gcp_conn_id=self.gcp_conn_id,
-            project_id=self.table_ref.project_id,
-            dataset_id=self.table_ref.dataset_id,
-            table_id=self.table_ref.table_id,
-            table_resource=table_resource,
-            if_exists="log",
-            dag=workflow_dag,
-            task_group=task_group,
-        )
-        update_table = BigQueryUpdateTableOperator(
-            task_id="update_table_resources",
-            dag=workflow_dag,
-            task_group=task_group,
-            table_resource=self.bq_table_resource,
-            gcp_conn_id=self.gcp_conn_id,
-            project_id=self.table_ref.project_id,
-            dataset_id=self.table_ref.dataset_id,
-            table_id=self.table_ref.table_id,
-        )
-        self.workflow_service.chain_tasks(create_table, update_table)
-        return task_group
+        return [
+            TaskSpec(
+                name="create_empty_table",
+                action="bigquery.create_table",
+                params={**table, "table_resource": table_resource, "if_exists": "log"},
+            ),
+            TaskSpec(
+                name="update_table_resources",
+                action="bigquery.update_table",
+                params={**table, "table_resource": self.bq_table_resource},
+            ),
+        ]

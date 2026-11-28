@@ -1,7 +1,7 @@
 from debussy.core.composition.composition_base import CompositionBase
 from debussy.core.phrase.utils.start import StartPhrase
 from debussy.core.phrase.utils.end import EndPhrase
-from debussy.backends.airflow.bigquery_job import HivePartitioningOptions
+from google.cloud.bigquery.external_config import HivePartitioningOptions
 from debussy.pipeline.data_ingestion.config.base import ConfigDataIngestionBase
 from debussy.pipeline.data_ingestion.config.movement_parameters.time_partitioned import (
     TimePartitionedDataIngestionMovementParameters,

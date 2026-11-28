@@ -73,3 +73,8 @@ def _param_value(spec: TaskSpec, key: str, value: Any) -> Any:
     if key in spec.templated or not isinstance(value, _RENDERED_TYPES):
         return value
     return literal(value)
+
+
+# Registers the backend's named actions. Imported last because it imports
+# ``actions`` from this module.
+from debussy.backends.airflow import operator_actions  # noqa: E402, F401

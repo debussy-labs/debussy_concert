@@ -1,16 +1,18 @@
-from typing import Optional
-from debussy.core.service.lakehouse.google_cloud import (
-    GoogleCloudLakeHouseService,
-)
+from typing import TYPE_CHECKING, Optional
+
 from debussy.core.entities.table import BigQueryTable
 from debussy.core.motif.motif_base import MotifBase
-from debussy.backends.airflow.bigquery_job import (
-    BigQueryJobMixin,
-    HivePartitioningOptions,
-)
+from debussy.core.service.lakehouse.bigquery_job import BigQueryJobMixin
+from debussy.core.service.lakehouse.google_cloud import GoogleCloudLakeHouseService
+from debussy.core.tasks import TaskSpec
+
+if TYPE_CHECKING:
+    from google.cloud.bigquery.external_config import HivePartitioningOptions
 
 
 class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
+    group_tasks = False
+
     def __init__(
         self,
         *,
@@ -19,7 +21,7 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         destination_partition: str,
         write_disposition: Optional[str] = None,
         create_disposition: Optional[str] = None,
-        hive_partitioning_options: Optional[HivePartitioningOptions] = None,
+        hive_partitioning_options: Optional["HivePartitioningOptions"] = None,
         table_definition: Optional[BigQueryTable] = None,
         schema_update_options=None,
         gcp_conn_id="google_cloud_default",
@@ -44,26 +46,29 @@ class LoadGcsToBigQueryHivePartitionMotif(MotifBase, BigQueryJobMixin):
         )
         self.destination_table = f"{destination_table_uri}${self.destination_partition}"
 
-    def build(self, dag, phrase_group):
+    def tasks(self):
         schema = GoogleCloudLakeHouseService.get_table_schema(self.table_definition)
         schema = {
             "fields": [field for field in schema if not field["name"].startswith("_")]
         }
-
-        bigquery_job_operator = self.insert_job_operator(
-            dag,
-            phrase_group,
-            self.load_configuration(
-                destination_table=self.destination_table,
-                source_uris=self.source_uri,
-                source_format=self.source_format,
-                write_disposition=self.write_disposition,
-                create_disposition=self.create_disposition,
-                schema=schema,
-                schema_update_options=self.schema_update_options,
-                hive_partitioning_options=self.hive_partitioning_options,
-            ),
-            self.gcp_conn_id,
-            **self.op_kw_args,
-        )
-        return bigquery_job_operator
+        return [
+            TaskSpec(
+                name=self.name,
+                action="bigquery.insert_job",
+                params={
+                    "configuration": self.load_configuration(
+                        destination_table=self.destination_table,
+                        source_uris=self.source_uri,
+                        source_format=self.source_format,
+                        write_disposition=self.write_disposition,
+                        create_disposition=self.create_disposition,
+                        schema=schema,
+                        schema_update_options=self.schema_update_options,
+                        hive_partitioning_options=self.hive_partitioning_options,
+                    ),
+                    "gcp_conn_id": self.gcp_conn_id,
+                    **self.op_kw_args,
+                },
+                templated={"configuration"},
+            )
+        ]
