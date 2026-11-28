@@ -4,7 +4,7 @@ All notable changes to Debussy are documented here. The format follows [Keep a C
 
 ## [Unreleased] - 2.0.0
 
-Pre-releases: 2.0.0.dev1 (2026-11-27).
+Pre-releases: 2.0.0.dev1 (2026-11-27), 2.0.0.dev2 (2026-11-28).
 
 ### Breaking changes
 
