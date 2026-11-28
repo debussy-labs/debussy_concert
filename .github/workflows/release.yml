@@ -4,6 +4,8 @@ name: Release
 # PyPI trusted publisher settings: owner debussy-labs, repository debussy,
 # workflow release.yml, environment pypi.
 #
+# After publishing, a GitHub Release with generated notes is created for the tag.
+#
 # To release: set __version__ in debussy/__init__.py, merge it, then push a tag
 # that matches it (version 2.0.0 is tag v2.0.0).
 
@@ -66,3 +68,31 @@ jobs:
           path: dist/
 
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # create the release
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Final versions (v2.0.0) are normal releases; dev, alpha, beta and
+          # release candidates (v2.0.0.dev1, v2.0.0rc1) are marked pre-release.
+          flags=(--generate-notes --verify-tag)
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" "${flags[@]}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$GITHUB_REF_NAME" \
+            dist/*

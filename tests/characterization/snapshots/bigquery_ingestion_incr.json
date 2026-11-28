@@ -210,7 +210,7 @@
             "destinationTable": {
               "datasetId": "raw",
               "projectId": "modular-aileron-191222",
-              "tableId": "bigquery_example_sintetico_incr${{ macros.ds_format(logical_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"
+              "tableId": "bigquery_example_sintetico_incr${{ logical_date.strftime('%Y%m%d%H') }}"
             },
             "hivePartitioningOptions": {
               "mode": "AUTO",
