@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Protocol, Sequence
 
 from debussy.core.entities.protocols import (
     PMotifGroup,
@@ -6,6 +6,7 @@ from debussy.core.entities.protocols import (
     PMovementGroup,
     PWorkflowDag,
 )
+from debussy.core.tasks.spec import TaskSpec
 
 
 class PWorkflowService(Protocol):
@@ -22,4 +23,20 @@ class PWorkflowService(Protocol):
         pass
 
     def chain_tasks(self, *tasks):
+        pass
+
+    def build_tasks(
+        self,
+        group_id: str,
+        specs: Sequence[TaskSpec],
+        workflow_dag,
+        phrase_group,
+        grouped: bool = True,
+    ):
+        """Build a motif's engine-neutral tasks, run in order.
+
+        With ``grouped``, the tasks go in a motif group named ``group_id``,
+        which is returned. Without it, there must be exactly one task, built
+        directly in ``phrase_group`` and returned.
+        """
         pass

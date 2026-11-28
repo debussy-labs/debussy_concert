@@ -2,7 +2,9 @@ from enum import Enum
 
 from airflow.sdk import DAG, TaskGroup, chain
 
+from debussy.backends.airflow.tasks import build_task
 from debussy.core.service.workflow.protocol import PWorkflowService
+from debussy.core.tasks import validate_tasks
 
 
 class GroupColor(Enum):
@@ -48,3 +50,26 @@ class AirflowService(PWorkflowService):
     @staticmethod
     def chain_tasks(*tasks):
         return chain(*tasks)
+
+    @staticmethod
+    def build_tasks(group_id, specs, workflow_dag, phrase_group, grouped=True):
+        specs = validate_tasks(specs)
+        if not specs:
+            raise ValueError(f"Motif {group_id!r} has no tasks")
+        if grouped:
+            parent = AirflowService.motif_group(
+                group_id=group_id, workflow_dag=workflow_dag, phrase_group=phrase_group
+            )
+        elif len(specs) == 1:
+            parent = phrase_group
+        else:
+            raise ValueError(
+                f"Motif {group_id!r} has {len(specs)} tasks: only a motif with"
+                " one task can build it outside a motif group"
+            )
+        tasks = [
+            build_task(spec, dag=workflow_dag, task_group=parent) for spec in specs
+        ]
+        if len(tasks) > 1:
+            chain(*tasks)
+        return parent if grouped else tasks[0]

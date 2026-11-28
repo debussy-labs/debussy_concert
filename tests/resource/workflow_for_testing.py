@@ -27,3 +27,10 @@ class WorkflowServiceForTesting(PWorkflowService):
     def chain_tasks(self, *tasks):
         for upstream, downstream in zip(tasks, tasks[1:]):
             upstream >> downstream
+
+    def build_tasks(self, group_id, specs, workflow_dag, phrase_group, grouped=True):
+        # Records what a backend would build, so core tests can check it.
+        group = self.motif_group(group_id, workflow_dag, phrase_group)
+        group.specs = tuple(specs)
+        group.grouped = grouped
+        return group
