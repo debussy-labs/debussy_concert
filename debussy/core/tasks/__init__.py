@@ -16,6 +16,7 @@ from debussy.core.tasks.spec import (
     Action,
     TaskSpec,
     required_capabilities,
+    result_of,
     validate_tasks,
 )
 
@@ -30,5 +31,6 @@ __all__ = [
     "UnsupportedCapabilityError",
     "check_capabilities",
     "required_capabilities",
+    "result_of",
     "validate_tasks",
 ]

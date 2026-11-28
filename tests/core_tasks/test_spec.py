@@ -7,6 +7,7 @@ from debussy.core.tasks import (
     RunContext,
     TaskSpec,
     required_capabilities,
+    result_of,
     validate_tasks,
 )
 
@@ -167,3 +168,21 @@ def test_required_capabilities_of_several_specs():
     ]
     assert required_capabilities(specs) == {Capability.RETRIES, Capability.XCOM}
     assert required_capabilities([]) == frozenset()
+
+
+def test_always_run():
+    assert TaskSpec(name="t", action=noop).always_run is False
+    assert TaskSpec(name="t", action=noop, always_run=True).always_run is True
+    with pytest.raises(TypeError, match="always_run"):
+        TaskSpec(name="t", action=noop, always_run="yes")
+
+
+def test_result_of_renders_an_earlier_result():
+    context = RunContext(
+        logical_date=datetime(2026, 1, 2, tzinfo=timezone.utc),
+        results={"make_id": "ab12"},
+    )
+    assert result_of("make_id") == "{{ task_result('make_id') }}"
+    assert context.render(f"dby{result_of('make_id')}-x") == "dbyab12-x"
+    with pytest.raises(ValueError):
+        result_of("bad name")
