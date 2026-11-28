@@ -33,4 +33,4 @@ ingestion_parameters:
     extract_connection_id: google_cloud_debussy
     data_partitioning:
       gcs_partition_schema: _load_flag=incr/_logical_ts={{ logical_date }}/_ingestion_ts={{ dag_run.start_date }}
-      destination_partition: "{{ macros.ds_format(logical_date, '%Y-%m-%dT%H:%M:%S+00:00', '%Y%m%d%H') }}"
+      destination_partition: "{{ logical_date.strftime('%Y%m%d%H') }}"
