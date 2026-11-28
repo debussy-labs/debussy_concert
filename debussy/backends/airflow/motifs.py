@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 
 from airflow.sdk import BaseOperator
 
+from debussy.backends.airflow.run_dates import fill_run_dates
+
 
 class StartOperator(BaseOperator):
     """First task of a phase: returns the run's dates as its XCom value."""
@@ -15,6 +17,9 @@ class StartOperator(BaseOperator):
     def execute(self, context):
         def isoformat(value):
             return value.isoformat() if value else None
+
+        context = dict(context)
+        fill_run_dates(context)  # the same dates the templates of the run see
 
         return {
             "logical_date": isoformat(context.get("logical_date")),
