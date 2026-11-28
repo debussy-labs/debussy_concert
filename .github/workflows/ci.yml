@@ -29,6 +29,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev pkg-config
 
       - uses: astral-sh/setup-uv@v7
+        with:
+          # Without a suffix every job computes the same cache key, so all but
+          # one fail to save it.
+          cache-suffix: py${{ matrix.python-version }}
 
       - name: Create virtual environment
         run: |
@@ -61,6 +65,8 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: astral-sh/setup-uv@v7
+        with:
+          cache-suffix: core
 
       - name: Install the core only
         run: |
