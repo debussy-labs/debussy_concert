@@ -37,6 +37,7 @@ def test_core_modules_import_without_airflow():
     modules = list(_module_names())
     assert "debussy.core.composition.composition_base" in modules
     assert "debussy.pipeline.reverse_etl.config.reverse_etl" in modules
+    assert "debussy.core.tasks.context" in modules
 
     script = (
         "import importlib, sys\n"
