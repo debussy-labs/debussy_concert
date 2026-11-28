@@ -243,7 +243,7 @@ Please read the [contributing guidelines](https://github.com/debussy-labs/debuss
 
 ## Changelog
 
-Release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md). Highlights:
+Release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md), in the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format. Upgrading from 1.x? Start with its **Breaking changes** section and the [migration guide](docs/migration.md).
 
 - **2.0.0 (unreleased):** package renamed from `debussy_concert` to `debussy` (import `debussy`, environment variable prefix `DEBUSSY__`), Python 3.11+ and Airflow 3.4+, Airflow code moved to `debussy.backends.airflow`, and Airflow/Google Cloud/dbt/MySQL/SFTP dependencies split into extras. `airflow_easy_setup` and per-pipeline setup files are replaced by `load_dags`.
 - **1.2.0:** packaging fixes, `airflow_easy_setup` and Dataproc Serverless support.
