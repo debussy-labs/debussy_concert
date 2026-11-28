@@ -1,6 +1,8 @@
 from enum import Enum
 
-from airflow.sdk import DAG, TaskGroup, chain
+from airflow.sdk import TaskGroup, chain
+
+from debussy.backends.airflow.run_dates import DebussyDAG
 
 from debussy.backends.airflow.tasks import build_task, resolve_task_results
 from debussy.core.service.workflow.protocol import PWorkflowService
@@ -45,7 +47,7 @@ class AirflowService(PWorkflowService):
 
     @staticmethod
     def workflow_dag(dag_id, **kwargs):
-        return DAG(dag_id=dag_id, **kwargs)
+        return DebussyDAG(dag_id=dag_id, **kwargs)
 
     @staticmethod
     def chain_tasks(*tasks):

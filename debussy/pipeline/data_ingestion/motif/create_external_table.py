@@ -32,20 +32,21 @@ class CreateExternalBigQueryTableMotif(MotifBase, PCreateExternalTableMotif):
         return self
 
     def tasks(self):
+        project_id, dataset_id, table_id = self.destination_table_uri.split(".")
         return [
             TaskSpec(
                 name=self.name,
-                action="bigquery.create_external_table",
+                action="bigquery.create_table",
                 params={
-                    "bucket": self.source_storage_uri_prefix,
-                    "destination_project_dataset_table": self.destination_table_uri,
+                    "project_id": project_id,
+                    "dataset_id": dataset_id,
+                    "table_id": table_id,
                     "table_resource": self.table_resource,
-                    "bigquery_conn_id": self.gcp_conn_id,
+                    "gcp_conn_id": self.gcp_conn_id,
+                    # Hive partitioning finds new partitions by itself, so an
+                    # existing external table is kept as it is.
+                    "if_exists": "ignore",
                 },
-                templated={
-                    "bucket",
-                    "destination_project_dataset_table",
-                    "table_resource",
-                },
+                templated={"project_id", "dataset_id", "table_id", "table_resource"},
             )
         ]

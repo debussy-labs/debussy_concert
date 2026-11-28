@@ -2,6 +2,7 @@
 
 import datetime as dt
 
+import inject
 import pytest
 
 pytest.importorskip("airflow")
@@ -12,8 +13,11 @@ from debussy.backends.airflow.operator_actions import (  # noqa: E402
     OPERATOR_ACTIONS,
     _import,
 )
+from debussy.backends.airflow.service import AirflowService  # noqa: E402
 from debussy.backends.airflow.tasks import actions, build_task  # noqa: E402
+from debussy.core.config.config_composition import ConfigComposition  # noqa: E402
 from debussy.core.motif.motif_base import MotifBase  # noqa: E402
+from debussy.core.service.workflow.protocol import PWorkflowService  # noqa: E402
 from debussy.core.tasks import TaskSpec  # noqa: E402
 from debussy.pipeline.data_ingestion.motif.create_external_table import (  # noqa: E402
     CreateExternalBigQueryTableMotif,
@@ -64,10 +68,38 @@ def test_every_action_is_registered_and_importable(name):
     assert isinstance(_import(OPERATOR_ACTIONS[name]), type)
 
 
-def test_create_external_table_reports_the_missing_operator():
-    spec = TaskSpec(name="t", action="bigquery.create_external_table")
-    with pytest.raises(NotImplementedError, match="no longer ships"):
-        build_task(spec, dag=None)
+@pytest.fixture
+def injected():
+    def bindings(binder):
+        binder.bind(PWorkflowService, AirflowService())
+        binder.bind(ConfigComposition, object())
+
+    inject.clear_and_configure(bindings)
+    yield
+    inject.clear()
+
+
+def test_create_external_table_builds_an_external_bigquery_table(injected):
+    dag = DAG(dag_id="external", schedule=None, start_date=dt.datetime(2026, 1, 1))
+    motif = CreateExternalBigQueryTableMotif(gcp_conn_id="c", name="external")
+    motif.setup(
+        source_bucket_uri_prefix="gs://raw-vault/sakila/actor",
+        destination_project_dataset_table="p.raw_vault.sakila_actor",
+    )
+    (spec,) = motif.tasks()
+    operator = build_task(spec, dag=dag)
+    assert type(operator).__name__ == "BigQueryCreateTableOperator"
+    assert (operator.project_id, operator.dataset_id, operator.table_id) == (
+        "p",
+        "raw_vault",
+        "sakila_actor",
+    )
+    assert operator.table_resource["type"] == "EXTERNAL"
+    assert operator.table_resource["externalDataConfiguration"]["sourceUris"] == [
+        "gs://raw-vault/sakila/actor/*.parquet"
+    ]
+    assert operator.gcp_conn_id == "c"
+    assert operator.if_exists.value == "ignore"
 
 
 def test_factory_builds_the_operator_with_the_params():

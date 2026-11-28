@@ -8,6 +8,7 @@ import io
 import os
 import stat
 from contextlib import contextmanager
+from functools import cached_property
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Dict, Optional, Sequence, Union
 from uuid import uuid4
@@ -62,22 +63,40 @@ class StorageHookInterface(BaseHook, ABC):
         return os.path.basename(path_uri)
 
 
-class GCSHook(StorageHookInterface, AirflowGCSHook):
+class GCSHook(StorageHookInterface):
+    """Google Cloud Storage on top of Airflow's ``GCSHook``.
+
+    Airflow's hook reads its connection when it is created. The pipelines
+    create their hooks while the DAG file is parsed, so the Airflow hook is
+    created on first use instead: a missing connection must fail the task that
+    needs it, not the parsing of every DAG in the file.
+    """
+
     def __init__(
         self,
         gcp_conn_id: str = "google_cloud_default",
         impersonation_chain: Optional[Union[str, Sequence[str]]] = None,
     ):
-        super().__init__(
-            gcp_conn_id=gcp_conn_id, impersonation_chain=impersonation_chain
+        super().__init__()
+        self.gcp_conn_id = gcp_conn_id
+        self.impersonation_chain = impersonation_chain
+
+    @cached_property
+    def hook(self) -> AirflowGCSHook:
+        return AirflowGCSHook(
+            gcp_conn_id=self.gcp_conn_id,
+            impersonation_chain=self.impersonation_chain,
         )
+
+    def get_conn(self):
+        return self.hook.get_conn()
 
     def upload_file(
         self, remote_file_uri, local_file_uri, mime_type="application/octet-stream"
     ):
         self.log.info("Uploading file from %s to %s", local_file_uri, remote_file_uri)
         bucket, object_path = _parse_gcs_url(remote_file_uri)
-        return self.upload(
+        return self.hook.upload(
             bucket_name=bucket,
             object_name=object_path,
             filename=local_file_uri,
@@ -91,21 +110,21 @@ class GCSHook(StorageHookInterface, AirflowGCSHook):
 
     def download_file(self, remote_file_uri, local_file_uri):
         bucket, object_path = _parse_gcs_url(remote_file_uri)
-        self.download(bucket, object_path, local_file_uri)
+        self.hook.download(bucket, object_path, local_file_uri)
 
     def download_string(self, remote_file_uri, encoding="utf-8"):
         bucket, object_path = _parse_gcs_url(remote_file_uri)
-        return self.download(bucket, object_path).decode(encoding)
+        return self.hook.download(bucket, object_path).decode(encoding)
 
     def exists_file(self, file_path):
         bucket, object_path = _parse_gcs_url(file_path)
-        return self.exists(bucket_name=bucket, object_name=object_path)
+        return self.hook.exists(bucket_name=bucket, object_name=object_path)
 
     def list_dir(self, remote_uri):
         if not remote_uri.endswith("/"):
             remote_uri = remote_uri + "/"
         bucket, object_path = _parse_gcs_url(remote_uri)
-        full_path_blobs = self.list(bucket_name=bucket, prefix=object_path)
+        full_path_blobs = self.hook.list(bucket_name=bucket, prefix=object_path)
         return parse_blob_list_to_ls_behavior(full_path_blobs, prefix=object_path)
 
 

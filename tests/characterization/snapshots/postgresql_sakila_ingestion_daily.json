@@ -358,7 +358,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -375,7 +375,7 @@
       "task_group": "DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -389,7 +389,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -769,7 +769,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -786,7 +786,7 @@
       "task_group": "DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -800,7 +800,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "job": {
           "placement": {
@@ -1170,7 +1170,7 @@
           }
         },
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "labels": null,
         "project_id": "modular-aileron-191222",
@@ -1187,7 +1187,7 @@
       "task_group": "DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "cluster_name": "dby{{ ti.xcom_pull(dag_id='postgresql_sakila_ingestion_daily', task_ids='DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id') }}sakila",
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "project_id": "modular-aileron-191222",
         "region": "us-central1"
@@ -1201,7 +1201,7 @@
       "operator": "airflow.providers.google.cloud.operators.dataproc.DataprocSubmitJobOperator",
       "task_group": "DataIngestionMovement_language.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "gcp_conn_id": "google_cloud_default",
+        "gcp_conn_id": "google_cloud_debussy",
         "impersonation_chain": null,
         "job": {
           "placement": {

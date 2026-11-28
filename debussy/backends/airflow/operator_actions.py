@@ -67,18 +67,6 @@ for _name, _path in OPERATOR_ACTIONS.items():
     actions.register(_name, operator_factory(_path))
 
 
-@actions.register("bigquery.create_external_table")
-def bigquery_create_external_table(spec, **_):
-    # The motif used BigQueryCreateExternalTableOperator, which current Google
-    # provider releases no longer ship, so it could not even be imported. No
-    # example uses it; a replacement is tracked as a bug fix.
-    raise NotImplementedError(
-        f"Task {spec.name!r}: the bigquery.create_external_table action needs"
-        " BigQueryCreateExternalTableOperator, which the installed Google"
-        " provider no longer ships"
-    )
-
-
 @actions.register("debussy.begin")
 def begin(spec, *, dag, task_group, **operator_kwargs):
     """The first task of a phase (``StartOperator``), which returns the run's

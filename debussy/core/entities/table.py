@@ -189,7 +189,6 @@ class BigQueryTable:
 
     @classmethod
     def load_from_dict(cls, table_dict):
-        print(table_dict)
         schema = BigQueryTableSchema.load_from_dict(table_dict)
         partitioning = None
         if partitioning_dict := table_dict.get("partitioning"):
