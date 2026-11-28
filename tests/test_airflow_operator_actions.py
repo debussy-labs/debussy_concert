@@ -21,6 +21,10 @@ from debussy.pipeline.data_ingestion.motif.create_external_table import (  # noq
 from debussy.pipeline.data_ingestion.motif.create_update_table_schema import (  # noqa: E402
     CreateBigQueryTableMotif,
 )
+from debussy.pipeline.data_ingestion.motif.export_table import (  # noqa: E402
+    DataprocExportRdbmsTableToGcsMotif,
+    DataprocServerlessExportRdbmsTableToGcsMotif,
+)
 from debussy.pipeline.data_ingestion.motif.load_table import (  # noqa: E402
     LoadGcsToBigQueryHivePartitionMotif,
 )
@@ -49,6 +53,8 @@ TASK_MOTIFS = [
     DbtRunMotif,
     StorageToRdbmsQueryMotif,
     StorageToStorageMotif,
+    DataprocExportRdbmsTableToGcsMotif,
+    DataprocServerlessExportRdbmsTableToGcsMotif,
 ]
 
 
@@ -88,3 +94,22 @@ def test_migrated_motifs_describe_their_work_with_tasks(motif):
     # They must not fall back to building operators themselves.
     assert motif.build is MotifBase.build
     assert callable(getattr(motif, "tasks", None))
+
+
+def _dag():
+    return DAG(dag_id="begin_test", schedule=None, start_date=dt.datetime(2026, 1, 1))
+
+
+def test_begin_builds_the_start_operator():
+    from debussy.backends.airflow.motifs import StartOperator
+
+    spec = TaskSpec(name="begin_film", action="debussy.begin", params={"phase": "film"})
+    operator = build_task(spec, dag=_dag())
+    assert isinstance(operator, StartOperator)
+    assert operator.task_id == "begin_film"
+
+
+def test_begin_task_name_must_match_the_phase():
+    spec = TaskSpec(name="start", action="debussy.begin", params={"phase": "film"})
+    with pytest.raises(ValueError, match="begin_film"):
+        build_task(spec, dag=_dag())

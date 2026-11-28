@@ -20,6 +20,19 @@ OPERATOR_ACTIONS = {
     "bigquery.update_table": (
         "airflow.providers.google.cloud.operators.bigquery:BigQueryUpdateTableOperator"
     ),
+    "dataproc.create_cluster": (
+        "airflow.providers.google.cloud.operators.dataproc"
+        ":DataprocCreateClusterOperator"
+    ),
+    "dataproc.submit_job": (
+        "airflow.providers.google.cloud.operators.dataproc:DataprocSubmitJobOperator"
+    ),
+    "dataproc.delete_cluster": (
+        "debussy.backends.airflow.dataproc:DebussyDataprocDeleteClusterOperator"
+    ),
+    "dataproc.create_batch": (
+        "debussy.backends.airflow.dataproc:DataprocServerlessSubmitJobOperator"
+    ),
     "dbt.run": "debussy.backends.airflow.dbt:DebussyDbtRunOperator",
     "storage.to_rdbms": "debussy.backends.airflow.operators:StorageToRdbmsOperator",
     "storage.to_storage": "debussy.backends.airflow.operators:StorageToStorageOperator",
@@ -63,3 +76,15 @@ def bigquery_create_external_table(spec, **_):
         " BigQueryCreateExternalTableOperator, which the installed Google"
         " provider no longer ships"
     )
+
+
+@actions.register("debussy.begin")
+def begin(spec, *, dag, task_group, **operator_kwargs):
+    """The first task of a phase (``StartOperator``), which returns the run's
+    dates. Its name must be ``begin_<phase>``."""
+    from debussy.backends.airflow.motifs import StartOperator
+
+    phase = spec.params["phase"]
+    if spec.name != f"begin_{phase}":
+        raise ValueError(f"Task {spec.name!r}: a debussy.begin task is begin_{phase}")
+    return StartOperator(phase=phase, dag=dag, task_group=task_group, **operator_kwargs)

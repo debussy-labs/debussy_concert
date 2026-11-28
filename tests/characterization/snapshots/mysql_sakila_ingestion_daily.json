@@ -354,13 +354,13 @@
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.tasks.functions.identity>",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "op_args": [
-          "{{ ti.id.hex[:8] }}"
-        ],
-        "op_kwargs": {},
+        "op_args": [],
+        "op_kwargs": {
+          "value": "{{ ti.id.hex[:8] }}"
+        },
         "templates_dict": null
       },
       "trigger_rule": "all_success",
@@ -855,13 +855,13 @@
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.tasks.functions.identity>",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "op_args": [
-          "{{ ti.id.hex[:8] }}"
-        ],
-        "op_kwargs": {},
+        "op_args": [],
+        "op_kwargs": {
+          "value": "{{ ti.id.hex[:8] }}"
+        },
         "templates_dict": null
       },
       "trigger_rule": "all_success",
@@ -1256,13 +1256,13 @@
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif.cluster_name_id": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocExportRdbmsTableToGcsMotif.cluster_name_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.tasks.functions.identity>",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "op_args": [
-          "{{ ti.id.hex[:8] }}"
-        ],
-        "op_kwargs": {},
+        "op_args": [],
+        "op_kwargs": {
+          "value": "{{ ti.id.hex[:8] }}"
+        },
         "templates_dict": null
       },
       "trigger_rule": "all_success",
