@@ -33,6 +33,7 @@ OPERATOR_ACTIONS = {
     "dataproc.create_batch": (
         "debussy.backends.airflow.dataproc:DataprocServerlessSubmitJobOperator"
     ),
+    "debussy.noop": "airflow.providers.standard.operators.empty:EmptyOperator",
     "dbt.run": "debussy.backends.airflow.dbt:DebussyDbtRunOperator",
     "storage.to_rdbms": "debussy.backends.airflow.operators:StorageToRdbmsOperator",
     "storage.to_storage": "debussy.backends.airflow.operators:StorageToStorageOperator",

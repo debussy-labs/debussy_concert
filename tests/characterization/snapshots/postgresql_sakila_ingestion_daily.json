@@ -508,7 +508,7 @@
     },
     "DataIngestionMovement_actor.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.lifecycle.log_input>",
       "task_group": "DataIngestionMovement_actor.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -909,7 +909,7 @@
     },
     "DataIngestionMovement_category.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.lifecycle.log_input>",
       "task_group": "DataIngestionMovement_category.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
@@ -1310,7 +1310,7 @@
     },
     "DataIngestionMovement_language.StartPhrase.StartMotif.log_input": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.backends.airflow.motifs.StartMotif.build.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.motif.lifecycle.log_input>",
       "task_group": "DataIngestionMovement_language.StartPhrase.StartMotif",
       "templated_fields": {
         "op_args": [],
