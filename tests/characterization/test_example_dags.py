@@ -133,3 +133,19 @@ def test_no_orphan_snapshots(example_environment):
         expected.update(f"{dag_id}.json" for dag_id in _build_dags(example_file))
     existing = {p.name for p in SNAPSHOTS_DIR.glob("*.json")}
     assert existing <= expected, f"orphan snapshots: {sorted(existing - expected)}"
+
+
+def test_example_paths_exist():
+    """Paths under the DAGs folder that the examples reference must exist.
+
+    Some are only read when a task runs (the dbt project), so building the DAG
+    does not catch a stale one.
+    """
+    pattern = re.compile(r"\$\{DEBUSSY__DAGS_FOLDER\}/([^\s'\"]+)")
+    missing = [
+        f"{yaml_file.relative_to(REPO_ROOT)}: {relative}"
+        for yaml_file in sorted(EXAMPLES_DIR.rglob("*.yaml"))
+        for relative in pattern.findall(yaml_file.read_text())
+        if not (REPO_ROOT / relative).exists()
+    ]
+    assert not missing, missing

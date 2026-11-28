@@ -19,5 +19,5 @@ dag_parameters:
 transformation_parameters:
   - name: sakila
     dbt_run_parameters:
-      dir: ${DEBUSSY__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
-      profiles_dir: ${DEBUSSY__DAGS_FOLDER}/examples/sakila_transformation/sakila_dbt
+      dir: ${DEBUSSY__DAGS_FOLDER}/examples/data_transformation/sakila_transformation/sakila_dbt
+      profiles_dir: ${DEBUSSY__DAGS_FOLDER}/examples/data_transformation/sakila_transformation/sakila_dbt
