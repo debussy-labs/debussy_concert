@@ -149,3 +149,22 @@ def test_example_paths_exist():
         if not (REPO_ROOT / relative).exists()
     ]
     assert not missing, missing
+
+
+def test_dataproc_tasks_use_the_lakehouse_connection(example_environment):
+    """Not every templated field is in the snapshots (the serverless operator
+    does not template gcp_conn_id), so check the operators directly."""
+    dataproc_tasks = [
+        task
+        for example_file in EXAMPLE_FILES
+        for dag in _build_dags(example_file).values()
+        for task in dag.tasks
+        if ".dataproc" in type(task).__module__
+    ]
+    assert {type(task).__name__ for task in dataproc_tasks} == {
+        "DataprocCreateClusterOperator",
+        "DataprocSubmitJobOperator",
+        "DebussyDataprocDeleteClusterOperator",
+        "DataprocServerlessSubmitJobOperator",
+    }
+    assert {task.gcp_conn_id for task in dataproc_tasks} == {"google_cloud_debussy"}

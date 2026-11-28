@@ -202,10 +202,12 @@ class DataprocExportRdbmsTableToGcsMotif(
     def tasks(self):
         environment = self.config.environment
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
+        gcp_conn_id = environment.data_lakehouse_connection_id
         cluster = {
             "project_id": environment.project,
             "region": environment.region,
             "cluster_name": self.cluster_name,
+            "gcp_conn_id": gcp_conn_id,
         }
         return [
             begin_task(self.movement_parameters.name),
@@ -238,6 +240,7 @@ class DataprocExportRdbmsTableToGcsMotif(
                     },
                     "region": environment.region,
                     "project_id": environment.project,
+                    "gcp_conn_id": gcp_conn_id,
                 },
                 templated={"job"},
             ),
@@ -334,6 +337,7 @@ class DataprocServerlessExportRdbmsTableToGcsMotif(
                     "batch": self.batch_config,
                     "region": environment.region,
                     "batch_id": self.batch_id,
+                    "gcp_conn_id": environment.data_lakehouse_connection_id,
                 },
                 templated={"batch", "batch_id"},
             ),
