@@ -14,6 +14,7 @@ import os
 import re
 import runpy
 from pathlib import Path
+from unittest import mock
 
 import inject
 import pytest
@@ -22,6 +23,8 @@ pytest.importorskip("airflow")
 
 from airflow.configuration import conf  # noqa: E402
 from airflow.sdk import DAG  # noqa: E402
+
+from debussy.backends.airflow import loader  # noqa: E402
 
 from tests.characterization.dag_snapshot import dag_to_snapshot, dump  # noqa: E402
 
@@ -35,11 +38,9 @@ UPDATE = os.environ.get("DEBUSSY_UPDATE_SNAPSHOTS", "").lower() in ("1", "true",
 FIXED_ENV = {
     "DEBUSSY__PROJECT": "snapshot-project",
     "PWD": "/snapshot/pwd",
-    # Some compositions instantiate hooks while the DAG is parsed, which looks
-    # up the connection. These dummy connections never reach a real system.
-    "AIRFLOW_CONN_GOOGLE_CLOUD_DEBUSSY": "google-cloud-platform://",
-    "AIRFLOW_CONN_MYSQL_DEV": "mysql://user:password@localhost:3306/sakila",
 }
+# Parsing a DAG must not need any connection: the scheduler may not have them.
+UNSET_ENV = ("AIRFLOW_CONN_GOOGLE_CLOUD_DEBUSSY", "AIRFLOW_CONN_MYSQL_DEV")
 
 DAGS_FOLDER_PLACEHOLDER = "<DAGS_FOLDER>"
 
@@ -69,6 +70,8 @@ def example_environment(monkeypatch):
     conf.set("core", "dags_folder", str(REPO_ROOT))
     for key, value in FIXED_ENV.items():
         monkeypatch.setenv(key, value)
+    for key in UNSET_ENV:
+        monkeypatch.delenv(key, raising=False)
     inject.clear()
     yield
     inject.clear()
@@ -76,7 +79,10 @@ def example_environment(monkeypatch):
 
 
 def _build_dags(example_file: Path):
-    namespace = runpy.run_path(str(example_file))
+    # The loader logs and skips a pipeline that fails to build; here it must not.
+    with mock.patch.object(loader, "log") as log:
+        namespace = runpy.run_path(str(example_file))
+    assert not log.exception.called, log.exception.call_args_list
     dags = {
         value.dag_id: value for value in namespace.values() if isinstance(value, DAG)
     }

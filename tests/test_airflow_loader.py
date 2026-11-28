@@ -174,13 +174,46 @@ def test_duplicate_dag_id_is_an_error(airflow_conf):
             pipelines_dir="pipelines",
             environment_file="environment.yaml",
             pipelines=[_python_config()],
+            strict=True,
         )
+
+
+def test_duplicate_dag_id_keeps_the_first_pipeline(airflow_conf, caplog):
+    _yaml_pipeline(airflow_conf)
+    namespace = {}
+    dags = load_dags(
+        namespace,
+        pipelines_dir="pipelines",
+        environment_file="environment.yaml",
+        pipelines=[_python_config()],
+    )
+    assert list(namespace) == ["twin"] and len(dags) == 1
+    assert "Duplicate dag id 'twin'" in caplog.text
 
 
 def test_unknown_composition_type_is_an_error(airflow_conf):
     _yaml_pipeline(airflow_conf, composition_type="nope")
     with pytest.raises(ValueError, match="unknown composition_type 'nope'"):
-        load_dags({}, pipelines_dir="pipelines", environment_file="environment.yaml")
+        load_dags(
+            {},
+            pipelines_dir="pipelines",
+            environment_file="environment.yaml",
+            strict=True,
+        )
+
+
+def test_a_broken_pipeline_does_not_hide_the_others(airflow_conf, caplog):
+    _yaml_pipeline(airflow_conf, composition_type="nope")
+    namespace = {}
+    load_dags(
+        namespace,
+        pipelines_dir="pipelines",
+        environment_file="environment.yaml",
+        pipelines=[_python_config("other")],
+    )
+    assert list(namespace) == ["other"]
+    assert "unknown composition_type 'nope'" in caplog.text
+    assert "skipped 1 pipeline(s)" in caplog.text
 
 
 def test_pipelines_dir_needs_an_environment_file():
