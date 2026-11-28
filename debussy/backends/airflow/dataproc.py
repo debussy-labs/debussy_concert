@@ -1,10 +1,9 @@
-from airflow.sdk import TriggerRule
+from typing import Any, Dict, Optional, Sequence
+
 from airflow.providers.google.cloud.operators.dataproc import (
-    DataprocCreateClusterOperator,
+    DataprocCreateBatchOperator,
     DataprocDeleteClusterOperator,
 )
-
-from debussy.core.motif.motif_base import PClusterMotifMixin
 
 
 class DebussyDataprocDeleteClusterOperator(DataprocDeleteClusterOperator):
@@ -17,31 +16,34 @@ class DebussyDataprocDeleteClusterOperator(DataprocDeleteClusterOperator):
             self.log.info("Cluster not found. It may already have been deleted.")
 
 
-class DataprocClusterHandlerMixin:
-    def delete_dataproc_cluster(
-        self: PClusterMotifMixin, dag, task_group
-    ) -> DataprocDeleteClusterOperator:
-        delete_dataproc_cluster = DebussyDataprocDeleteClusterOperator(
-            task_id="delete_dataproc_cluster",
-            project_id=self.config.environment.project,
-            cluster_name=self.cluster_name,
-            region=self.config.environment.region,
-            trigger_rule=TriggerRule.ALL_DONE,
-            dag=dag,
-            task_group=task_group,
-        )
-        return delete_dataproc_cluster
+class DataprocServerlessSubmitJobOperator(DataprocCreateBatchOperator):
+    template_fields: Sequence[str] = (
+        "project_id",
+        "batch",
+        "batch_id",
+        "region",
+        "impersonation_chain",
+    )
 
-    def create_dataproc_cluster(
-        self: PClusterMotifMixin, dag, task_group
-    ) -> DataprocCreateClusterOperator:
-        create_dataproc_cluster = DataprocCreateClusterOperator(
-            task_id="create_dataproc_cluster",
-            project_id=self.config.environment.project,
-            cluster_config=self.cluster_config,
-            region=self.config.environment.region,
-            cluster_name=self.cluster_name,
-            dag=dag,
-            task_group=task_group,
+    def __init__(
+        self,
+        region: Optional[str] = None,
+        project_id: Optional[str] = None,
+        batch: Dict[str, Any] = None,
+        batch_id: Optional[str] = None,
+        timeout: Optional[float] = None,
+        gcp_conn_id: str = "google_cloud_default",
+        **kwargs,
+    ):
+        super().__init__(
+            region=region,
+            project_id=project_id,
+            batch=batch,
+            batch_id=batch_id,
+            timeout=timeout,
+            gcp_conn_id=gcp_conn_id,
+            **kwargs,
         )
-        return create_dataproc_cluster
+
+    def execute(self, context):
+        DataprocCreateBatchOperator.execute(self, context)

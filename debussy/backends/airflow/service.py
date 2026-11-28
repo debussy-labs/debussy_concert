@@ -2,7 +2,7 @@ from enum import Enum
 
 from airflow.sdk import DAG, TaskGroup, chain
 
-from debussy.backends.airflow.tasks import build_task
+from debussy.backends.airflow.tasks import build_task, resolve_task_results
 from debussy.core.service.workflow.protocol import PWorkflowService
 from debussy.core.tasks import validate_tasks
 
@@ -67,9 +67,12 @@ class AirflowService(PWorkflowService):
                 f"Motif {group_id!r} has {len(specs)} tasks: only a motif with"
                 " one task can build it outside a motif group"
             )
-        tasks = [
-            build_task(spec, dag=workflow_dag, task_group=parent) for spec in specs
-        ]
+        tasks, task_ids = [], {}
+        for spec in specs:
+            spec = resolve_task_results(spec, task_ids, workflow_dag.dag_id)
+            task = build_task(spec, dag=workflow_dag, task_group=parent)
+            task_ids[spec.name] = task.task_id
+            tasks.append(task)
         if len(tasks) > 1:
             chain(*tasks)
         return parent if grouped else tasks[0]

@@ -346,13 +346,13 @@
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.tasks.functions.identity>",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "op_args": [
-          "{{ ti.id.hex[:8] }}"
-        ],
-        "op_kwargs": {},
+        "op_args": [],
+        "op_kwargs": {
+          "value": "{{ ti.id.hex[:8] }}"
+        },
         "templates_dict": null
       },
       "trigger_rule": "all_success",
@@ -370,7 +370,7 @@
       ]
     },
     "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
-      "operator": "debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "operator": "debussy.backends.airflow.dataproc.DataprocServerlessSubmitJobOperator",
       "task_group": "DataIngestionMovement_film.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "batch": {
@@ -743,13 +743,13 @@
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.tasks.functions.identity>",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "op_args": [
-          "{{ ti.id.hex[:8] }}"
-        ],
-        "op_kwargs": {},
+        "op_args": [],
+        "op_kwargs": {
+          "value": "{{ ti.id.hex[:8] }}"
+        },
         "templates_dict": null
       },
       "trigger_rule": "all_success",
@@ -767,7 +767,7 @@
       ]
     },
     "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
-      "operator": "debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "operator": "debussy.backends.airflow.dataproc.DataprocServerlessSubmitJobOperator",
       "task_group": "DataIngestionMovement_film_actor.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "batch": {
@@ -1040,13 +1040,13 @@
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id": {
       "operator": "airflow.providers.standard.operators.python.PythonOperator",
-      "python_callable": "<callable debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessExportRdbmsTableToGcsMotif.batch_job_id.<locals>.<lambda>>",
+      "python_callable": "<callable debussy.core.tasks.functions.identity>",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
-        "op_args": [
-          "{{ ti.id.hex[:8] }}"
-        ],
-        "op_kwargs": {},
+        "op_args": [],
+        "op_kwargs": {
+          "value": "{{ ti.id.hex[:8] }}"
+        },
         "templates_dict": null
       },
       "trigger_rule": "all_success",
@@ -1064,7 +1064,7 @@
       ]
     },
     "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif.create_dataproc_serverless": {
-      "operator": "debussy.pipeline.data_ingestion.motif.export_table.DataprocServerlessSubmitJobOperator",
+      "operator": "debussy.backends.airflow.dataproc.DataprocServerlessSubmitJobOperator",
       "task_group": "DataIngestionMovement_film_category.IngestionSourceToRawVaultStoragePhrase.DataprocServerlessExportRdbmsTableToGcsMotif",
       "templated_fields": {
         "batch": {

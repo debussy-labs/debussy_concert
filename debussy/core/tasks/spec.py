@@ -42,6 +42,9 @@ class TaskSpec:
     #: How many times to run the task again after a failure. ``None`` leaves
     #: it to the backend's default.
     retries: Optional[int] = None
+    #: Run the task even when an earlier task of the motif failed, for example
+    #: to delete a cluster an earlier task created.
+    always_run: bool = False
 
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not _NAME_PATTERN.match(self.name):
@@ -65,6 +68,9 @@ class TaskSpec:
             raise ValueError(
                 f"Task {self.name!r}: retries must be a non-negative integer"
             )
+
+        if not isinstance(self.always_run, bool):
+            raise TypeError(f"Task {self.name!r}: always_run must be a bool")
 
         # Copy and freeze the collections, so a spec cannot change after it is
         # built, even if the caller keeps a reference to what it passed in.
@@ -108,6 +114,24 @@ class TaskSpec:
             )
             for key, value in self.params.items()
         }
+
+
+def result_of(task_name: str) -> str:
+    """A template expression for the result of an earlier task of the same
+    motif, to use in a templated param.
+
+    For example ``f"cluster-{result_of('name_suffix')}"``. Each backend
+    resolves it: the Airflow backend reads the task's XCom.
+    """
+    if not isinstance(task_name, str) or not _NAME_PATTERN.match(task_name):
+        raise ValueError(f"Invalid task name {task_name!r}")
+    return "{{ task_result('" + task_name + "') }}"
+
+
+#: Matches the ``task_result('name')`` calls that ``result_of`` writes.
+TASK_RESULT_PATTERN = re.compile(
+    r"task_result\(\s*'([A-Za-z0-9_][A-Za-z0-9_.-]*)'\s*\)"
+)
 
 
 def validate_tasks(specs: Iterable[TaskSpec]) -> tuple:

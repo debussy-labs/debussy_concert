@@ -99,7 +99,10 @@ class RunContext:
     Airflow (``logical_date``, ``data_interval_end``, ``dag_run.start_date``,
     ``ts_nodash``, ``macros.ds_format``, ``ti.id``, ``ti.xcom_pull`` and a few
     more, see ``template_variables``), so a pipeline's YAML renders the same
-    way on every backend.
+    way on every backend. ``task_result(name)``, written by
+    ``debussy.core.tasks.result_of``, reads ``results``: the executor gives
+    each task a context whose results are keyed by the task names of its
+    motif.
     """
 
     #: The date the run is for. Naive datetimes are taken as UTC.
@@ -174,6 +177,7 @@ class RunContext:
                 start_date=self.run_start,
             ),
             "ti": _TaskInstance(self, task_name),
+            "task_result": self.results.get,
             "macros": MACROS,
         }
 

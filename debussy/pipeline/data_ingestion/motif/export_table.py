@@ -1,25 +1,14 @@
-from airflow.sdk import DAG
-from airflow.sdk import TaskGroup
-from typing import Any, Optional, Sequence, Dict
-from google.protobuf.duration_pb2 import Duration
-from airflow.providers.standard.operators.python import PythonOperator
-from airflow.providers.google.cloud.operators.dataproc import (
-    DataprocSubmitJobOperator,
-    DataprocCreateBatchOperator,
-)
-
-from debussy.core.phrase.protocols import PExportDataToStorageMotif
 from debussy.core.motif.motif_base import MotifBase, PClusterMotifMixin
-from debussy.backends.airflow.dataproc import DataprocClusterHandlerMixin
-from debussy.backends.airflow.bigquery_query_job import BigQueryQueryJobMotif
-from debussy.pipeline.data_ingestion.config.rdbms_data_ingestion import (
-    ConfigRdbmsDataIngestion,
-)
+from debussy.core.phrase.protocols import PExportDataToStorageMotif
+from debussy.core.tasks import TaskSpec, result_of
+from debussy.core.tasks.functions import identity
 from debussy.pipeline.data_ingestion.config.movement_parameters.rdbms_data_ingestion import (
     RdbmsDataIngestionMovementParameters,
 )
-
-from debussy.backends.airflow.motifs import StartOperator
+from debussy.pipeline.data_ingestion.config.rdbms_data_ingestion import (
+    ConfigRdbmsDataIngestion,
+)
+from debussy.pipeline.reverse_etl.motif.bigquery_query_job import BigQueryQueryJobMotif
 
 
 class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
@@ -50,42 +39,8 @@ class ExportBigQueryQueryToGcsMotif(BigQueryQueryJobMotif):
         return self
 
 
-class DataprocServerlessSubmitJobOperator(DataprocCreateBatchOperator):
-    template_fields: Sequence[str] = (
-        "project_id",
-        "batch",
-        "batch_id",
-        "region",
-        "impersonation_chain",
-    )
-
-    def __init__(
-        self,
-        region: Optional[str] = None,
-        project_id: Optional[str] = None,
-        batch: Dict[str, Any] = None,
-        batch_id: Optional[str] = None,
-        timeout: Optional[float] = None,
-        gcp_conn_id: str = "google_cloud_default",
-        **kwargs,
-    ):
-        super().__init__(
-            region=region,
-            project_id=project_id,
-            batch=batch,
-            batch_id=batch_id,
-            timeout=timeout,
-            gcp_conn_id=gcp_conn_id,
-            **kwargs,
-        )
-
-    def execute(self, context):
-        DataprocCreateBatchOperator.execute(self, context)
-
-
 class DataprocExportRdbmsTableToGcsMotif(
     MotifBase,
-    DataprocClusterHandlerMixin,
     PClusterMotifMixin,
     PExportDataToStorageMotif,
 ):
@@ -105,7 +60,6 @@ class DataprocExportRdbmsTableToGcsMotif(
     endpoint_enable_http_port_access = True
     internal_ip_only = False
     idle_seconds_delete_ttl = 8 * 60  # 8 minutes
-    _cluster_name_task_id = None
 
     def __init__(
         self,
@@ -160,11 +114,11 @@ class DataprocExportRdbmsTableToGcsMotif(
 
     @property
     def cluster_name(self):
-        if not self._cluster_name_task_id:
-            raise RuntimeError(
-                "Cluster name is not defined or being accessed before being defined"
-            )
-        return self._cluster_name_task_id
+        # max number of characters for dataproc cluster names is 34
+        return (
+            f"dby{result_of('cluster_name_id')}"
+            f"{self.config.source_name.replace('_', '').lower()[:22]}"
+        )
 
     @property
     def cluster_config(self):
@@ -173,6 +127,8 @@ class DataprocExportRdbmsTableToGcsMotif(
         region = environment.region
         zone = environment.zone
         staging_bucket = environment.staging_bucket
+
+        from google.protobuf.duration_pb2 import Duration
 
         init_action_timeout = Duration()
         init_action_timeout.FromSeconds(500)
@@ -243,88 +199,62 @@ class DataprocExportRdbmsTableToGcsMotif(
         self.destination_storage_uri = destination_storage_uri
         return self
 
-    def build(self, dag, parent_task_group: TaskGroup):
-        task_group = TaskGroup(
-            group_id=self.name, dag=dag, parent_group=parent_task_group
-        )
-
-        start = StartOperator(
-            phase=self.movement_parameters.name, dag=dag, task_group=task_group
-        )
-
-        cluster_name_id = self.cluster_name_id(dag, task_group)
-        self._cluster_name_task_id = self.build_cluster_name(dag, cluster_name_id)
-
-        create_dataproc_cluster = self.create_dataproc_cluster(dag, task_group)
-        jdbc_to_raw_vault = self.jdbc_to_raw_vault(
-            dag, task_group, self.movement_parameters.extraction_query
-        )
-        delete_dataproc_cluster = self.delete_dataproc_cluster(dag, task_group)
-        self.workflow_service.chain_tasks(
-            start,
-            cluster_name_id,
-            create_dataproc_cluster,
-            jdbc_to_raw_vault,
-            delete_dataproc_cluster,
-        )
-        return task_group
-
-    def build_cluster_name(self, dag: DAG, cluster_name_task):
-        # max number of characters for dataproc cluster names is 34
-        # for usage in cluster_name property
-        return (
-            f"dby{{{{ ti.xcom_pull(dag_id='{dag.dag_id}', task_ids='{cluster_name_task.task_id}') }}}}"
-            f"{self.config.source_name.replace('_', '').lower()[:22]}"
-        )
-
-    def cluster_name_id(self, dag, task_group):
-        cluster_name_id = PythonOperator(
-            task_id="cluster_name_id",
-            python_callable=lambda x: x,
-            op_args=["{{ ti.id.hex[:8] }}"],
-            dag=dag,
-            task_group=task_group,
-        )
-        return cluster_name_id
-
-    def jdbc_to_raw_vault(self, dag, task_group, extraction_query):
-
+    def tasks(self):
+        environment = self.config.environment
         secret_uri = f"{self.config.secret_manager_uri}/versions/latest"
-        run_ts = "{{ ts_nodash }}"
-
-        jdbc_to_raw_vault = DataprocSubmitJobOperator(
-            task_id="jdbc_to_raw_vault",
-            job={
-                "reference": {"project_id": self.config.environment.project},
-                "placement": {"cluster_name": self.cluster_name},
-                "pyspark_job": {
-                    "main_python_file_uri": self.main_python_file_uri,
-                    "args": [
-                        self.jdbc_driver,
-                        self.jdbc_url,
-                        secret_uri,
-                        self.config.source_name,
-                        extraction_query,
-                        run_ts,
-                        f"{self.destination_storage_uri}/{self.gcs_partition}",
-                    ],
+        cluster = {
+            "project_id": environment.project,
+            "region": environment.region,
+            "cluster_name": self.cluster_name,
+        }
+        return [
+            begin_task(self.movement_parameters.name),
+            short_id_task("cluster_name_id"),
+            TaskSpec(
+                name="create_dataproc_cluster",
+                action="dataproc.create_cluster",
+                params={**cluster, "cluster_config": self.cluster_config},
+                templated={"cluster_name"},
+            ),
+            TaskSpec(
+                name="jdbc_to_raw_vault",
+                action="dataproc.submit_job",
+                params={
+                    "job": {
+                        "reference": {"project_id": environment.project},
+                        "placement": {"cluster_name": self.cluster_name},
+                        "pyspark_job": {
+                            "main_python_file_uri": self.main_python_file_uri,
+                            "args": [
+                                self.jdbc_driver,
+                                self.jdbc_url,
+                                secret_uri,
+                                self.config.source_name,
+                                self.movement_parameters.extraction_query,
+                                "{{ ts_nodash }}",
+                                f"{self.destination_storage_uri}/{self.gcs_partition}",
+                            ],
+                        },
+                    },
+                    "region": environment.region,
+                    "project_id": environment.project,
                 },
-            },
-            region=self.config.environment.region,
-            project_id=self.config.environment.project,
-            dag=dag,
-            task_group=task_group,
-        )
-
-        return jdbc_to_raw_vault
+                templated={"job"},
+            ),
+            TaskSpec(
+                name="delete_dataproc_cluster",
+                action="dataproc.delete_cluster",
+                params=cluster,
+                templated={"cluster_name"},
+                always_run=True,
+            ),
+        ]
 
 
 class DataprocServerlessExportRdbmsTableToGcsMotif(
     MotifBase, PExportDataToStorageMotif
 ):
     config: ConfigRdbmsDataIngestion
-
-    _batch_id_task_id = None
 
     def __init__(
         self,
@@ -352,11 +282,12 @@ class DataprocServerlessExportRdbmsTableToGcsMotif(
 
     @property
     def batch_id(self):
-        if not self._batch_id_task_id:
-            raise RuntimeError(
-                "serverless name id is not defined or being accessed before being defined"
-            )
-        return self._batch_id_task_id
+        # max number of characters for dataproc serverless names is 34
+        return (
+            f"dby{result_of('batch_job_id')}"
+            f"-{self.config.source_name.replace('_', '').lower()[:22]}"
+            f"-{self.movement_parameters.name.replace('_', '').lower()[:22]}"
+        )
 
     @property
     def batch_config(self):
@@ -390,49 +321,38 @@ class DataprocServerlessExportRdbmsTableToGcsMotif(
         self.destination_storage_uri = destination_storage_uri
         return self
 
-    def build(self, dag, parent_task_group: TaskGroup):
-        task_group = TaskGroup(
-            group_id=self.name, dag=dag, parent_group=parent_task_group
-        )
+    def tasks(self):
+        environment = self.config.environment
+        return [
+            begin_task(self.movement_parameters.name),
+            short_id_task("batch_job_id"),
+            TaskSpec(
+                name="create_dataproc_serverless",
+                action="dataproc.create_batch",
+                params={
+                    "project_id": environment.project,
+                    "batch": self.batch_config,
+                    "region": environment.region,
+                    "batch_id": self.batch_id,
+                },
+                templated={"batch", "batch_id"},
+            ),
+        ]
 
-        start = StartOperator(
-            phase=self.movement_parameters.name, dag=dag, task_group=task_group
-        )
 
-        batch_id = self.batch_job_id(dag, task_group)
-        self._batch_id_task_id = self.build_batch_id_task_id(dag, batch_id)
+def begin_task(phase: str) -> TaskSpec:
+    """The first task of a phase, which returns the run's dates."""
+    return TaskSpec(
+        name=f"begin_{phase}", action="debussy.begin", params={"phase": phase}
+    )
 
-        create_dataproc_serverless = self.submit_job(dag, task_group)
-        self.workflow_service.chain_tasks(start, batch_id, create_dataproc_serverless)
-        return task_group
 
-    def build_batch_id_task_id(self, dag: DAG, batch_id):
-        # max number of characters for dataproc serverless names is 34
-        # for usage in serverless_name property
-        return (
-            f"dby{{{{ ti.xcom_pull(dag_id='{dag.dag_id}', task_ids='{batch_id.task_id}') }}}}"
-            f"-{self.config.source_name.replace('_', '').lower()[:22]}"
-            f"-{self.movement_parameters.name.replace('_', '').lower()[:22]}"
-        )
-
-    def batch_job_id(self, dag, task_group):
-        batch_id = PythonOperator(
-            task_id="batch_job_id",
-            python_callable=lambda x: x,
-            op_args=["{{ ti.id.hex[:8] }}"],
-            dag=dag,
-            task_group=task_group,
-        )
-        return batch_id
-
-    def submit_job(self, dag, task_group) -> DataprocServerlessSubmitJobOperator:
-        create_dataproc_serverless = DataprocServerlessSubmitJobOperator(
-            task_id="create_dataproc_serverless",
-            project_id=self.config.environment.project,
-            batch=self.batch_config,
-            region=self.config.environment.region,
-            batch_id=self.batch_id,
-            dag=dag,
-            task_group=task_group,
-        )
-        return create_dataproc_serverless
+def short_id_task(name: str) -> TaskSpec:
+    """A task whose result is a short id unique to the task instance, used to
+    name cloud resources."""
+    return TaskSpec(
+        name=name,
+        action=identity,
+        params={"value": "{{ ti.id.hex[:8] }}"},
+        templated={"value"},
+    )

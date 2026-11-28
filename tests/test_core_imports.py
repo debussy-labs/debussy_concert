@@ -1,9 +1,10 @@
 """The core must import without Airflow, a cloud SDK or dbt.
 
-Airflow-specific code lives in ``debussy.backends.airflow``. The pipeline
-compositions and motifs still build Airflow operators directly, so they are
-Airflow-only until the engine-neutral task contract exists. Every other module
-has to import with Airflow blocked, even when Airflow is installed.
+Airflow-specific code lives in ``debussy.backends.airflow``. Motifs describe
+their work with the engine-neutral task contract (``debussy.core.tasks``), so
+they import without Airflow; the pipeline compositions still build Airflow
+objects directly. Every other module has to import with Airflow blocked, even
+when Airflow is installed.
 """
 
 import subprocess
@@ -13,9 +14,9 @@ from pathlib import Path
 PACKAGE_ROOT = Path(__file__).resolve().parents[1] / "debussy"
 
 # Directories whose modules need Airflow.
-AIRFLOW_ONLY_DIRS = {"backends", "composition", "motif"}
-# ``composition`` and ``motif`` are Airflow-only only below ``pipeline``: the
-# core versions of these packages must stay importable.
+AIRFLOW_ONLY_DIRS = {"backends", "composition"}
+# ``composition`` is Airflow-only only below ``pipeline``: the core version of
+# this package must stay importable.
 CORE_DIRS = {PACKAGE_ROOT / "core"}
 
 
@@ -38,6 +39,8 @@ def test_core_modules_import_without_airflow():
     assert "debussy.core.composition.composition_base" in modules
     assert "debussy.pipeline.reverse_etl.config.reverse_etl" in modules
     assert "debussy.core.tasks.context" in modules
+    assert "debussy.pipeline.reverse_etl.motif.bigquery_query_job" in modules
+    assert "debussy.pipeline.data_ingestion.motif.export_table" in modules
 
     script = (
         "import importlib, sys\n"
